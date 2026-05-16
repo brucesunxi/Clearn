@@ -1,0 +1,47 @@
+{
+  "id": "my-day",
+  "title": "我的一天",
+  "titleEn": "My Day",
+  "level": 2,
+  "emoji": "⏰",
+  "paragraphs": [
+    {
+      "text": "每天早上七点，我起床了。",
+      "translation": "Every morning at seven o'clock, I get up."
+    },
+    {
+      "text": "我穿上衣服，洗洗脸，然后吃早饭。",
+      "translation": "I put on my clothes, wash my face, and then eat breakfast."
+    },
+    {
+      "text": "吃完早饭，妈妈带我去学校。",
+      "translation": "After breakfast, mom takes me to school."
+    },
+    {
+      "text": "在学校里，我学中文、数学和画画。",
+      "translation": "At school, I learn Chinese, math, and drawing."
+    },
+    {
+      "text": "我喜欢和朋友们一起玩。",
+      "translation": "I like to play with my friends."
+    },
+    {
+      "text": "下午三点，我回家了。",
+      "translation": "At three in the afternoon, I go home."
+    }
+  ],
+  "vocabulary": [
+    { "word": "每天", "pinyin": "měitiān", "meaning": "every day" },
+    { "word": "起床", "pinyin": "qǐchuáng", "meaning": "to get up" },
+    { "word": "穿", "pinyin": "chuān", "meaning": "to wear, to put on" },
+    { "word": "衣服", "pinyin": "yīfu", "meaning": "clothes" },
+    { "word": "洗脸", "pinyin": "xǐ liǎn", "meaning": "to wash face" },
+    { "word": "早饭", "pinyin": "zǎofàn", "meaning": "breakfast" },
+    { "word": "学校", "pinyin": "xuéxiào", "meaning": "school" },
+    { "word": "数学", "pinyin": "shùxué", "meaning": "math" },
+    { "word": "画画", "pinyin": "huàhuà", "meaning": "to draw" },
+    { "word": "朋友", "pinyin": "péngyǒu", "meaning": "friend" },
+    { "word": "一起", "pinyin": "yìqǐ", "meaning": "together" },
+    { "word": "回家", "pinyin": "huíjiā", "meaning": "to go home" }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "my-family",
+  "title": "我的家",
+  "titleEn": "My Family",
+  "level": 1,
+  "emoji": "🏠",
+  "paragraphs": [
+    {
+      "text": "我家有三口人。",
+      "translation": "My family has three people."
+    },
+    {
+      "text": "爸爸、妈妈和我。",
+      "translation": "Dad, mom, and me."
+    },
+    {
+      "text": "爸爸很高，妈妈很漂亮。",
+      "translation": "Dad is very tall, mom is very pretty."
+    },
+    {
+      "text": "我爱我的家。",
+      "translation": "I love my family."
+    }
+  ],
+  "vocabulary": [
+    { "word": "家", "pinyin": "jiā", "meaning": "family, home" },
+    { "word": "有", "pinyin": "yǒu", "meaning": "to have" },
+    { "word": "三口人", "pinyin": "sān kǒu rén", "meaning": "three people (in a family)" },
+    { "word": "爸爸", "pinyin": "bàba", "meaning": "dad" },
+    { "word": "妈妈", "pinyin": "māma", "meaning": "mom" },
+    { "word": "高", "pinyin": "gāo", "meaning": "tall" },
+    { "word": "漂亮", "pinyin": "piàoliang", "meaning": "pretty" },
+    { "word": "爱", "pinyin": "ài", "meaning": "to love" }
+  ]
+}

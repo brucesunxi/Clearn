@@ -1,0 +1,41 @@
+{
+  "id": "pets",
+  "title": "我的小动物",
+  "titleEn": "My Little Pets",
+  "level": 2,
+  "emoji": "🐱",
+  "paragraphs": [
+    {
+      "text": "我有一只小猫，它叫花花。",
+      "translation": "I have a little cat, its name is Huahua."
+    },
+    {
+      "text": "花花的毛是白色的，眼睛大大的。",
+      "translation": "Huahua's fur is white, and its eyes are big."
+    },
+    {
+      "text": "它最喜欢吃鱼和喝牛奶。",
+      "translation": "It likes to eat fish and drink milk the most."
+    },
+    {
+      "text": "每天放学回家，花花都跑过来找我。",
+      "translation": "Every day when I come home from school, Huahua runs over to me."
+    },
+    {
+      "text": "我和花花一起玩球，真开心！",
+      "translation": "Huahua and I play ball together, so happy!"
+    }
+  ],
+  "vocabulary": [
+    { "word": "猫", "pinyin": "māo", "meaning": "cat" },
+    { "word": "毛", "pinyin": "máo", "meaning": "fur" },
+    { "word": "白色", "pinyin": "báisè", "meaning": "white color" },
+    { "word": "眼睛", "pinyin": "yǎnjīng", "meaning": "eyes" },
+    { "word": "鱼", "pinyin": "yú", "meaning": "fish" },
+    { "word": "牛奶", "pinyin": "niúnǎi", "meaning": "milk" },
+    { "word": "放学", "pinyin": "fàngxué", "meaning": "school ends" },
+    { "word": "跑", "pinyin": "pǎo", "meaning": "to run" },
+    { "word": "球", "pinyin": "qiú", "meaning": "ball" },
+    { "word": "开心", "pinyin": "kāixīn", "meaning": "happy" }
+  ]
+}

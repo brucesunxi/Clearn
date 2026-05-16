@@ -1,0 +1,41 @@
+{
+  "id": "spring-festival",
+  "title": "春节",
+  "titleEn": "Spring Festival",
+  "level": 3,
+  "emoji": "🧧",
+  "paragraphs": [
+    {
+      "text": "春节是中国最重要的节日。",
+      "translation": "Spring Festival is the most important holiday in China."
+    },
+    {
+      "text": "春节的时候，全家人都会聚在一起吃饭。",
+      "translation": "During Spring Festival, the whole family gets together to eat."
+    },
+    {
+      "text": "大家会吃饺子、鱼和年糕。",
+      "translation": "Everyone eats dumplings, fish, and New Year cake."
+    },
+    {
+      "text": "小朋友们最喜欢收红包，因为红包里有压岁钱。",
+      "translation": "Children like receiving red envelopes the most, because there is lucky money inside."
+    },
+    {
+      "text": "晚上，大家还会放烟花，五颜六色的，非常漂亮！",
+      "translation": "In the evening, people set off fireworks — they are colorful and very beautiful!"
+    }
+  ],
+  "vocabulary": [
+    { "word": "春节", "pinyin": "chūnjié", "meaning": "Spring Festival" },
+    { "word": "重要", "pinyin": "zhòngyào", "meaning": "important" },
+    { "word": "节日", "pinyin": "jiérì", "meaning": "festival, holiday" },
+    { "word": "聚", "pinyin": "jù", "meaning": "to gather" },
+    { "word": "饺子", "pinyin": "jiǎozi", "meaning": "dumplings" },
+    { "word": "年糕", "pinyin": "niángāo", "meaning": "New Year cake" },
+    { "word": "红包", "pinyin": "hóngbāo", "meaning": "red envelope" },
+    { "word": "压岁钱", "pinyin": "yāsuìqián", "meaning": "lucky money" },
+    { "word": "烟花", "pinyin": "yānhuā", "meaning": "fireworks" },
+    { "word": "五颜六色", "pinyin": "wǔyánliùsè", "meaning": "colorful" }
+  ]
+}

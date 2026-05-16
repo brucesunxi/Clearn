@@ -1,0 +1,42 @@
+{
+  "id": "great-wall",
+  "title": "长城",
+  "titleEn": "The Great Wall",
+  "level": 3,
+  "emoji": "🏯",
+  "paragraphs": [
+    {
+      "text": "长城在中国，是非常有名的建筑。",
+      "translation": "The Great Wall is in China and is a very famous building."
+    },
+    {
+      "text": "长城很长很长，像一条巨大的龙，睡在山顶上。",
+      "translation": "The Great Wall is very, very long, like a giant dragon sleeping on the mountaintops."
+    },
+    {
+      "text": "很久以前，人们修建长城是为了保护自己的国家。",
+      "translation": "A long time ago, people built the Great Wall to protect their country."
+    },
+    {
+      "text": "今天，全世界的人都去长城旅游。",
+      "translation": "Today, people from all over the world travel to the Great Wall."
+    },
+    {
+      "text": "如果你去北京，一定要去看看长城！",
+      "translation": "If you go to Beijing, you must go see the Great Wall!"
+    }
+  ],
+  "vocabulary": [
+    { "word": "长城", "pinyin": "Chángchéng", "meaning": "Great Wall" },
+    { "word": "有名", "pinyin": "yǒumíng", "meaning": "famous" },
+    { "word": "建筑", "pinyin": "jiànzhù", "meaning": "building, architecture" },
+    { "word": "条", "pinyin": "tiáo", "meaning": "measure word for long things" },
+    { "word": "巨大", "pinyin": "jùdà", "meaning": "giant, huge" },
+    { "word": "龙", "pinyin": "lóng", "meaning": "dragon" },
+    { "word": "山顶", "pinyin": "shāndǐng", "meaning": "mountaintop" },
+    { "word": "修建", "pinyin": "xiūjiàn", "meaning": "to build, to construct" },
+    { "word": "保护", "pinyin": "bǎohù", "meaning": "to protect" },
+    { "word": "国家", "pinyin": "guójiā", "meaning": "country, nation" },
+    { "word": "旅游", "pinyin": "lǚyóu", "meaning": "to travel" }
+  ]
+}

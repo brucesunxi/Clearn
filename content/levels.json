@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "name": "启蒙",
+    "emoji": "🌱",
+    "color": "#FF6B6B",
+    "description": "适合 4-6 岁的小朋友，认识最简单的字和词",
+    "ageRange": "4-6岁",
+    "charCount": "50-100字"
+  },
+  {
+    "id": 2,
+    "name": "初级",
+    "emoji": "🌿",
+    "color": "#4ECDC4",
+    "description": "适合 6-8 岁的小朋友，读短小的故事",
+    "ageRange": "6-8岁",
+    "charCount": "200-400字"
+  },
+  {
+    "id": 3,
+    "name": "中级",
+    "emoji": "🌳",
+    "color": "#45B7D1",
+    "description": "适合 8-10 岁的孩子，阅读更长的故事",
+    "ageRange": "8-10岁",
+    "charCount": "500-800字"
+  },
+  {
+    "id": 4,
+    "name": "高级",
+    "emoji": "🌲",
+    "color": "#96CEB4",
+    "description": "适合 10 岁以上的孩子，阅读成语和历史故事",
+    "ageRange": "10岁+",
+    "charCount": "800+字"
+  }
+]

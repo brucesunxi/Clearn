@@ -1,0 +1,34 @@
+{
+  "id": "hello",
+  "title": "你好",
+  "titleEn": "Hello",
+  "level": 1,
+  "emoji": "👋",
+  "paragraphs": [
+    {
+      "text": "你好！我叫小明。",
+      "translation": "Hello! My name is Xiaoming."
+    },
+    {
+      "text": "我五岁了。",
+      "translation": "I am five years old."
+    },
+    {
+      "text": "我喜欢吃苹果。",
+      "translation": "I like to eat apples."
+    },
+    {
+      "text": "你呢？",
+      "translation": "How about you?"
+    }
+  ],
+  "vocabulary": [
+    { "word": "你好", "pinyin": "nǐ hǎo", "meaning": "hello" },
+    { "word": "我", "pinyin": "wǒ", "meaning": "I, me" },
+    { "word": "叫", "pinyin": "jiào", "meaning": "to be called" },
+    { "word": "岁", "pinyin": "suì", "meaning": "years old" },
+    { "word": "喜欢", "pinyin": "xǐhuān", "meaning": "to like" },
+    { "word": "吃", "pinyin": "chī", "meaning": "to eat" },
+    { "word": "苹果", "pinyin": "píngguǒ", "meaning": "apple" }
+  ]
+}
