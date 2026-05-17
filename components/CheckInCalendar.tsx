@@ -1,51 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { getCheckInData, getMonthData, isCheckedInToday } from '@/lib/checkin'
+import { useState } from 'react'
+import { getCheckInData, getMonthData } from '@/lib/checkin'
 
 const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
 
 export default function CheckInCalendar() {
-  const [checkin, setCheckin] = useState(() => getCheckInData())
-  const [todayChecked, setTodayChecked] = useState(false)
+  const [checkin] = useState(() => getCheckInData())
   const now = new Date()
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
-
-  useEffect(() => {
-    setTodayChecked(isCheckedInToday())
-  }, [])
-
-  const handleCheckIn = () => {
-    if (todayChecked) return
-    const { doCheckIn } = require('@/lib/checkin')
-    const newData = doCheckIn()
-    setCheckin(newData)
-    setTodayChecked(true)
-  }
 
   const days = getMonthData(year, month)
   const firstDayOfMonth = new Date(year, month - 1, 1).getDay()
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-      {/* Streak display */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-lg font-bold text-gray-800">学习打卡</h2>
-          <p className="text-sm text-gray-400">坚持学习，每天进步</p>
-        </div>
-        <button
-          onClick={handleCheckIn}
-          disabled={todayChecked}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-            todayChecked
-              ? 'bg-green-100 text-green-600 border border-green-200'
-              : 'bg-orange-500 text-white hover:bg-orange-600 shadow-sm'
-          }`}
-        >
-          {todayChecked ? '✅ 已打卡' : '📌 今日打卡'}
-        </button>
+      <div className="mb-4">
+        <h2 className="text-lg font-bold text-gray-800">学习打卡</h2>
+        <p className="text-sm text-gray-400">
+          完成一轮单词学习自动打卡，坚持就是胜利
+        </p>
       </div>
 
       {/* Stats */}
@@ -104,7 +79,6 @@ export default function CheckInCalendar() {
             {w}
           </div>
         ))}
-        {/* Empty cells before first day */}
         {Array.from({ length: firstDayOfMonth }).map((_, i) => (
           <div key={`empty-${i}`} />
         ))}
@@ -114,9 +88,7 @@ export default function CheckInCalendar() {
             <div
               key={d.date}
               className={`aspect-square rounded-lg flex items-center justify-center text-sm ${
-                d.checked
-                  ? 'bg-green-100'
-                  : 'text-gray-400'
+                d.checked ? 'bg-green-100' : 'text-gray-400'
               }`}
             >
               {d.checked ? '🟢' : dateNum}

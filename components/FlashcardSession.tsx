@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from 'react'
 import Flashcard from './Flashcard'
 import type { Article, VocabularyItem } from '@/lib/types'
 import { buildWordDatabase, getNewWords, getReviewWords, recordAnswer } from '@/lib/words'
+import { doCheckIn } from '@/lib/checkin'
 
 interface FlashcardSessionProps {
   articles: Article[]
@@ -65,6 +66,7 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
     if (currentIndex + 1 < cards.length) {
       setCurrentIndex((i) => i + 1)
     } else {
+      doCheckIn() // Only check in after completing ALL words
       setStep('summary')
     }
   }, [cards, currentIndex])

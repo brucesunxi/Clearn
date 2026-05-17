@@ -153,10 +153,6 @@ export function recordAnswer(
 
   saveAllProgress(progress)
 
-  // Trigger auto-checkin on learning activity
-  const { doCheckIn } = require('./checkin')
-  doCheckIn()
-
   return progress[wordId]
 }
 
