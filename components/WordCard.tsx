@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
 import type { VocabularyItem } from '@/lib/types'
 
@@ -10,6 +11,7 @@ interface WordCardProps {
 }
 
 export default function WordCard({ word, onClose }: WordCardProps) {
+  const { t } = useTranslation()
   const [playing, setPlaying] = useState(false)
 
   const handleSpeak = () => {
@@ -38,7 +40,7 @@ export default function WordCard({ word, onClose }: WordCardProps) {
         <p className="text-base text-gray-600 mb-3">{word.meaning}</p>
         {word.tips && (
           <div className="bg-orange-50 rounded-xl p-3 border border-orange-100">
-            <p className="text-xs text-orange-400 font-medium mb-1">💡 记忆技巧</p>
+            <p className="text-xs text-orange-400 font-medium mb-1">💡 {t('wordcard.tips')}</p>
             <p className="text-sm text-gray-600 leading-relaxed">{word.tips}</p>
           </div>
         )}
@@ -46,7 +48,7 @@ export default function WordCard({ word, onClose }: WordCardProps) {
           onClick={onClose}
           className="mt-4 w-full py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm text-gray-500 transition-colors"
         >
-          关闭
+          {t('wordcard.close')}
         </button>
       </div>
     </div>

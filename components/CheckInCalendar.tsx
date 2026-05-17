@@ -1,11 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslation } from '@/lib/i18n/context'
 import { getCheckInData, getMonthData } from '@/lib/checkin'
 
-const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六']
+const WEEKDAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const WEEKDAYS_ZH = ['日', '一', '二', '三', '四', '五', '六']
 
 export default function CheckInCalendar() {
+  const { locale, t } = useTranslation()
   const [checkin] = useState(() => getCheckInData())
   const now = new Date()
   const [year, setYear] = useState(now.getFullYear())
@@ -13,58 +16,47 @@ export default function CheckInCalendar() {
 
   const days = getMonthData(year, month)
   const firstDayOfMonth = new Date(year, month - 1, 1).getDay()
+  const weekdays = locale === 'zh' ? WEEKDAYS_ZH : WEEKDAYS_EN
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
       <div className="mb-4">
-        <h2 className="text-lg font-bold text-gray-800">学习打卡</h2>
-        <p className="text-sm text-gray-400">
-          完成一轮单词学习自动打卡，坚持就是胜利
-        </p>
+        <h2 className="text-lg font-bold text-gray-800">{t('checkin.title')}</h2>
+        <p className="text-sm text-gray-400">{t('checkin.desc')}</p>
       </div>
 
-      {/* Stats */}
       <div className="flex gap-6 mb-5">
         <div className="text-center">
           <div className="text-2xl font-bold text-orange-500">{checkin.currentStreak}</div>
-          <div className="text-xs text-gray-400">🔥 连续天数</div>
+          <div className="text-xs text-gray-400">🔥 {t('checkin.streak')}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-blue-500">{checkin.history.length}</div>
-          <div className="text-xs text-gray-400">📅 累计天数</div>
+          <div className="text-xs text-gray-400">📅 {t('checkin.total')}</div>
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-purple-500">{checkin.longestStreak}</div>
-          <div className="text-xs text-gray-400">🏆 最长记录</div>
+          <div className="text-xs text-gray-400">🏆 {t('checkin.best')}</div>
         </div>
       </div>
 
-      {/* Month navigation */}
       <div className="flex items-center justify-between mb-3">
         <button
           onClick={() => {
-            if (month === 1) {
-              setYear(year - 1)
-              setMonth(12)
-            } else {
-              setMonth(month - 1)
-            }
+            if (month === 1) { setYear(year - 1); setMonth(12) }
+            else setMonth(month - 1)
           }}
           className="text-gray-400 hover:text-gray-600 p-1"
         >
           ◀
         </button>
         <span className="text-sm font-medium text-gray-700">
-          {year}年{month}月
+          {locale === 'zh' ? `${year}年${month}月` : `${month}/${year}`}
         </span>
         <button
           onClick={() => {
-            if (month === 12) {
-              setYear(year + 1)
-              setMonth(1)
-            } else {
-              setMonth(month + 1)
-            }
+            if (month === 12) { setYear(year + 1); setMonth(1) }
+            else setMonth(month + 1)
           }}
           className="text-gray-400 hover:text-gray-600 p-1"
         >
@@ -72,9 +64,8 @@ export default function CheckInCalendar() {
         </button>
       </div>
 
-      {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-1">
-        {WEEKDAYS.map((w) => (
+        {weekdays.map((w) => (
           <div key={w} className="text-center text-xs text-gray-400 py-1 font-medium">
             {w}
           </div>

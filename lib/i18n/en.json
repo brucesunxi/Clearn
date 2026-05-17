@@ -1,0 +1,84 @@
+{
+  "site.title": "Chinese Joy - Learn Chinese Through Reading",
+  "site.description": "A leveled Chinese reading platform for children. Make learning Chinese fun and easy.",
+  "site.footer": "Chinese Joy - Helping kids around the world fall in love with Chinese",
+
+  "lang.en": "EN",
+  "lang.zh": "中文",
+
+  "nav.home": "Home",
+  "nav.reading": "Reading",
+  "nav.learn": "Learn",
+
+  "home.hero.title": "Chinese, Can Be Fun!",
+  "home.hero.subtitle": "A leveled reading platform designed for children.\\nStart reading and fall in love with Chinese!",
+  "home.hero.cta": "Start Reading",
+  "home.levels.title": "Choose Your Level",
+  "home.recent.title": "Latest Articles",
+  "home.recent.viewAll": "View All",
+
+  "reading.title": "Reading",
+  "reading.subtitle": "Pick an article and start reading!",
+  "reading.all": "All",
+  "reading.noArticles": "No articles for this level yet. Stay tuned!",
+  "reading.newWords": "New Words",
+  "reading.studyWords": "Study These Words",
+
+  "article.showTranslation": "Show Translation",
+  "article.hideTranslation": "Hide Translation",
+
+  "wordcard.tips": "Memory Tip",
+  "wordcard.close": "Close",
+
+  "wordlist.allWords": "Lesson Vocabulary",
+  "wordlist.speakAll": "Read All",
+
+  "flashcard.remember": "I Know It",
+  "flashcard.forgot": "Don't Know",
+  "flashcard.verifyTitle": "Did you really know it?",
+  "flashcard.verifyDesc": "Think back and confirm",
+  "flashcard.knew": "Yes, I Knew It",
+  "flashcard.notReally": "Actually Not",
+  "flashcard.continue": "Continue",
+  "flashcard.noTips": "No memory tip yet. Read it a few more times to remember!",
+
+  "flashcard.tip.newWord": "New Word",
+  "flashcard.tip.review": "Review",
+
+  "session.config.title": "Start Learning",
+  "session.config.desc": "Set how many words to study today",
+  "session.newWords": "New Words",
+  "session.reviewWords": "Review Words",
+  "session.start": "Start Learning",
+  "session.completed": "Session Complete!",
+  "session.todaysResult": "Today's Results",
+  "session.correct": "Correct",
+  "session.wrong": "Wrong",
+  "session.accuracy": "Accuracy",
+  "session.ebbinghaus.title": "Ebbinghaus Memory Schedule",
+  "session.ebbinghaus.desc": "Correct words are scheduled: 1d → 2d → 4d → 7d → 15d → 30d → 90d",
+  "session.needReview": "Words to Review Again",
+  "session.again": "One More Round",
+  "session.remaining": "{n} remaining · Wrong words will reappear later to reinforce memory",
+  "session.attempt": "Attempt",
+  "session.noWords": "No words to study. Read some articles first!",
+  "session.streak": "{count}d streak",
+
+  "checkin.title": "Study Streak",
+  "checkin.desc": "Complete a learning session to check in automatically",
+  "checkin.streak": "Current Streak",
+  "checkin.total": "Total Days",
+  "checkin.best": "Best Streak",
+
+  "learn.title": "Learning Center",
+  "learn.subtitle": "Learn a little every day, Chinese gets better and better!",
+
+  "level.1.name": "Sprout",
+  "level.1.desc": "For ages 4-6. Learn the simplest characters and words.",
+  "level.2.name": "Seedling",
+  "level.2.desc": "For ages 6-8. Read short stories.",
+  "level.3.name": "Sapling",
+  "level.3.desc": "For ages 8-10. Read longer stories.",
+  "level.4.name": "Tree",
+  "level.4.desc": "For ages 10+. Read idioms and history stories."
+}

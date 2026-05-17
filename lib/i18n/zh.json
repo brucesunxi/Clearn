@@ -1,0 +1,84 @@
+{
+  "site.title": "中文乐 - 海外华裔儿童中文学习",
+  "site.description": "为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。",
+  "site.footer": "© 2024 中文乐 - 让海外孩子爱上中文",
+
+  "lang.en": "EN",
+  "lang.zh": "中文",
+
+  "nav.home": "首页",
+  "nav.reading": "阅读",
+  "nav.learn": "学习",
+
+  "home.hero.title": "中文，可以很有趣！",
+  "home.hero.subtitle": "专为海外华裔儿童设计的中文分级阅读平台。\\n从简单到复杂，让孩子在阅读中爱上中文。",
+  "home.hero.cta": "开始阅读",
+  "home.levels.title": "选择你的级别",
+  "home.recent.title": "最新文章",
+  "home.recent.viewAll": "查看全部",
+
+  "reading.title": "阅读",
+  "reading.subtitle": "选择感兴趣的文章，开始阅读吧！",
+  "reading.all": "全部",
+  "reading.noArticles": "这个级别还没有文章，敬请期待！",
+  "reading.newWords": "个生词",
+  "reading.studyWords": "学这些单词",
+
+  "article.showTranslation": "显示翻译",
+  "article.hideTranslation": "隐藏翻译",
+
+  "wordcard.tips": "记忆技巧",
+  "wordcard.close": "关闭",
+
+  "wordlist.allWords": "本课词汇",
+  "wordlist.speakAll": "朗读全部",
+
+  "flashcard.remember": "我记得",
+  "flashcard.forgot": "不记得",
+  "flashcard.verifyTitle": "你真的知道了吗？",
+  "flashcard.verifyDesc": "先回想一下再确认",
+  "flashcard.knew": "知道了",
+  "flashcard.notReally": "其实不知道",
+  "flashcard.continue": "继续",
+  "flashcard.noTips": "暂无记忆技巧，多读几遍记住吧📝",
+
+  "flashcard.tip.newWord": "新词",
+  "flashcard.tip.review": "复习",
+
+  "session.config.title": "开始学习",
+  "session.config.desc": "设置今天要学习的单词数量",
+  "session.newWords": "新词数量",
+  "session.reviewWords": "复习数量",
+  "session.start": "开始学习",
+  "session.completed": "学习完成！",
+  "session.todaysResult": "今天的成果",
+  "session.correct": "正确",
+  "session.wrong": "错误",
+  "session.accuracy": "正确率",
+  "session.ebbinghaus.title": "艾宾浩斯记忆进度",
+  "session.ebbinghaus.desc": "答对的词会按 1天→2天→4天→7天→15天→30天→90天 间隔科学复习",
+  "session.needReview": "需要再复习的单词：",
+  "session.again": "再来一轮",
+  "session.remaining": "剩余 {n} 题 · 答错会间隔后重现，巩固记忆",
+  "session.attempt": "第{n}次尝试",
+  "session.noWords": "没有需要学习的单词，先去阅读文章吧！",
+  "session.streak": "连续 {count} 天",
+
+  "checkin.title": "学习打卡",
+  "checkin.desc": "完成一轮单词学习自动打卡，坚持就是胜利",
+  "checkin.streak": "连续天数",
+  "checkin.total": "累计天数",
+  "checkin.best": "最长记录",
+
+  "learn.title": "学习中心",
+  "learn.subtitle": "每天学一点，中文越来越好！",
+
+  "level.1.name": "启蒙",
+  "level.1.desc": "适合 4-6 岁的小朋友，认识最简单的字和词",
+  "level.2.name": "初级",
+  "level.2.desc": "适合 6-8 岁的小朋友，读短小的故事",
+  "level.3.name": "中级",
+  "level.3.desc": "适合 8-10 岁的孩子，阅读更长的故事",
+  "level.4.name": "高级",
+  "level.4.desc": "适合 10 岁以上的孩子，阅读成语和历史故事"
+}

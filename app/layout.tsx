@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
+import { I18nProvider } from '@/lib/i18n/context'
 import { GAScript } from '@/lib/ga'
+import TranslationUpdater from '@/components/TranslationUpdater'
 
 export const metadata: Metadata = {
   title: '中文乐 - 海外华裔儿童中文学习',
@@ -20,11 +22,14 @@ export default function RootLayout({
         <GAScript />
       </head>
       <body>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <footer className="bg-white border-t mt-16 py-8 text-center text-sm text-gray-400">
-          <p>© 2024 中文乐 - 让海外孩子爱上中文</p>
-        </footer>
+        <I18nProvider>
+          <TranslationUpdater />
+          <Header />
+          <main className="min-h-screen">{children}</main>
+          <footer className="bg-white border-t mt-16 py-8 text-center text-sm text-gray-400" id="site-footer">
+            © 2024 中文乐 - 让海外孩子爱上中文
+          </footer>
+        </I18nProvider>
       </body>
     </html>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
 import type { VocabularyItem } from '@/lib/types'
 
@@ -9,6 +10,7 @@ interface WordListProps {
 }
 
 export default function WordList({ vocabulary }: WordListProps) {
+  const { t } = useTranslation()
   const [playing, setPlaying] = useState<string | null>(null)
 
   const handleSpeak = useCallback((word: VocabularyItem) => {
@@ -26,7 +28,7 @@ export default function WordList({ vocabulary }: WordListProps) {
     <section className="mt-12 border-t pt-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">
-          本课词汇 ({vocabulary.length})
+          {t('wordlist.allWords')} ({vocabulary.length})
         </h2>
         <div className="flex gap-2">
           <button
@@ -34,7 +36,7 @@ export default function WordList({ vocabulary }: WordListProps) {
             disabled={playing === 'all'}
             className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 transition-colors"
           >
-            {playing === 'all' ? '🔊' : '🔈'} 朗读全部
+            {playing === 'all' ? '🔊' : '🔈'} {t('wordlist.speakAll')}
           </button>
         </div>
       </div>
@@ -45,14 +47,12 @@ export default function WordList({ vocabulary }: WordListProps) {
             className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
-              <span className="text-lg font-bold text-gray-800">
-                {v.word}
-              </span>
+              <span className="text-lg font-bold text-gray-800">{v.word}</span>
               <button
                 onClick={() => handleSpeak(v)}
                 disabled={playing === v.word}
                 className="w-8 h-8 rounded-full bg-gray-50 hover:bg-orange-100 disabled:opacity-50 flex items-center justify-center transition-colors"
-                aria-label={`朗读 ${v.word}`}
+                aria-label="朗读"
               >
                 {playing === v.word ? '🔊' : '🔈'}
               </button>
