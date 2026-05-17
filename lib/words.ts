@@ -8,13 +8,23 @@ export interface WordProgress {
   word: string
   meaning: string
   pinyin: string
-  level: number        // 0=new, 1=learning, 2=familiar, 3=mastered
-  nextReview: string   // ISO date string YYYY-MM-DD
+  stage: number         // 0=new, 1-6=复习中, 7=已掌握
+  nextReview: string    // ISO date string YYYY-MM-DD
   reviewCount: number
-  correctCount: number
   lastReviewDate: string
   articleId: string
 }
+
+// Ebbinghaus forgetting curve intervals (in days)
+// Stage 0 = new word (not yet learned)
+// Stage 1 = 1st review → next in 1 day
+// Stage 2 = 2nd review → next in 2 days
+// Stage 3 = 3rd review → next in 4 days
+// Stage 4 = 4th review → next in 7 days
+// Stage 5 = 5th review → next in 15 days
+// Stage 6 = 6th review → next in 30 days
+// Stage 7 = 7th review → next in 90 days (mastered)
+const EBBINGHAUS_INTERVALS = [0, 1, 2, 4, 7, 15, 30, 90]
 
 export function getWordId(word: string, level: number, articleId: string): string {
   return `${word}_level-${level}_${articleId}`
@@ -24,7 +34,16 @@ function getAllProgress(): Record<string, WordProgress> {
   if (typeof window === 'undefined') return {}
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : {}
+    if (!raw) return {}
+    const data = JSON.parse(raw)
+    // Migrate legacy 'level'-based data to 'stage'
+    for (const key of Object.keys(data)) {
+      if (data[key].level !== undefined && data[key].stage === undefined) {
+        data[key].stage = Math.min(data[key].level + 1, 7)
+        delete data[key].level
+      }
+    }
+    return data
   } catch {
     return {}
   }
@@ -35,8 +54,9 @@ function saveAllProgress(data: Record<string, WordProgress>) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
-// Build a complete word database from all articles, deduplicated
-export function buildWordDatabase(articles: Article[]): Map<string, { word: VocabularyItem; articleId: string; level: number }> {
+export function buildWordDatabase(
+  articles: Article[]
+): Map<string, { word: VocabularyItem; articleId: string; level: number }> {
   const db = new Map<string, { word: VocabularyItem; articleId: string; level: number }>()
 
   for (const article of articles) {
@@ -51,7 +71,6 @@ export function buildWordDatabase(articles: Article[]): Map<string, { word: Voca
   return db
 }
 
-// Get words that are new (never studied)
 export function getNewWords(
   db: Map<string, { word: VocabularyItem; articleId: string; level: number }>,
   count: number
@@ -59,10 +78,11 @@ export function getNewWords(
   const progress = getAllProgress()
   const newWords: { id: string; word: VocabularyItem; articleId: string; level: number }[] = []
 
-  db.forEach((value, key) => {
+  db.forEach((value) => {
     if (newWords.length >= count) return
     const wordId = getWordId(value.word.word, value.level, value.articleId)
-    if (!progress[wordId] || progress[wordId].level === 0) {
+    const prog = progress[wordId]
+    if (!prog || prog.stage === 0) {
       newWords.push({ id: wordId, ...value })
     }
   })
@@ -70,7 +90,6 @@ export function getNewWords(
   return newWords
 }
 
-// Get words due for review
 export function getReviewWords(
   count: number
 ): { id: string; word: VocabularyItem; articleId: string; level: number }[] {
@@ -81,12 +100,11 @@ export function getReviewWords(
   const dueEntries: { id: string; progress: WordProgress }[] = []
 
   for (const [id, prog] of Object.entries(progress)) {
-    if (prog.level > 0 && prog.nextReview <= todayStr) {
+    if (prog.stage > 0 && prog.stage < 7 && prog.nextReview <= todayStr) {
       dueEntries.push({ id, progress: prog })
     }
   }
 
-  // Shuffle and limit
   const shuffled = dueEntries.sort(() => Math.random() - 0.5)
   const selected = shuffled.slice(0, count)
 
@@ -98,11 +116,10 @@ export function getReviewWords(
       meaning: entry.progress.meaning,
     },
     articleId: entry.progress.articleId,
-    level: entry.progress.level,
+    level: entry.progress.stage,
   }))
 }
 
-// Record an answer
 export function recordAnswer(
   wordId: string,
   word: VocabularyItem,
@@ -115,44 +132,43 @@ export function recordAnswer(
   const today = new Date()
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-  const nextReview = new Date(today)
-
   if (correct) {
-    // Spaced repetition: longer intervals
-    const level = existing ? Math.min(existing.level + 1, 3) : 1
-    const days = [0, 1, 3, 7, 14][level] || 7
-    nextReview.setDate(nextReview.getDate() + days)
+    // Correct: advance to next Ebbinghaus stage
+    const currentStage = existing?.stage || 0
+    const newStage = Math.min(currentStage + 1, 7)
+    const intervalDays = EBBINGHAUS_INTERVALS[newStage] || 90
+
+    const nextDate = new Date(today)
+    nextDate.setDate(nextDate.getDate() + intervalDays)
 
     progress[wordId] = {
       word: word.word,
       meaning: word.meaning,
       pinyin: word.pinyin,
-      level,
-      nextReview: `${nextReview.getFullYear()}-${String(nextReview.getMonth() + 1).padStart(2, '0')}-${String(nextReview.getDate()).padStart(2, '0')}`,
+      stage: newStage,
+      nextReview: `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`,
       reviewCount: (existing?.reviewCount || 0) + 1,
-      correctCount: (existing?.correctCount || 0) + 1,
       lastReviewDate: todayStr,
       articleId,
     }
   } else {
-    // Wrong: review tomorrow
-    nextReview.setDate(nextReview.getDate() + 1)
+    // Incorrect: reset to stage 1, review tomorrow
+    const nextDate = new Date(today)
+    nextDate.setDate(nextDate.getDate() + 1)
 
     progress[wordId] = {
       word: word.word,
       meaning: word.meaning,
       pinyin: word.pinyin,
-      level: existing ? Math.max(existing.level - 1, 1) : 1,
-      nextReview: `${nextReview.getFullYear()}-${String(nextReview.getMonth() + 1).padStart(2, '0')}-${String(nextReview.getDate()).padStart(2, '0')}`,
+      stage: 1,
+      nextReview: `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`,
       reviewCount: (existing?.reviewCount || 0) + 1,
-      correctCount: existing?.correctCount || 0,
       lastReviewDate: todayStr,
       articleId,
     }
   }
 
   saveAllProgress(progress)
-
   return progress[wordId]
 }
 
@@ -162,17 +178,19 @@ export function getDueReviewCount(): number {
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
   return Object.values(progress).filter(
-    (p) => p.level > 0 && p.nextReview <= todayStr
+    (p) => p.stage > 0 && p.stage < 7 && p.nextReview <= todayStr
   ).length
 }
 
-export function getNewWordsCount(db: Map<string, { word: VocabularyItem; articleId: string; level: number }>): number {
+export function getNewWordsCount(
+  db: Map<string, { word: VocabularyItem; articleId: string; level: number }>
+): number {
   const progress = getAllProgress()
   let count = 0
 
   db.forEach((value) => {
     const wordId = getWordId(value.word.word, value.level, value.articleId)
-    if (!progress[wordId] || progress[wordId].level === 0) {
+    if (!progress[wordId] || progress[wordId].stage === 0) {
       count++
     }
   })

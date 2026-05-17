@@ -17,7 +17,11 @@ interface SessionCard {
   level: number
   type: 'new' | 'review'
   correct: boolean | null
+  wrongCount: number
 }
+
+const EBBINGHAUS_INTERVALS = [0, 1, 2, 4, 7, 15, 30, 90]
+const MAX_ATTEMPTS = 3
 
 export default function FlashcardSession({ articles }: FlashcardSessionProps) {
   const [step, setStep] = useState<'config' | 'learning' | 'summary'>('config')
@@ -26,6 +30,7 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
   const [cards, setCards] = useState<SessionCard[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [results, setResults] = useState<SessionCard[]>([])
+  const [totalStarted, setTotalStarted] = useState(0)
 
   const wordDb = useMemo(() => buildWordDatabase(articles), [articles])
 
@@ -34,11 +39,13 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
       ...w,
       type: 'new' as const,
       correct: null,
+      wrongCount: 0,
     }))
     const reviews = getReviewWords(reviewCount).map((w) => ({
       ...w,
       type: 'review' as const,
       correct: null,
+      wrongCount: 0,
     }))
 
     const allCards = [...news, ...reviews].sort(() => Math.random() - 0.5)
@@ -51,40 +58,73 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
     setCards(allCards)
     setCurrentIndex(0)
     setResults([])
+    setTotalStarted(allCards.length)
     setStep('learning')
   }, [wordDb, newCount, reviewCount])
 
   const handleResult = useCallback((correct: boolean) => {
-    const currentCard = cards[currentIndex]
-    const updatedCard = { ...currentCard, correct }
+    const idx = currentIndex
+    const card = cards[idx]
+    if (!card) return
 
-    // Record in localStorage
-    recordAnswer(currentCard.id, currentCard.word, currentCard.articleId, correct)
+    if (correct) {
+      // Correct: record permanently, remove from queue
+      recordAnswer(card.id, card.word, card.articleId, true)
+      setResults((prev) => [...prev, { ...card, correct: true }])
 
-    setResults((prev) => [...prev, updatedCard])
-
-    if (currentIndex + 1 < cards.length) {
-      setCurrentIndex((i) => i + 1)
+      if (idx + 1 >= cards.length) {
+        doCheckIn()
+        setStep('summary')
+      } else {
+        setCurrentIndex(idx + 1)
+      }
     } else {
-      doCheckIn() // Only check in after completing ALL words
-      setStep('summary')
+      const wc = card.wrongCount || 0
+
+      if (wc + 1 >= MAX_ATTEMPTS) {
+        // MAX attempts reached: give up, remove from queue
+        recordAnswer(card.id, card.word, card.articleId, false)
+        setResults((prev) => [...prev, { ...card, correct: false, wrongCount: wc + 1 }])
+
+        if (idx + 1 >= cards.length) {
+          doCheckIn()
+          setStep('summary')
+        } else {
+          setCurrentIndex(idx + 1)
+        }
+      } else {
+        // Ebbinghaus short-term recall: reinsert after offset cards
+        const offset = 3 + wc * 2
+        const insertAt = Math.min(idx + 1 + offset, cards.length)
+
+        setCards((prev) => {
+          const newCards = [...prev]
+          newCards.splice(insertAt, 0, {
+            ...card,
+            wrongCount: wc + 1,
+            id: card.id + '_r' + (wc + 1),
+          })
+          return newCards
+        })
+        setCurrentIndex(idx + 1)
+      }
     }
   }, [cards, currentIndex])
 
   const correctCount = results.filter((r) => r.correct === true).length
   const wrongCount = results.filter((r) => r.correct === false).length
+  const totalDone = results.length
+  const accuracy = totalDone > 0 ? Math.round((correctCount / totalDone) * 100) : 0
 
   if (step === 'config') {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-xl font-bold text-gray-800 mb-2">开始学习 📚</h2>
-        <p className="text-sm text-gray-400 mb-6">设置今天要学习的单词数量</p>
+        <p className="text-sm text-gray-400 mb-6">艾宾浩斯遗忘曲线科学记忆</p>
 
         <div className="space-y-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-2">
-              新词数量
-            </label>
+            <label className="block text-sm font-medium text-gray-600 mb-2">新词数量</label>
             <div className="flex gap-2">
               {[3, 5, 10, 15].map((n) => (
                 <button
@@ -102,9 +142,7 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-2">
-              复习数量
-            </label>
+            <label className="block text-sm font-medium text-gray-600 mb-2">复习数量</label>
             <div className="flex gap-2">
               {[3, 5, 10, 15].map((n) => (
                 <button
@@ -135,24 +173,35 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
 
   if (step === 'learning') {
     const currentCard = cards[currentIndex]
+    const remaining = cards.length - currentIndex - 1
     return (
       <div>
         {/* Progress bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
             <span>
-              {currentIndex + 1} / {cards.length}
+              {totalDone} / {totalStarted} 完成
             </span>
-            <span>
-              {currentCard.type === 'new' ? '🆕 新词' : '🔄 复习'}
+            <span className="flex items-center gap-3">
+              {currentCard.wrongCount > 0 && (
+                <span className="text-orange-500">
+                  💪 第{currentCard.wrongCount + 1}次尝试
+                </span>
+              )}
+              <span>{currentCard.type === 'new' ? '🆕 新词' : '🔄 复习'}</span>
             </span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-2">
             <div
               className="bg-orange-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentIndex) / cards.length) * 100}%` }}
+              style={{ width: `${totalStarted > 0 ? (totalDone / totalStarted) * 100 : 0}%` }}
             />
           </div>
+          {remaining > 0 && (
+            <p className="text-xs text-gray-300 mt-1">
+              剩余 {remaining} 题 · 答错会间隔后重现，巩固记忆
+            </p>
+          )}
         </div>
 
         <Flashcard key={currentCard.id} word={currentCard.word} onResult={handleResult} />
@@ -161,9 +210,6 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
   }
 
   // Summary
-  const totalDone = results.length
-  const accuracy = totalDone > 0 ? Math.round((correctCount / totalDone) * 100) : 0
-
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
       <div className="text-4xl mb-4">
@@ -187,7 +233,29 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
         </div>
       </div>
 
-      {/* Incorrect words for review */}
+      {/* Ebbinghaus progress explanation */}
+      <div className="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+        <h3 className="text-sm font-medium text-gray-600 mb-2">🧠 艾宾浩斯记忆进度</h3>
+        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+          {EBBINGHAUS_INTERVALS.slice(1).map((days, i) => (
+            <div key={i} className="flex items-center">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium ${
+                i < 3 ? 'bg-orange-100 text-orange-500' : 'bg-gray-100 text-gray-300'
+              }`}>
+                {days}d
+              </div>
+              {i < EBBINGHAUS_INTERVALS.slice(1).length - 1 && (
+                <div className="w-2 h-px bg-gray-200" />
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          答对的词会按 1天→2天→4天→7天→15天→30天→90天 间隔科学复习
+        </p>
+      </div>
+
+      {/* Incorrect words */}
       {results.filter((r) => r.correct === false).length > 0 && (
         <div className="mb-6 text-left">
           <h3 className="text-sm font-medium text-gray-600 mb-2">需要再复习的单词：</h3>
