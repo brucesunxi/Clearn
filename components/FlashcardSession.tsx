@@ -155,7 +155,7 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
           </div>
         </div>
 
-        <Flashcard word={currentCard.word} onResult={handleResult} />
+        <Flashcard key={currentCard.id} word={currentCard.word} onResult={handleResult} />
       </div>
     )
   }
