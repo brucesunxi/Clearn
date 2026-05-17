@@ -12,7 +12,7 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl">🀄</span>
           <span className="text-xl font-bold text-gray-800">
-            {locale === 'zh' ? '中文乐' : 'Chinese Joy'}
+            {locale === 'zh' ? '熊猫汉语' : 'Panda Chinese'}
           </span>
         </Link>
         <nav className="flex items-center gap-6">

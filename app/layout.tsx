@@ -6,7 +6,7 @@ import { GAScript } from '@/lib/ga'
 import TranslationUpdater from '@/components/TranslationUpdater'
 
 export const metadata: Metadata = {
-  title: '中文乐 - 海外华裔儿童中文学习',
+  title: '熊猫汉语 - 海外华裔儿童中文学习',
   description:
     '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
 }
@@ -27,7 +27,7 @@ export default function RootLayout({
           <Header />
           <main className="min-h-screen">{children}</main>
           <footer className="bg-white border-t mt-16 py-8 text-center text-sm text-gray-400" id="site-footer">
-            © 2024 中文乐 - 让海外孩子爱上中文
+            🐼 熊猫汉语
           </footer>
         </I18nProvider>
       </body>
