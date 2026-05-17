@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslation } from '@/lib/i18n/context'
+import { AdBanner } from '@/lib/adsense'
 import type { Article } from '@/lib/types'
 import CheckInCalendar from '@/components/CheckInCalendar'
 import FlashcardSession from '@/components/FlashcardSession'
@@ -20,6 +21,8 @@ export default function LearnPageClient({ articles }: LearnPageClientProps) {
       <div className="mb-8">
         <CheckInCalendar />
       </div>
+
+      <AdBanner />
 
       <FlashcardSession articles={articles} />
     </div>

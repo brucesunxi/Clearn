@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
+import { AdBanner } from '@/lib/adsense'
 import type { Level, Article } from '@/lib/types'
 
 interface HomePageClientProps {
@@ -30,6 +31,8 @@ export default function HomePageClient({ levels, recentArticles }: HomePageClien
         </Link>
       </section>
 
+      <AdBanner />
+
       {/* Levels section */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
@@ -41,6 +44,8 @@ export default function HomePageClient({ levels, recentArticles }: HomePageClien
           ))}
         </div>
       </section>
+
+      <AdBanner />
 
       {/* Recent articles */}
       <section className="mb-16">
