@@ -23,13 +23,53 @@
     }
   ],
   "vocabulary": [
-    { "word": "家", "pinyin": "jiā", "meaning": "family, home" },
-    { "word": "有", "pinyin": "yǒu", "meaning": "to have" },
-    { "word": "三口人", "pinyin": "sān kǒu rén", "meaning": "three people (in a family)" },
-    { "word": "爸爸", "pinyin": "bàba", "meaning": "dad" },
-    { "word": "妈妈", "pinyin": "māma", "meaning": "mom" },
-    { "word": "高", "pinyin": "gāo", "meaning": "tall" },
-    { "word": "漂亮", "pinyin": "piàoliang", "meaning": "pretty" },
-    { "word": "爱", "pinyin": "ài", "meaning": "to love" }
+    {
+      "word": "家",
+      "pinyin": "jiā",
+      "meaning": "family, home",
+      "tips": "宀(roof屋顶) + 豕(pig) → 屋檐下有猪的地方就是「家」🏠"
+    },
+    {
+      "word": "有",
+      "pinyin": "yǒu",
+      "meaning": "to have",
+      "tips": "𠂇(hand手) + 月(meat肉) → 手里拿着肉 = 拥「有」✋"
+    },
+    {
+      "word": "三口人",
+      "pinyin": "sān kǒu rén",
+      "meaning": "three people (in a family)",
+      "tips": "三(3) + 口(mouth嘴) → 三张嘴吃饭，就是三个人👨‍👩‍👦"
+    },
+    {
+      "word": "爸爸",
+      "pinyin": "bàba",
+      "meaning": "dad",
+      "tips": "父(father) + 巴(ba sounds like) → 爸爸是家里最可靠的人💪"
+    },
+    {
+      "word": "妈妈",
+      "pinyin": "māma",
+      "meaning": "mom",
+      "tips": "女(woman) + 马(horse, sounds like mǎ) → 妈妈像马一样勤劳温暖🤱"
+    },
+    {
+      "word": "高",
+      "pinyin": "gāo",
+      "meaning": "tall",
+      "tips": "像一座高高的塔，上面尖尖的🗼"
+    },
+    {
+      "word": "漂亮",
+      "pinyin": "piàoliang",
+      "meaning": "pretty",
+      "tips": "漂 = 氵(water) + 票(ticket); 亮 = 亠+口+儿 → 像水一样清澈明亮✨"
+    },
+    {
+      "word": "爱",
+      "pinyin": "ài",
+      "meaning": "to love",
+      "tips": "爫(claw) + 冖(cover) + 友(friend) + 心(heart) → 用心去爱你的朋友❤️"
+    }
   ]
 }

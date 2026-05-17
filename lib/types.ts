@@ -17,6 +17,7 @@ export interface VocabularyItem {
   word: string
   pinyin: string
   meaning: string
+  tips?: string
 }
 
 export interface Article {

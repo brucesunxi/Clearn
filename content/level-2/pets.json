@@ -27,15 +27,65 @@
     }
   ],
   "vocabulary": [
-    { "word": "猫", "pinyin": "māo", "meaning": "cat" },
-    { "word": "毛", "pinyin": "máo", "meaning": "fur" },
-    { "word": "白色", "pinyin": "báisè", "meaning": "white color" },
-    { "word": "眼睛", "pinyin": "yǎnjīng", "meaning": "eyes" },
-    { "word": "鱼", "pinyin": "yú", "meaning": "fish" },
-    { "word": "牛奶", "pinyin": "niúnǎi", "meaning": "milk" },
-    { "word": "放学", "pinyin": "fàngxué", "meaning": "school ends" },
-    { "word": "跑", "pinyin": "pǎo", "meaning": "to run" },
-    { "word": "球", "pinyin": "qiú", "meaning": "ball" },
-    { "word": "开心", "pinyin": "kāixīn", "meaning": "happy" }
+    {
+      "word": "猫",
+      "pinyin": "māo",
+      "meaning": "cat",
+      "tips": "犭(animal) + 苗(seedling) → 小猫像幼苗一样可爱，叫声就是 māo 🐱"
+    },
+    {
+      "word": "毛",
+      "pinyin": "máo",
+      "meaning": "fur",
+      "tips": "像一根根毛发竖起来的形状，上面是毛尖🐾"
+    },
+    {
+      "word": "白色",
+      "pinyin": "báisè",
+      "meaning": "white color",
+      "tips": "白 = 日(sun) + 丿(ray) → 太阳的光芒是白色的☀️"
+    },
+    {
+      "word": "眼睛",
+      "pinyin": "yǎnjīng",
+      "meaning": "eyes",
+      "tips": "眼 = 目(eye) + 艮(根, root); 睛 = 目(eye) + 青 → 用眼睛看世界👀"
+    },
+    {
+      "word": "鱼",
+      "pinyin": "yú",
+      "meaning": "fish",
+      "tips": "象形字，像一条鱼在水里游：上面是鱼头，中间是鱼身，下面是鱼尾🐟"
+    },
+    {
+      "word": "牛奶",
+      "pinyin": "niúnǎi",
+      "meaning": "milk",
+      "tips": "牛(cow) + 奶(milk, breast) → 牛身上的奶就是「牛奶」🥛"
+    },
+    {
+      "word": "放学",
+      "pinyin": "fàngxué",
+      "meaning": "school ends",
+      "tips": "放(release, let go) = 方(sound) + 攵(action); 学(school) → 学校放你回家了🎒"
+    },
+    {
+      "word": "跑",
+      "pinyin": "pǎo",
+      "meaning": "to run",
+      "tips": "足(foot) + 包(bag) → 用脚像包里装了弹簧一样弹出去 = 跑🏃"
+    },
+    {
+      "word": "球",
+      "pinyin": "qiú",
+      "meaning": "ball",
+      "tips": "王(king) + 求(seek) → 国王寻找的圆形宝物⚽"
+    },
+    {
+      "word": "开心",
+      "pinyin": "kāixīn",
+      "meaning": "happy",
+      "tips": "开(open) + 心(heart) → 心打开了，敞开心扉，就是「开心」😄"
+    }
   ]
 }

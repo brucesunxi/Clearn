@@ -31,17 +31,77 @@
     }
   ],
   "vocabulary": [
-    { "word": "每天", "pinyin": "měitiān", "meaning": "every day" },
-    { "word": "起床", "pinyin": "qǐchuáng", "meaning": "to get up" },
-    { "word": "穿", "pinyin": "chuān", "meaning": "to wear, to put on" },
-    { "word": "衣服", "pinyin": "yīfu", "meaning": "clothes" },
-    { "word": "洗脸", "pinyin": "xǐ liǎn", "meaning": "to wash face" },
-    { "word": "早饭", "pinyin": "zǎofàn", "meaning": "breakfast" },
-    { "word": "学校", "pinyin": "xuéxiào", "meaning": "school" },
-    { "word": "数学", "pinyin": "shùxué", "meaning": "math" },
-    { "word": "画画", "pinyin": "huàhuà", "meaning": "to draw" },
-    { "word": "朋友", "pinyin": "péngyǒu", "meaning": "friend" },
-    { "word": "一起", "pinyin": "yìqǐ", "meaning": "together" },
-    { "word": "回家", "pinyin": "huíjiā", "meaning": "to go home" }
+    {
+      "word": "每天",
+      "pinyin": "měitiān",
+      "meaning": "every day",
+      "tips": "每(每, each) + 天(day, sky) → 每一天都叫「每天」📅"
+    },
+    {
+      "word": "起床",
+      "pinyin": "qǐchuáng",
+      "meaning": "to get up",
+      "tips": "起( 起 = 走+己，自己站起来) + 床(bed) → 从床上起来就是「起床」🌅"
+    },
+    {
+      "word": "穿",
+      "pinyin": "chuān",
+      "meaning": "to wear, to put on",
+      "tips": "穴(cave) + 牙(tooth) → 把身体像钻进洞一样套进衣服里👕"
+    },
+    {
+      "word": "衣服",
+      "pinyin": "yīfu",
+      "meaning": "clothes",
+      "tips": "衣 = 像一件上衣的形状，上面是领子，下面是衣摆👗"
+    },
+    {
+      "word": "洗脸",
+      "pinyin": "xǐ liǎn",
+      "meaning": "to wash face",
+      "tips": "洗 = 氵(water) + 先(first); 脸 = 月(meat→body) + 佥 → 用水先洗身体最前面的部分🧼"
+    },
+    {
+      "word": "早饭",
+      "pinyin": "zǎofàn",
+      "meaning": "breakfast",
+      "tips": "早(early) + 饭(food) → 早上吃的饭就是「早饭」🌅🍚"
+    },
+    {
+      "word": "学校",
+      "pinyin": "xuéxiào",
+      "meaning": "school",
+      "tips": "学(learn) = 孩子(子)在教室里学习; 校 = 木+交 → 学习的地方🏫"
+    },
+    {
+      "word": "数学",
+      "pinyin": "shùxué",
+      "meaning": "math",
+      "tips": "数(number, count) + 学(study) → 学习数字的学科就是「数学」🔢"
+    },
+    {
+      "word": "画画",
+      "pinyin": "huàhuà",
+      "meaning": "to draw",
+      "tips": "画 = 一(brush) + 田(frame) + 凵(container) → 用笔在框里画东西🎨"
+    },
+    {
+      "word": "朋友",
+      "pinyin": "péngyǒu",
+      "meaning": "friend",
+      "tips": "朋 = 两个月(months) → 两个人像月亮一样相伴; 友 = 又+又 → 两只手拉在一起🤝"
+    },
+    {
+      "word": "一起",
+      "pinyin": "yìqǐ",
+      "meaning": "together",
+      "tips": "一(one) + 起(to rise) → 大家同时站起来 → 「一起」做事情👫"
+    },
+    {
+      "word": "回家",
+      "pinyin": "huíjiā",
+      "meaning": "to go home",
+      "tips": "回 = 口(around) + 口(center) → 从外面走回中心; 家 = home → 「回家」🏠"
+    }
   ]
 }

@@ -17,6 +17,12 @@ export default function Header() {
           >
             阅读 📖
           </Link>
+          <Link
+            href="/learn"
+            className="text-gray-600 hover:text-orange-500 font-medium transition-colors"
+          >
+            学习 📝
+          </Link>
         </nav>
       </div>
     </header>

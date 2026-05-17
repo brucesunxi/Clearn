@@ -39,6 +39,16 @@ export default function ArticlePage({ params }: ArticlePageProps) {
 
       {/* Vocabulary list */}
       <WordList vocabulary={article.vocabulary} />
+
+      {/* Learn this lesson's words */}
+      <div className="mt-8 text-center">
+        <Link
+          href="/learn"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-orange-500 text-white font-medium hover:bg-orange-600 transition-colors shadow-sm"
+        >
+          📝 学这些单词
+        </Link>
+      </div>
     </div>
   )
 }

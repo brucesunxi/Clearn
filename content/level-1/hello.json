@@ -23,12 +23,47 @@
     }
   ],
   "vocabulary": [
-    { "word": "你好", "pinyin": "nǐ hǎo", "meaning": "hello" },
-    { "word": "我", "pinyin": "wǒ", "meaning": "I, me" },
-    { "word": "叫", "pinyin": "jiào", "meaning": "to be called" },
-    { "word": "岁", "pinyin": "suì", "meaning": "years old" },
-    { "word": "喜欢", "pinyin": "xǐhuān", "meaning": "to like" },
-    { "word": "吃", "pinyin": "chī", "meaning": "to eat" },
-    { "word": "苹果", "pinyin": "píngguǒ", "meaning": "apple" }
+    {
+      "word": "你好",
+      "pinyin": "nǐ hǎo",
+      "meaning": "hello",
+      "tips": "你 = 亻(person) + 尔(you); 好 = 女(woman) + 子(child) → 见到人问「好」就是「你好」👋"
+    },
+    {
+      "word": "我",
+      "pinyin": "wǒ",
+      "meaning": "I, me",
+      "tips": "像一只手握着戈(武器)，指着自己 → 「我」自己"
+    },
+    {
+      "word": "叫",
+      "pinyin": "jiào",
+      "meaning": "to be called",
+      "tips": "口(mouth) + 丩 → 用嘴巴告诉别人你叫什么名字🗣️"
+    },
+    {
+      "word": "岁",
+      "pinyin": "suì",
+      "meaning": "years old",
+      "tips": "山(mountain) + 夕(evening) → 过了多少个黄昏就是多少「岁」🌄"
+    },
+    {
+      "word": "喜欢",
+      "pinyin": "xǐhuān",
+      "meaning": "to like",
+      "tips": "喜 = 士 + 口 + 豆(beans); 欢 = 又 + 欠 → 看到豆子就开心得拍手，就是「喜欢」😊"
+    },
+    {
+      "word": "吃",
+      "pinyin": "chī",
+      "meaning": "to eat",
+      "tips": "口(mouth) + 乞 → 用嘴巴吃东西🍽️"
+    },
+    {
+      "word": "苹果",
+      "pinyin": "píngguǒ",
+      "meaning": "apple",
+      "tips": "苹 = 艹(grass) + 平(flat); 果 = 田(field) + 木(tree) → 长在树上的水果🍎"
+    }
   ]
 }

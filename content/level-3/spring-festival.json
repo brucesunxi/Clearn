@@ -27,15 +27,65 @@
     }
   ],
   "vocabulary": [
-    { "word": "春节", "pinyin": "chūnjié", "meaning": "Spring Festival" },
-    { "word": "重要", "pinyin": "zhòngyào", "meaning": "important" },
-    { "word": "节日", "pinyin": "jiérì", "meaning": "festival, holiday" },
-    { "word": "聚", "pinyin": "jù", "meaning": "to gather" },
-    { "word": "饺子", "pinyin": "jiǎozi", "meaning": "dumplings" },
-    { "word": "年糕", "pinyin": "niángāo", "meaning": "New Year cake" },
-    { "word": "红包", "pinyin": "hóngbāo", "meaning": "red envelope" },
-    { "word": "压岁钱", "pinyin": "yāsuìqián", "meaning": "lucky money" },
-    { "word": "烟花", "pinyin": "yānhuā", "meaning": "fireworks" },
-    { "word": "五颜六色", "pinyin": "wǔyánliùsè", "meaning": "colorful" }
+    {
+      "word": "春节",
+      "pinyin": "chūnjié",
+      "meaning": "Spring Festival",
+      "tips": "春(spring) = 三(three) + 人 + 日(sun) → 三人看日，春天来了; 节(festival) = 艹(grass) + 卩(knot) → 像草结一样的时间节点🌸"
+    },
+    {
+      "word": "重要",
+      "pinyin": "zhòngyào",
+      "meaning": "important",
+      "tips": "重(heavy) = 千(thousand) + 里(mile) → 走千里很重(累); 要(need, essential) → 重要 = 又重又需要⭐"
+    },
+    {
+      "word": "节日",
+      "pinyin": "jiérì",
+      "meaning": "festival, holiday",
+      "tips": "节(festival) + 日(day) → 庆祝的日子 = 节日🎉"
+    },
+    {
+      "word": "聚",
+      "pinyin": "jù",
+      "meaning": "to gather",
+      "tips": "取(take) + 众(crowd) → 把大家取(叫)到一起 = 聚集👨‍👩‍👧‍👦"
+    },
+    {
+      "word": "饺子",
+      "pinyin": "jiǎozi",
+      "meaning": "dumplings",
+      "tips": "饺 = 食(food) + 交 → 用面皮包着馅交叠捏紧的食物🥟"
+    },
+    {
+      "word": "年糕",
+      "pinyin": "niángāo",
+      "meaning": "New Year cake",
+      "tips": "年(year) + 糕(cake) → 过年吃的糕，谐音「年高」— 年年高升🎋"
+    },
+    {
+      "word": "红包",
+      "pinyin": "hóngbāo",
+      "meaning": "red envelope",
+      "tips": "红(red) = 纟(silk) + 工(work); 包(bag, wrap) → 红色的包包🧧"
+    },
+    {
+      "word": "压岁钱",
+      "pinyin": "yāsuìqián",
+      "meaning": "lucky money",
+      "tips": "压(press, suppress) + 岁(year, age) + 钱(money) → 压住邪祟(岁)，保佑平安的💰"
+    },
+    {
+      "word": "烟花",
+      "pinyin": "yānhuā",
+      "meaning": "fireworks",
+      "tips": "烟(smoke) + 花(flower) → 像烟雾一样散开的花 = 烟花🎆"
+    },
+    {
+      "word": "五颜六色",
+      "pinyin": "wǔyánliùsè",
+      "meaning": "colorful",
+      "tips": "五(five) + 颜(colors) + 六(six) + 色(color) → 五颜六色 = 色彩非常丰富🌈"
+    }
   ]
 }

@@ -27,16 +27,71 @@
     }
   ],
   "vocabulary": [
-    { "word": "长城", "pinyin": "Chángchéng", "meaning": "Great Wall" },
-    { "word": "有名", "pinyin": "yǒumíng", "meaning": "famous" },
-    { "word": "建筑", "pinyin": "jiànzhù", "meaning": "building, architecture" },
-    { "word": "条", "pinyin": "tiáo", "meaning": "measure word for long things" },
-    { "word": "巨大", "pinyin": "jùdà", "meaning": "giant, huge" },
-    { "word": "龙", "pinyin": "lóng", "meaning": "dragon" },
-    { "word": "山顶", "pinyin": "shāndǐng", "meaning": "mountaintop" },
-    { "word": "修建", "pinyin": "xiūjiàn", "meaning": "to build, to construct" },
-    { "word": "保护", "pinyin": "bǎohù", "meaning": "to protect" },
-    { "word": "国家", "pinyin": "guójiā", "meaning": "country, nation" },
-    { "word": "旅游", "pinyin": "lǚyóu", "meaning": "to travel" }
+    {
+      "word": "长城",
+      "pinyin": "Chángchéng",
+      "meaning": "Great Wall",
+      "tips": "长(long) + 城(wall, city) → 长长的城墙，万里长城🏯"
+    },
+    {
+      "word": "有名",
+      "pinyin": "yǒumíng",
+      "meaning": "famous",
+      "tips": "有(have) + 名(name) → 名字人人皆知 = 有名⭐"
+    },
+    {
+      "word": "建筑",
+      "pinyin": "jiànzhù",
+      "meaning": "building, architecture",
+      "tips": "建(build) = 廴(move forward) + 聿(pen → plan); 筑(build) = ⺮(bamboo) + 巩(solid) → 用竹子等材料搭建🏗️"
+    },
+    {
+      "word": "条",
+      "pinyin": "tiáo",
+      "meaning": "measure word for long things",
+      "tips": "像一条长长的树枝，用来数长条形的东西：一条路、一条鱼、一条龙📏"
+    },
+    {
+      "word": "巨大",
+      "pinyin": "jùdà",
+      "meaning": "giant, huge",
+      "tips": "巨(giant) = 像一把巨大的尺子，非常大; 大(big) → 又巨又大 = 巨大🦕"
+    },
+    {
+      "word": "龙",
+      "pinyin": "lóng",
+      "meaning": "dragon",
+      "tips": "象形字，像一条有角、有身、有尾的神龙，中国文化的象征🐉"
+    },
+    {
+      "word": "山顶",
+      "pinyin": "shāndǐng",
+      "meaning": "mountaintop",
+      "tips": "山(mountain) + 顶(top, crown) → 山的头顶 = 山顶⛰️"
+    },
+    {
+      "word": "修建",
+      "pinyin": "xiūjiàn",
+      "meaning": "to build, to construct",
+      "tips": "修(repair) = 亻+ 丨 + 夂; 建(build) → 修理和建造🏗️"
+    },
+    {
+      "word": "保护",
+      "pinyin": "bǎohù",
+      "meaning": "to protect",
+      "tips": "保(protect) = 亻(人) + 子(child) → 大人保护孩子; 护 = 扌(hand) + 户(door) → 用手护住门🛡️"
+    },
+    {
+      "word": "国家",
+      "pinyin": "guójiā",
+      "meaning": "country, nation",
+      "tips": "国 = 口(border) + 玉(jade) → 有疆界和珍宝的地方; 家(family) → 国就是千万个家🏛️"
+    },
+    {
+      "word": "旅游",
+      "pinyin": "lǚyóu",
+      "meaning": "to travel",
+      "tips": "旅(travel) = 方(flag) + 㐬(people following); 游(swim, roam) = 氵+ 方+ 子 → 像在水上漂流一样到处走✈️"
+    }
   ]
 }
