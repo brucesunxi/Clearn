@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
+import { speak } from '@/lib/tts'
 import type { Article, VocabularyItem } from '@/lib/types'
 import WordCard from './WordCard'
 
@@ -13,6 +14,7 @@ export default function ArticleContent({ article }: ArticleContentProps) {
   const { t, locale } = useTranslation()
   const [selectedWord, setSelectedWord] = useState<VocabularyItem | null>(null)
   const [showTranslations, setShowTranslations] = useState(false)
+  const [playingPara, setPlayingPara] = useState<number | null>(null)
 
   const sortedVocab = useMemo(
     () =>
@@ -51,6 +53,11 @@ export default function ArticleContent({ article }: ArticleContentProps) {
     return parts
   }
 
+  const playParagraph = (idx: number, text: string) => {
+    setPlayingPara(idx)
+    speak(text, { onEnd: () => setPlayingPara(null) })
+  }
+
   return (
     <article className="max-w-2xl mx-auto">
       {/* Article header */}
@@ -80,31 +87,48 @@ export default function ArticleContent({ article }: ArticleContentProps) {
         </span>
       </div>
 
-      {/* Paragraphs */}
+      {/* Paragraphs with sentence-level audio */}
       <div className="space-y-8">
         {article.paragraphs.map((p, i) => (
-          <div key={i}>
-            <p className="text-xl md:text-2xl leading-[2.4] text-gray-800 font-serif tracking-wide">
-              {highlightText(p.text).map((part, j) =>
-                typeof part === 'string' ? (
-                  <span key={j}>{part}</span>
-                ) : (
-                  <button
-                    key={j}
-                    onClick={() => setSelectedWord(part)}
-                    className="word-highlight inline"
-                    title={`${part.word} (${part.pinyin})`}
-                  >
-                    {part.word}
-                  </button>
-                )
+          <div key={i} className="group flex gap-2 items-start">
+            {/* Speaker button — appears on hover */}
+            <button
+              onClick={() => playParagraph(i, p.text)}
+              className={`shrink-0 mt-1.5 w-7 h-7 rounded-full flex items-center justify-center text-xs transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 ${
+                playingPara === i
+                  ? 'bg-orange-100 text-orange-500 opacity-100'
+                  : 'bg-gray-100 text-gray-400 hover:bg-orange-100 hover:text-orange-500'
+              }`}
+              title={locale === 'zh' ? '朗读本句' : 'Read this sentence'}
+            >
+              {playingPara === i ? '🔊' : '🔈'}
+            </button>
+
+            <div className="flex-1">
+              <p className="text-xl md:text-2xl leading-[2.4] text-gray-800 font-serif tracking-wide">
+                {highlightText(p.text).map((part, j) =>
+                  typeof part === 'string' ? (
+                    <span key={j}>{part}</span>
+                  ) : (
+                    <button
+                      key={j}
+                      onClick={() => setSelectedWord(part)}
+                      className="word-highlight inline"
+                      title={`${part.word} (${part.pinyin})`}
+                    >
+                      {part.word}
+                    </button>
+                  )
+                )}
+              </p>
+
+              {/* Translation */}
+              {showTranslations && (
+                <div className="mt-2 pl-4 border-l-2 border-orange-200">
+                  <p className="text-sm text-gray-400 italic leading-relaxed">{p.translation}</p>
+                </div>
               )}
-            </p>
-            {showTranslations && (
-              <div className="mt-2 pl-4 border-l-2 border-orange-200">
-                <p className="text-sm text-gray-400 italic leading-relaxed">{p.translation}</p>
-              </div>
-            )}
+            </div>
           </div>
         ))}
       </div>
