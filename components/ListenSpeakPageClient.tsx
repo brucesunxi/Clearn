@@ -5,12 +5,13 @@ import { useTranslation } from '@/lib/i18n/context'
 import type { Article } from '@/lib/types'
 import ListenSession from './ListenSession'
 import SpeakSession from './SpeakSession'
+import IntensiveListening from './IntensiveListening'
 
 interface ListenSpeakPageClientProps {
   articles: Article[]
 }
 
-type Tab = 'listen' | 'speak'
+type Tab = 'listen' | 'speak' | 'intensive'
 
 export default function ListenSpeakPageClient({ articles }: ListenSpeakPageClientProps) {
   const { t, locale } = useTranslation()
@@ -38,7 +39,17 @@ export default function ListenSpeakPageClient({ articles }: ListenSpeakPageClien
               : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
           }`}
         >
-          🎧 {t('listenspeak.listen')}
+          🎧 {locale === 'zh' ? '选意思' : 'Quiz'}
+        </button>
+        <button
+          onClick={() => setTab('intensive')}
+          className={`flex-1 py-3 rounded-xl text-base font-medium transition-all ${
+            tab === 'intensive'
+              ? 'bg-indigo-500 text-white shadow-sm'
+              : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+          }`}
+        >
+          🎯 {locale === 'zh' ? '精听' : 'Intensive'}
         </button>
         <button
           onClick={() => setTab('speak')}
@@ -52,20 +63,10 @@ export default function ListenSpeakPageClient({ articles }: ListenSpeakPageClien
         </button>
       </div>
 
-      {/* Tab description */}
-      <p className="text-sm text-gray-400 mb-4 text-center">
-        {tab === 'listen'
-          ? `🔊 ${t('listenspeak.listenDesc')}`
-          : `🎤 ${t('listenspeak.speakDesc')}`
-        }
-      </p>
-
       {/* Content */}
-      {tab === 'listen' ? (
-        <ListenSession articles={articles} />
-      ) : (
-        <SpeakSession articles={articles} />
-      )}
+      {tab === 'listen' && <ListenSession articles={articles} />}
+      {tab === 'intensive' && <IntensiveListening articles={articles} />}
+      {tab === 'speak' && <SpeakSession articles={articles} />}
     </div>
   )
 }
