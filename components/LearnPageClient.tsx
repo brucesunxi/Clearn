@@ -2,13 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
-import type { Level, Article } from '@/lib/types'
+import type { Level, Article, VocabularyItem } from '@/lib/types'
 import {
   getCheckInData, getDailyGoal, setDailyGoal,
   getTodayProgress, incrementTodayProgress, isCheckedInToday,
   doCheckIn
 } from '@/lib/checkin'
 import { getMasteredCount, getTotalWordsCount, getDueReviewCount } from '@/lib/words'
+import { WORD_BOOKS, getWordBook } from '@/lib/wordbooks'
+import type { WordBookEntry } from '@/lib/wordbooks'
 import CheckInCalendar from '@/components/CheckInCalendar'
 import FlashcardSession from '@/components/FlashcardSession'
 import QuizSession from '@/components/QuizSession'
@@ -36,6 +38,25 @@ function getSavedBook(): number | null {
 function saveBook(level: number | null) {
   if (typeof window === 'undefined') return
   localStorage.setItem(BOOK_KEY, level === null ? 'all' : String(level))
+}
+
+function wordBookToArticles(wordBookId: number): Article[] {
+  const wb = getWordBook(wordBookId)
+  if (!wb) return []
+  return [{
+    id: `wordbook-${wb.id}`,
+    title: wb.name,
+    titleEn: wb.name,
+    level: wb.id,
+    emoji: wb.emoji,
+    paragraphs: [],
+    vocabulary: wb.words.map((w: WordBookEntry) => ({
+      word: w.word,
+      pinyin: w.pinyin,
+      meaning: w.meaning,
+      tips: w.tips,
+    })),
+  }]
 }
 
 export default function LearnPageClient({ levels, articles }: LearnPageClientProps) {
@@ -68,9 +89,16 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
     setWordBook(getSavedBook())
   }, [refreshStats])
 
+  // When a specific word book is selected, use its virtual articles.
+  // For "All Words", use the article-derived vocabulary.
   const filteredArticles = wordBook === null
     ? articles
-    : articles.filter((a) => a.level === wordBook)
+    : wordBookToArticles(wordBook)
+
+  // Count total vocab in the selected source
+  const sourceWordCount = wordBook === null
+    ? articles.reduce((sum, a) => sum + a.vocabulary.length, 0)
+    : (getWordBook(wordBook)?.words.length ?? 0)
 
   const handleSetGoal = (n: number) => {
     setDailyGoal(n)
@@ -184,9 +212,16 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
 
       {/* Word book selector */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
-        <h3 className="text-sm font-semibold text-gray-600 mb-3">
-          📚 {locale === 'zh' ? '选择词书' : 'Word Book'}
-        </h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-gray-600">
+            📚 {locale === 'zh' ? '选择词书' : 'Word Book'}
+          </h3>
+          {wordBook !== null && (
+            <span className="text-xs text-gray-400">
+              {locale === 'zh' ? `${sourceWordCount} 个词` : `${sourceWordCount} words`}
+            </span>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleWordBookChange(null)}
@@ -198,27 +233,27 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
           >
             {locale === 'zh' ? '全部单词' : 'All Words'}
           </button>
-          {levels.map((l) => (
+          {WORD_BOOKS.map((wb) => (
             <button
-              key={l.id}
-              onClick={() => handleWordBookChange(l.id)}
+              key={wb.id}
+              onClick={() => handleWordBookChange(wb.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                wordBook === l.id
+                wordBook === wb.id
                   ? 'text-white shadow-sm'
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
               }`}
-              style={wordBook === l.id ? { backgroundColor: l.color } : undefined}
+              style={wordBook === wb.id ? { backgroundColor: wb.color } : undefined}
             >
-              {l.emoji} {locale === 'zh' ? l.name : t(`level.${l.id}.name`)}
+              {wb.emoji} {locale === 'zh' ? levels.find((l) => l.id === wb.id)?.name || wb.name : wb.name}
             </button>
           ))}
         </div>
         <p className="text-xs text-gray-400 mt-2">
           {wordBook === null
-            ? (locale === 'zh' ? `当前词库：全部文章 · ${filteredArticles.length} 篇文章` : `All articles · ${filteredArticles.length} articles`)
+            ? (locale === 'zh' ? `全部文章 · ${sourceWordCount} 个单词` : `All articles · ${sourceWordCount} words`)
             : (locale === 'zh'
-                ? `当前词库：${levels.find((l) => l.id === wordBook)?.name} · ${filteredArticles.length} 篇文章`
-                : `Current: ${levels.find((l) => l.id === wordBook)?.name} · ${filteredArticles.length} articles`)
+                ? `${levels.find((l) => l.id === wordBook)?.name || ''}词书 · ${sourceWordCount} 个单词`
+                : `${getWordBook(wordBook)?.name || ''} word book · ${sourceWordCount} words`)
           }
         </p>
       </div>
