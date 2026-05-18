@@ -1,85 +1,163 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
+import { getDailyGoal, getTodayProgress, isCheckedInToday, getCheckInData } from '@/lib/checkin'
+import { getMasteredCount, getTotalWordsCount, getDueReviewCount } from '@/lib/words'
 
-const sections = [
-  {
-    href: '/listen',
-    emoji: '🎧',
-    titleKey: 'listen',
-    subtitleKey: 'listenSub',
-    descKey: 'listenDesc',
-    bg: 'from-blue-100 to-blue-50',
-    border: 'border-blue-300',
-    btn: 'bg-white text-blue-600 hover:bg-blue-50',
-  },
-  {
-    href: '/speak',
-    emoji: '🗣️',
-    titleKey: 'speak',
-    subtitleKey: 'speakSub',
-    descKey: 'speakDesc',
-    bg: 'from-red-100 to-red-50',
-    border: 'border-red-300',
-    btn: 'bg-white text-red-600 hover:bg-red-50',
-  },
-  {
-    href: '/reading',
-    emoji: '📖',
-    titleKey: 'read',
-    subtitleKey: 'readSub',
-    descKey: 'readDesc',
-    bg: 'from-orange-100 to-orange-50',
-    border: 'border-orange-300',
-    btn: 'bg-white text-orange-600 hover:bg-orange-50',
-  },
-]
-
-const content: Record<string, { zh: string; en: string }> = {
-  listen: { zh: '听', en: 'Listen' },
-  listenSub: { zh: '听中文，选意思', en: 'Listen & Choose' },
-  listenDesc: { zh: '听单词发音，选择正确的英文意思，训练你的中文听力。', en: 'Listen to Chinese words and choose the correct meaning.' },
-  speak: { zh: '说', en: 'Speak' },
-  speakSub: { zh: '看中文，开口说', en: 'See & Speak' },
-  speakDesc: { zh: '看中文单词，用麦克风说出来，AI 帮你判断发音是否正确。', en: 'Read Chinese words aloud with speech recognition.' },
-  read: { zh: '读', en: 'Read' },
-  readSub: { zh: '读文章，学词汇', en: 'Read & Learn' },
-  readDesc: { zh: '阅读分级文章，学习新单词。艾宾浩斯遗忘曲线帮你科学记忆。', en: 'Read leveled articles and learn words with spaced repetition.' },
-  start: { zh: '开始学习', en: 'Start Learning' },
+interface HomePageClientProps {
+  totalArticles: number
 }
 
-export default function HomePageClient() {
-  const { locale } = useTranslation()
-  const t = (key: string) => locale === 'zh' ? content[key]?.zh : content[key]?.en
+export default function HomePageClient({ totalArticles }: HomePageClientProps) {
+  const { t, locale } = useTranslation()
+  const [goal, setGoal] = useState(10)
+  const [progress, setProgress] = useState({ done: 0, goal: 10 })
+  const [checkedIn, setCheckedIn] = useState(false)
+  const [streak, setStreak] = useState(0)
+  const [mastered, setMastered] = useState(0)
+  const [totalWords, setTotalWords] = useState(0)
+  const [dueReviews, setDueReviews] = useState(0)
+
+  useEffect(() => {
+    setGoal(getDailyGoal())
+    setProgress(getTodayProgress())
+    setCheckedIn(isCheckedInToday())
+    setStreak(getCheckInData().currentStreak)
+    setMastered(getMasteredCount())
+    setTotalWords(getTotalWordsCount())
+    setDueReviews(getDueReviewCount())
+  }, [])
 
   return (
-    <div className="flex flex-col">
-      {sections.map((s, i) => (
-        <Link
-          key={s.href}
-          href={s.href}
-          className={`min-h-[70vh] md:min-h-[80vh] flex items-center justify-center bg-gradient-to-b ${s.bg} border-b ${s.border} group transition-colors`}
-        >
-          <div className="max-w-2xl mx-auto px-6 text-center py-16">
-            <span className="text-7xl md:text-8xl block mb-6 group-hover:scale-110 transition-transform duration-300">
-              {s.emoji}
-            </span>
-            <h2 className="text-5xl md:text-7xl font-black text-gray-800 mb-2">
-              {t(s.titleKey)}
-            </h2>
-            <p className="text-lg md:text-xl font-medium text-gray-500 mb-4">
-              {t(s.subtitleKey)}
-            </p>
-            <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 max-w-md mx-auto">
-              {t(s.descKey)}
-            </p>
-            <span className={`inline-block px-8 py-3 rounded-full font-semibold text-base shadow-md transition-all group-hover:shadow-xl group-hover:-translate-y-0.5 ${s.btn}`}>
-              {t('start')} →
+    <div className="max-w-5xl mx-auto px-4 py-10 md:py-16">
+      {/* Header */}
+      <div className="text-center mb-10 md:mb-14">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          🐼 {locale === 'zh' ? '熊猫汉语' : 'Panda Chinese'}
+        </h1>
+        <p className="text-gray-500 text-base">
+          {locale === 'zh' ? '让海外孩子爱上中文' : 'Helping kids around the world learn Chinese'}
+        </p>
+      </div>
+
+      {/* Three cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+
+        {/* Word Memorization Card */}
+        <Link href="/learn"
+          className="group bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-3xl">📝</span>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">{t('home.wordMem')}</h2>
+              <p className="text-xs text-gray-400">{t('home.wordMemDesc')}</p>
+            </div>
+          </div>
+
+          {/* Daily progress bar */}
+          <div className="mb-3">
+            <div className="flex justify-between text-xs text-gray-500 mb-1">
+              <span>{t('wordmem.todayProgress')}</span>
+              <span>{progress.done}/{progress.goal}</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2.5">
+              <div className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((progress.done / Math.max(progress.goal, 1)) * 100, 100)}%` }} />
+            </div>
+          </div>
+
+          {/* Stats row */}
+          <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+            <span>🔥 {t('wordmem.streak', { n: streak })}</span>
+            <span>✅ {checkedIn ? t('wordmem.checkedIn') : t('wordmem.checkIn')}</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="bg-emerald-50 rounded-xl p-2.5 text-center">
+              <div className="text-lg font-bold text-emerald-600">{totalWords}</div>
+              <div className="text-[10px] text-emerald-500">{locale === 'zh' ? '已学' : 'Learned'}</div>
+            </div>
+            <div className="bg-amber-50 rounded-xl p-2.5 text-center">
+              <div className="text-lg font-bold text-amber-600">{dueReviews}</div>
+              <div className="text-[10px] text-amber-500">{locale === 'zh' ? '待复习' : 'To Review'}</div>
+            </div>
+          </div>
+
+          <div className="mt-auto">
+            <span className="block w-full py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-medium text-center group-hover:bg-emerald-600 transition-colors">
+              {locale === 'zh' ? '开始学习 →' : 'Start Learning →'}
             </span>
           </div>
         </Link>
-      ))}
+
+        {/* Reading Card */}
+        <Link href="/reading"
+          className="group bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-3xl">📖</span>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">{t('home.reading')}</h2>
+              <p className="text-xs text-gray-400">{t('home.readingDesc')}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="bg-sky-50 rounded-xl p-2.5 text-center">
+              <div className="text-lg font-bold text-sky-600">{totalArticles}</div>
+              <div className="text-[10px] text-sky-500">{locale === 'zh' ? '篇文章' : 'Articles'}</div>
+            </div>
+            <div className="bg-violet-50 rounded-xl p-2.5 text-center">
+              <div className="text-lg font-bold text-violet-600">{mastered}</div>
+              <div className="text-[10px] text-violet-500">{locale === 'zh' ? '已掌握词' : 'Mastered'}</div>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400 mb-4 flex-1">
+            {locale === 'zh' ? '分级文章，适合各个水平。点击可查单词、加入学习列表。' : 'Leveled articles for all levels. Tap words to look them up.'}
+          </p>
+
+          <div className="mt-auto">
+            <span className="block w-full py-2.5 rounded-xl bg-sky-500 text-white text-sm font-medium text-center group-hover:bg-sky-600 transition-colors">
+              {locale === 'zh' ? '开始阅读 →' : 'Start Reading →'}
+            </span>
+          </div>
+        </Link>
+
+        {/* Listening & Speaking Card */}
+        <Link href="/practice"
+          className="group bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-3xl">🎧</span>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">{t('home.listenSpeak')}</h2>
+              <p className="text-xs text-gray-400">{t('home.listenSpeakDesc')}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="bg-rose-50 rounded-xl p-2.5 text-center">
+              <div className="text-lg font-bold text-rose-500">🎧</div>
+              <div className="text-[10px] text-rose-400">{locale === 'zh' ? '听力' : 'Listen'}</div>
+            </div>
+            <div className="bg-red-50 rounded-xl p-2.5 text-center">
+              <div className="text-lg font-bold text-red-500">🗣️</div>
+              <div className="text-[10px] text-red-400">{locale === 'zh' ? '口语' : 'Speak'}</div>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400 mb-4 flex-1">
+            {locale === 'zh' ? '听单词选意思，看单词开口说。语音识别帮你纠正发音。' : 'Listen to words, choose meaning. Speak aloud with voice recognition.'}
+          </p>
+
+          <div className="mt-auto">
+            <span className="block w-full py-2.5 rounded-xl bg-rose-500 text-white text-sm font-medium text-center group-hover:bg-rose-600 transition-colors">
+              {locale === 'zh' ? '开始练习 →' : 'Start Practice →'}
+            </span>
+          </div>
+        </Link>
+      </div>
     </div>
   )
 }

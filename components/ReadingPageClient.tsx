@@ -1,8 +1,10 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article } from '@/lib/types'
+import { getMasteredCount, getTotalWordsCount } from '@/lib/words'
 
 interface ReadingPageClientProps {
   levels: Level[]
@@ -17,12 +19,44 @@ export default function ReadingPageClient({
   selectedLevelId,
   selectedLevel,
 }: ReadingPageClientProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const [mastered, setMastered] = useState(0)
+  const [totalWords, setTotalWords] = useState(0)
+
+  useEffect(() => {
+    setMastered(getMasteredCount())
+    setTotalWords(getTotalWordsCount())
+  }, [])
 
   return (
     <>
       <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('reading.title')}</h1>
-      <p className="text-gray-400 mb-8">{t('reading.subtitle')}</p>
+      <p className="text-gray-400 mb-4">{t('reading.subtitle')}</p>
+
+      {/* Stats bar */}
+      <div className="flex gap-3 mb-6">
+        <div className="bg-sky-50 rounded-xl px-4 py-2.5 flex items-center gap-2">
+          <span className="text-lg">📖</span>
+          <div>
+            <div className="text-sm font-bold text-sky-600">{articles.length}</div>
+            <div className="text-[10px] text-sky-400">{locale === 'zh' ? '文章' : 'Articles'}</div>
+          </div>
+        </div>
+        <div className="bg-emerald-50 rounded-xl px-4 py-2.5 flex items-center gap-2">
+          <span className="text-lg">📝</span>
+          <div>
+            <div className="text-sm font-bold text-emerald-600">{totalWords}</div>
+            <div className="text-[10px] text-emerald-400">{locale === 'zh' ? '已学单词' : 'Learned'}</div>
+          </div>
+        </div>
+        <div className="bg-violet-50 rounded-xl px-4 py-2.5 flex items-center gap-2">
+          <span className="text-lg">✅</span>
+          <div>
+            <div className="text-sm font-bold text-violet-600">{mastered}</div>
+            <div className="text-[10px] text-violet-400">{locale === 'zh' ? '已掌握' : 'Mastered'}</div>
+          </div>
+        </div>
+      </div>
 
       {/* Level filter tabs */}
       <div className="flex flex-wrap gap-2 mb-8">

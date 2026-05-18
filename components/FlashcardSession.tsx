@@ -5,11 +5,12 @@ import { useTranslation } from '@/lib/i18n/context'
 import Flashcard from './Flashcard'
 import type { Article, VocabularyItem } from '@/lib/types'
 import { buildWordDatabase, getNewWords, getReviewWords, recordAnswer } from '@/lib/words'
-import { doCheckIn } from '@/lib/checkin'
+import { doCheckIn, incrementTodayProgress } from '@/lib/checkin'
 import { addCoins } from '@/lib/pet'
 
 interface FlashcardSessionProps {
   articles: Article[]
+  onComplete?: () => void
 }
 
 interface SessionCard {
@@ -25,7 +26,7 @@ interface SessionCard {
 const EBBINGHAUS_INTERVALS = [0, 1, 2, 4, 7, 15, 30, 90]
 const MAX_ATTEMPTS = 3
 
-export default function FlashcardSession({ articles }: FlashcardSessionProps) {
+export default function FlashcardSession({ articles, onComplete }: FlashcardSessionProps) {
   const { t } = useTranslation()
   const [step, setStep] = useState<'config' | 'learning' | 'summary'>('config')
   const [newCount, setNewCount] = useState(5)
@@ -77,7 +78,9 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
 
         if (idx + 1 >= cards.length) {
           doCheckIn()
+          incrementTodayProgress(cards.length)
           addCoins(20)
+          onComplete?.()
           setStep('summary')
         } else {
           setCurrentIndex(idx + 1)
@@ -91,6 +94,8 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
 
           if (idx + 1 >= cards.length) {
             doCheckIn()
+            incrementTodayProgress(cards.length)
+            onComplete?.()
             setStep('summary')
           } else {
             setCurrentIndex(idx + 1)
@@ -112,7 +117,7 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
         }
       }
     },
-    [cards, currentIndex]
+    [cards, currentIndex, onComplete]
   )
 
   const correctCount = results.filter((r) => r.correct === true).length

@@ -197,3 +197,21 @@ export function getNewWordsCount(
 
   return count
 }
+
+// --- Statistics helpers ---
+
+export function getMasteredCount(): number {
+  return Object.values(getAllProgress()).filter((p) => p.stage >= 7).length
+}
+
+export function getTotalWordsCount(): number {
+  return Object.values(getAllProgress()).filter((p) => p.stage >= 1).length
+}
+
+export function getStageDistribution(): Record<number, number> {
+  const dist: Record<number, number> = {}
+  for (const p of Object.values(getAllProgress())) {
+    dist[p.stage] = (dist[p.stage] || 0) + 1
+  }
+  return dist
+}

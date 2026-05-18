@@ -80,5 +80,29 @@
   "level.3.name": "Sapling",
   "level.3.desc": "For ages 8-10. Read longer stories.",
   "level.4.name": "Tree",
-  "level.4.desc": "For ages 10+. Read idioms and history stories."
+  "level.4.desc": "For ages 10+. Read idioms and history stories.",
+
+  "wordmem.title": "Word Memorization",
+  "wordmem.dailyGoal": "Daily Goal",
+  "wordmem.todayProgress": "Today's Progress",
+  "wordmem.checkIn": "Check In",
+  "wordmem.checkedIn": "Checked In ✅",
+  "wordmem.startLearning": "Start Learning",
+  "wordmem.masteredCount": "{n} words mastered",
+  "wordmem.totalWords": "{n} words learned",
+  "wordmem.wordsToday": "{n} words today",
+  "wordmem.streak": "{n}-day streak",
+
+  "listenspeak.title": "Listening & Speaking",
+  "listenspeak.listen": "Listening",
+  "listenspeak.speak": "Speaking",
+  "listenspeak.listenDesc": "Listen to Chinese, pick the meaning",
+  "listenspeak.speakDesc": "Read Chinese, speak aloud",
+
+  "home.wordMem": "Word Memorization",
+  "home.wordMemDesc": "Flashcards with spaced repetition",
+  "home.reading": "Reading",
+  "home.readingDesc": "Leveled articles and stories",
+  "home.listenSpeak": "Listening & Speaking",
+  "home.listenSpeakDesc": "Practice listening and speaking"
 }

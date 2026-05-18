@@ -89,3 +89,55 @@ function formatDate(date: Date): string {
   const d = String(date.getDate()).padStart(2, '0')
   return `${y}-${m}-${d}`
 }
+
+// --- Daily goal system ---
+
+const GOAL_KEY = 'chineselearn-dailygoal'
+
+export interface DailyGoalData {
+  target: number
+  record: Record<string, number>  // date -> words completed
+}
+
+function getDailyGoalData(): DailyGoalData {
+  if (typeof window === 'undefined') return { target: 10, record: {} }
+  try {
+    const raw = localStorage.getItem(GOAL_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch {}
+  return { target: 10, record: {} }
+}
+
+function saveDailyGoalData(data: DailyGoalData) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(GOAL_KEY, JSON.stringify(data))
+}
+
+export function getDailyGoal(): number {
+  return getDailyGoalData().target
+}
+
+export function setDailyGoal(n: number) {
+  const data = getDailyGoalData()
+  data.target = n
+  saveDailyGoalData(data)
+}
+
+export function getTodayProgress(): { done: number; goal: number } {
+  const data = getDailyGoalData()
+  const t = today()
+  return { done: data.record[t] || 0, goal: data.target }
+}
+
+export function incrementTodayProgress(n: number): { done: number; goal: number } {
+  const data = getDailyGoalData()
+  const t = today()
+  data.record[t] = (data.record[t] || 0) + n
+  saveDailyGoalData(data)
+  return { done: data.record[t], goal: data.target }
+}
+
+export function isGoalCompletedToday(): boolean {
+  const { done, goal } = getTodayProgress()
+  return done >= goal
+}
