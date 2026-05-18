@@ -3,69 +3,83 @@
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
 
+const sections = [
+  {
+    href: '/listen',
+    emoji: '🎧',
+    titleKey: 'listen',
+    subtitleKey: 'listenSub',
+    descKey: 'listenDesc',
+    bg: 'from-blue-100 to-blue-50',
+    border: 'border-blue-300',
+    btn: 'bg-white text-blue-600 hover:bg-blue-50',
+  },
+  {
+    href: '/speak',
+    emoji: '🗣️',
+    titleKey: 'speak',
+    subtitleKey: 'speakSub',
+    descKey: 'speakDesc',
+    bg: 'from-red-100 to-red-50',
+    border: 'border-red-300',
+    btn: 'bg-white text-red-600 hover:bg-red-50',
+  },
+  {
+    href: '/reading',
+    emoji: '📖',
+    titleKey: 'read',
+    subtitleKey: 'readSub',
+    descKey: 'readDesc',
+    bg: 'from-orange-100 to-orange-50',
+    border: 'border-orange-300',
+    btn: 'bg-white text-orange-600 hover:bg-orange-50',
+  },
+]
+
+const content: Record<string, { zh: string; en: string }> = {
+  listen: { zh: '听', en: 'Listen' },
+  listenSub: { zh: '听中文，选意思', en: 'Listen & Choose' },
+  listenDesc: { zh: '听单词发音，选择正确的英文意思，训练你的中文听力。', en: 'Listen to Chinese words and choose the correct meaning.' },
+  speak: { zh: '说', en: 'Speak' },
+  speakSub: { zh: '看中文，开口说', en: 'See & Speak' },
+  speakDesc: { zh: '看中文单词，用麦克风说出来，AI 帮你判断发音是否正确。', en: 'Read Chinese words aloud with speech recognition.' },
+  read: { zh: '读', en: 'Read' },
+  readSub: { zh: '读文章，学词汇', en: 'Read & Learn' },
+  readDesc: { zh: '阅读分级文章，学习新单词。艾宾浩斯遗忘曲线帮你科学记忆。', en: 'Read leveled articles and learn words with spaced repetition.' },
+  start: { zh: '开始学习', en: 'Start Learning' },
+}
+
 export default function HomePageClient() {
   const { locale } = useTranslation()
-
-  const sections = [
-    {
-      href: '/listen',
-      emoji: '🎧',
-      title: locale === 'zh' ? '听' : 'Listen',
-      subtitle: locale === 'zh' ? '听中文，选意思' : 'Listen & Choose',
-      desc: locale === 'zh' ? '听单词的发音，选择正确的英文意思。提升听力理解能力。' : 'Listen to Chinese words and choose the correct meaning.',
-      bgClass: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
-      btnClass: 'bg-blue-500 hover:bg-blue-600',
-    },
-    {
-      href: '/speak',
-      emoji: '🗣️',
-      title: locale === 'zh' ? '说' : 'Speak',
-      subtitle: locale === 'zh' ? '看中文，开口说' : 'See & Speak',
-      desc: locale === 'zh' ? '看中文单词，用麦克风说出来。练习发音和口语表达。' : 'Read Chinese words aloud with speech recognition.',
-      bgClass: 'bg-red-50 hover:bg-red-100 border-red-200',
-      btnClass: 'bg-red-500 hover:bg-red-600',
-    },
-    {
-      href: '/reading',
-      emoji: '📖',
-      title: locale === 'zh' ? '读' : 'Read',
-      subtitle: locale === 'zh' ? '读文章，学词汇' : 'Read & Learn',
-      desc: locale === 'zh' ? '阅读分级文章，学习新单词。配合艾宾浩斯遗忘曲线科学记忆。' : 'Read leveled articles and learn words with spaced repetition.',
-      bgClass: 'bg-orange-50 hover:bg-orange-100 border-orange-200',
-      btnClass: 'bg-orange-500 hover:bg-orange-600',
-    },
-  ]
+  const t = (key: string) => locale === 'zh' ? content[key]?.zh : content[key]?.en
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12 md:py-20">
-      {/* Tagline */}
-      <div className="text-center mb-12 md:mb-16">
-        <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-3">
-          🐼 {locale === 'zh' ? '熊猫汉语' : 'Panda Chinese'}
-        </h1>
-        <p className="text-gray-500 text-lg">
-          {locale === 'zh' ? '听说读，三步学好中文' : 'Listen, Speak, Read — Three steps to Chinese'}
-        </p>
-      </div>
-
-      {/* Three pillars */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-        {sections.map((s) => (
-          <Link
-            key={s.href}
-            href={s.href}
-            className={`group rounded-2xl border-2 ${s.bgClass} p-8 md:p-10 flex flex-col items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
-          >
-            <span className="text-5xl md:text-6xl mb-4">{s.emoji}</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-1">{s.title}</h2>
-            <p className="text-sm font-medium text-gray-500 mb-4">{s.subtitle}</p>
-            <p className="text-sm text-gray-600 leading-relaxed mb-6">{s.desc}</p>
-            <span className={`inline-block px-6 py-2.5 rounded-full text-white font-medium text-sm transition-colors ${s.btnClass} group-hover:shadow-lg`}>
-              {locale === 'zh' ? '开始学习 →' : 'Start →'}
+    <div className="flex flex-col">
+      {sections.map((s, i) => (
+        <Link
+          key={s.href}
+          href={s.href}
+          className={`min-h-[70vh] md:min-h-[80vh] flex items-center justify-center bg-gradient-to-b ${s.bg} border-b ${s.border} group transition-colors`}
+        >
+          <div className="max-w-2xl mx-auto px-6 text-center py-16">
+            <span className="text-7xl md:text-8xl block mb-6 group-hover:scale-110 transition-transform duration-300">
+              {s.emoji}
             </span>
-          </Link>
-        ))}
-      </div>
+            <h2 className="text-5xl md:text-7xl font-black text-gray-800 mb-2">
+              {t(s.titleKey)}
+            </h2>
+            <p className="text-lg md:text-xl font-medium text-gray-500 mb-4">
+              {t(s.subtitleKey)}
+            </p>
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 max-w-md mx-auto">
+              {t(s.descKey)}
+            </p>
+            <span className={`inline-block px-8 py-3 rounded-full font-semibold text-base shadow-md transition-all group-hover:shadow-xl group-hover:-translate-y-0.5 ${s.btn}`}>
+              {t('start')} →
+            </span>
+          </div>
+        </Link>
+      ))}
     </div>
   )
 }
