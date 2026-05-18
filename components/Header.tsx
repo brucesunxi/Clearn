@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
+import SiteLogo from './SiteLogo'
 
 export default function Header() {
   const { locale, setLocale, t } = useTranslation()
@@ -10,10 +11,7 @@ export default function Header() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🀄</span>
-          <span className="text-xl font-bold text-gray-800">
-            {locale === 'zh' ? '熊猫汉语' : 'Panda Chinese'}
-          </span>
+          <SiteLogo />
         </Link>
         <nav className="flex items-center gap-6">
           <Link
