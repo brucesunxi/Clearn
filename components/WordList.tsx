@@ -21,7 +21,7 @@ export default function WordList({ vocabulary }: WordListProps) {
   const speakAll = useCallback(() => {
     const words = vocabulary.map((v) => v.word).join('。')
     setPlaying('all')
-    speak(words, { rate: 0.85, onEnd: () => setPlaying(null) })
+    speak(words, { onEnd: () => setPlaying(null) })
   }, [vocabulary])
 
   return (
