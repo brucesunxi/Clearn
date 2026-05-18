@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak, cancelSpeech } from '@/lib/tts'
 import type { Article } from '@/lib/types'
@@ -9,26 +9,33 @@ interface IntensiveListeningProps {
   articles: Article[]
 }
 
+interface SentenceItem {
+  text: string
+  translation: string
+}
+
 type Step = 'select' | 'listening' | 'done'
 
 export default function IntensiveListening({ articles }: IntensiveListeningProps) {
   const { locale } = useTranslation()
   const [step, setStep] = useState<Step>('select')
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null)
-  const [sentences, setSentences] = useState<string[]>([])
+  const [sentences, setSentences] = useState<SentenceItem[]>([])
   const [currentIdx, setCurrentIdx] = useState(0)
   const [revealed, setRevealed] = useState<Set<number>>(new Set())
+  const [showTrans, setShowTrans] = useState<Set<number>>(new Set())
   const [playing, setPlaying] = useState(false)
 
-  // Split article paragraphs into sentences
-  const splitSentences = useCallback((article: Article): string[] => {
-    const result: string[] = []
+  // Split article paragraphs into sentences, keeping translation mapping
+  const splitSentences = useCallback((article: Article): SentenceItem[] => {
+    const result: SentenceItem[] = []
     for (const p of article.paragraphs) {
-      // Split by Chinese sentence-ending punctuation
       const parts = p.text.split(/(?<=[。！？!?])/).filter(Boolean)
       for (const part of parts) {
         const trimmed = part.trim()
-        if (trimmed) result.push(trimmed)
+        if (trimmed) {
+          result.push({ text: trimmed, translation: p.translation })
+        }
       }
     }
     return result
@@ -40,18 +47,18 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
     setSentences(s)
     setCurrentIdx(0)
     setRevealed(new Set())
+    setShowTrans(new Set())
     setStep('listening')
-    // Auto-play first sentence after a brief delay
     setTimeout(() => playSentence(0, s), 500)
   }, [splitSentences])
 
-  const playSentence = useCallback((idx: number, s?: string[]) => {
+  const playSentence = useCallback((idx: number, s?: SentenceItem[]) => {
     const list = s || sentences
     if (idx >= list.length) return
     cancelSpeech()
     setPlaying(true)
     setCurrentIdx(idx)
-    speak(list[idx], { onEnd: () => setPlaying(false) })
+    speak(list[idx].text, { onEnd: () => setPlaying(false) })
   }, [sentences])
 
   const handleReveal = (idx: number) => {
@@ -62,11 +69,19 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
     })
   }
 
+  const handleToggleTrans = (idx: number) => {
+    setShowTrans((prev) => {
+      const next = new Set(prev)
+      if (next.has(idx)) next.delete(idx)
+      else next.add(idx)
+      return next
+    })
+  }
+
   const handleNext = () => {
     if (currentIdx + 1 < sentences.length) {
       const next = currentIdx + 1
       setCurrentIdx(next)
-      // Next sentence starts covered — user must tap to reveal
       playSentence(next)
     } else {
       setStep('done')
@@ -173,6 +188,7 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
         {sentences.map((sentence, idx) => {
           const isCurrent = idx === currentIdx
           const isRevealed = revealed.has(idx)
+          const transVisible = showTrans.has(idx)
 
           return (
             <div
@@ -186,7 +202,7 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
               }`}
             >
               <div className="p-4">
-                {/* Sentence content */}
+                {/* Sentence content — blurred when hidden */}
                 <div
                   className={`text-lg leading-relaxed ${
                     isRevealed ? 'text-gray-800' : 'blur-md select-none text-gray-800/40'
@@ -194,19 +210,39 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
                   onClick={() => !isRevealed && handleReveal(idx)}
                   title={!isRevealed ? (locale === 'zh' ? '点击擦除查看' : 'Click to reveal') : ''}
                 >
-                  {sentence}
+                  {sentence.text}
                 </div>
+
+                {/* Translation — shown after reveal + toggle */}
+                {isRevealed && transVisible && (
+                  <div className="mt-2 pl-4 border-l-2 border-indigo-300">
+                    <p className="text-sm text-gray-400 italic leading-relaxed">{sentence.translation}</p>
+                  </div>
+                )}
 
                 {/* Action row for current sentence */}
                 {isCurrent && (
-                  <div className="flex items-center gap-3 mt-4 pt-3 border-t border-blue-200/50">
+                  <div className="flex items-center gap-2 mt-4 pt-3 border-t border-blue-200/50 flex-wrap">
                     <button
                       onClick={handleReplay}
                       disabled={playing}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 disabled:opacity-50 text-blue-600 text-sm font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 disabled:opacity-50 text-blue-600 text-sm font-medium transition-colors"
                     >
                       {playing ? '🔊' : '🔈'} {locale === 'zh' ? '重听' : 'Replay'}
                     </button>
+
+                    {isRevealed && (
+                      <button
+                        onClick={() => handleToggleTrans(idx)}
+                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          transVisible
+                            ? 'bg-indigo-100 text-indigo-600'
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                      >
+                        🌐 {locale === 'zh' ? '翻译' : 'Translate'}
+                      </button>
+                    )}
 
                     {isRevealed ? (
                       <button
@@ -215,14 +251,14 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
                       >
                         {currentIdx + 1 < sentences.length
                           ? (locale === 'zh' ? '下一句 →' : 'Next →')
-                          : (locale === 'zh' ? '查看结果 📊' : 'See Results 📊')}
+                          : (locale === 'zh' ? '查看结果' : 'See Results')}
                       </button>
                     ) : (
                       <button
                         onClick={() => handleReveal(idx)}
                         className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 text-sm font-medium transition-colors"
                       >
-                        {locale === 'zh' ? '👆 点击擦除查看' : '👆 Tap to reveal'}
+                        {locale === 'zh' ? '点击擦除查看' : 'Tap to reveal'}
                       </button>
                     )}
                   </div>
