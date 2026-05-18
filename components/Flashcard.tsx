@@ -28,14 +28,16 @@ export default function Flashcard({ word, onResult }: FlashcardProps) {
     if (!spokenRef.current) {
       spokenRef.current = true
       const timer = setTimeout(() => {
-        speak(word.word)
+        setPlaying(true)
+        speak(word.word, { onEnd: () => setPlaying(false) })
       }, 200)
       return () => clearTimeout(timer)
     }
   }, [word.word])
 
   const playAudio = () => {
-    speak(word.word)
+    setPlaying(true)
+    speak(word.word, { onEnd: () => setPlaying(false) })
   }
 
   const handleRemember = () => {
