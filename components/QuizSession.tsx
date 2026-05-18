@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
+import { addCoins } from '@/lib/pet'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -38,6 +39,7 @@ export default function QuizSession({ articles }: QuizSessionProps) {
   const [selected, setSelected] = useState<string | null>(null)
   const [showResult, setShowResult] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
+  const [coinsEarned, setCoinsEarned] = useState(0)
   const [answers, setAnswers] = useState<{ question: Question; chosen: string; correct: boolean }[]>([])
 
   const wordDb = useMemo(() => buildWordDatabase(articles), [articles])
@@ -113,6 +115,10 @@ export default function QuizSession({ articles }: QuizSessionProps) {
       setSelected(null)
       setShowResult(false)
     } else {
+      // Award coins: 10 per correct answer
+      const coinsEarned = correctCount * 10 + 20 // bonus 20 for finishing
+      addCoins(coinsEarned)
+      setCoinsEarned(coinsEarned)
       setStep('result')
     }
   }
@@ -279,7 +285,14 @@ export default function QuizSession({ articles }: QuizSessionProps) {
         {accuracy >= 80 ? '🎉' : accuracy >= 50 ? '💪' : '🌱'}
       </div>
       <h2 className="text-xl font-bold text-gray-800 mb-2">Quiz Complete!</h2>
-      <p className="text-sm text-gray-400 mb-6">Your score</p>
+      <p className="text-sm text-gray-400 mb-4">Your score</p>
+
+      {/* Coins earned */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 mb-6 inline-flex items-center gap-2 text-sm">
+        <span className="text-lg">🪙</span>
+        <span className="font-bold text-yellow-700">+{coinsEarned}</span>
+        <span className="text-yellow-500">coins earned!</span>
+      </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-green-50 rounded-xl p-3">

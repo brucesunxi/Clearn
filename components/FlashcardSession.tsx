@@ -6,6 +6,7 @@ import Flashcard from './Flashcard'
 import type { Article, VocabularyItem } from '@/lib/types'
 import { buildWordDatabase, getNewWords, getReviewWords, recordAnswer } from '@/lib/words'
 import { doCheckIn } from '@/lib/checkin'
+import { addCoins } from '@/lib/pet'
 
 interface FlashcardSessionProps {
   articles: Article[]
@@ -76,6 +77,7 @@ export default function FlashcardSession({ articles }: FlashcardSessionProps) {
 
         if (idx + 1 >= cards.length) {
           doCheckIn()
+          addCoins(20)
           setStep('summary')
         } else {
           setCurrentIndex(idx + 1)

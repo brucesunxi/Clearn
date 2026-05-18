@@ -1,11 +1,20 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
+import { getCoins } from '@/lib/pet'
 import SiteLogo from './SiteLogo'
 
 export default function Header() {
   const { locale, setLocale, t } = useTranslation()
+  const [coins, setCoins] = useState(0)
+
+  useEffect(() => {
+    setCoins(getCoins())
+    const interval = setInterval(() => setCoins(getCoins()), 3000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -25,6 +34,19 @@ export default function Header() {
             className="text-gray-600 hover:text-orange-500 font-medium transition-colors"
           >
             {t('nav.learn')} 📝
+          </Link>
+          <Link
+            href="/pet"
+            className="text-gray-600 hover:text-green-500 font-medium transition-colors"
+          >
+            🐼 {locale === 'zh' ? '宠物' : 'Pet'}
+          </Link>
+          <Link
+            href="/pet"
+            className="flex items-center gap-1 text-sm text-yellow-600 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full hover:bg-yellow-100 transition-colors"
+          >
+            <span>🪙</span>
+            <span className="font-semibold">{coins}</span>
           </Link>
           <button
             onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
