@@ -66,12 +66,7 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
     if (currentIdx + 1 < sentences.length) {
       const next = currentIdx + 1
       setCurrentIdx(next)
-      setRevealed((prev) => {
-        // Reveal the next sentence too
-        const r = new Set(prev)
-        r.add(next)
-        return r
-      })
+      // Next sentence starts covered — user must tap to reveal
       playSentence(next)
     } else {
       setStep('done')
