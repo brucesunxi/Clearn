@@ -33,18 +33,17 @@ function findBestVoice(): SpeechSynthesisVoice | null {
   const anyZH = voices.find((v) => v.lang.startsWith('zh'))
   if (anyZH) return anyZH
 
-  // Fallback: macOS Sin-Ji or default
-  const sinji = voices.find((v) => v.name.includes('Sin-Ji'))
-  if (sinji) return sinji
-
   return null
 }
 
-/** Ensure voice cache is populated. Call early (e.g. on first user interaction). */
+/** Ensure voice is loaded. Call early on page load. */
 export function initVoice() {
   if (typeof window === 'undefined' || voiceReady) return
 
-  // Try immediately (works if voices already loaded)
+  // Trigger voice loading in Chrome (first call returns empty)
+  window.speechSynthesis.getVoices()
+
+  // Try immediately in case voices already loaded
   const v = findBestVoice()
   if (v) {
     cachedVoice = v
@@ -52,7 +51,7 @@ export function initVoice() {
     return
   }
 
-  // Listen for voice load event and retry
+  // Listen for voice load event
   const onChanged = () => {
     const found = findBestVoice()
     if (found) {
@@ -67,7 +66,10 @@ export function initVoice() {
 export function speak(text: string, options?: { rate?: number; onEnd?: () => void }) {
   if (typeof window === 'undefined') return
 
-  // Re-check voice each time if not yet ready
+  // Chrome bug: speech synthesis can get stuck. resume() fixes it.
+  window.speechSynthesis.resume()
+
+  // Re-check voice each call if not yet ready
   if (!voiceReady) {
     const v = findBestVoice()
     if (v) {
@@ -76,22 +78,32 @@ export function speak(text: string, options?: { rate?: number; onEnd?: () => voi
     }
   }
 
+  // Cancel previous speech
   window.speechSynthesis.cancel()
 
-  const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = 'zh-CN'
-  utterance.rate = options?.rate ?? 0.85
-  utterance.pitch = 1.0
+  // Chrome bug: cancel + speak in same tick can fail.
+  // Defer to next tick so cancel completes first.
+  setTimeout(() => {
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'zh-CN'
+    utterance.rate = options?.rate ?? 0.85
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
 
-  if (cachedVoice) {
-    utterance.voice = cachedVoice
-  }
+    if (cachedVoice) {
+      utterance.voice = cachedVoice
+    }
 
-  if (options?.onEnd) {
-    utterance.onend = options.onEnd
-  }
+    if (options?.onEnd) {
+      utterance.onend = options.onEnd
+    }
 
-  window.speechSynthesis.speak(utterance)
+    utterance.onerror = () => {
+      // Chrome may fire error during rapid navigation — safe to ignore
+    }
+
+    window.speechSynthesis.speak(utterance)
+  }, 50)
 }
 
 export function cancelSpeech() {
