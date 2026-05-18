@@ -2,121 +2,70 @@
 
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
-import { AdBanner } from '@/lib/adsense'
-import type { Level, Article } from '@/lib/types'
 
-interface HomePageClientProps {
-  levels: Level[]
-  recentArticles: Article[]
-}
+export default function HomePageClient() {
+  const { locale } = useTranslation()
 
-export default function HomePageClient({ levels, recentArticles }: HomePageClientProps) {
-  const { t } = useTranslation()
+  const sections = [
+    {
+      href: '/listen',
+      emoji: '🎧',
+      title: locale === 'zh' ? '听' : 'Listen',
+      subtitle: locale === 'zh' ? '听中文，选意思' : 'Listen & Choose',
+      desc: locale === 'zh' ? '听单词的发音，选择正确的英文意思。提升听力理解能力。' : 'Listen to Chinese words and choose the correct meaning.',
+      bgClass: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
+      btnClass: 'bg-blue-500 hover:bg-blue-600',
+    },
+    {
+      href: '/speak',
+      emoji: '🗣️',
+      title: locale === 'zh' ? '说' : 'Speak',
+      subtitle: locale === 'zh' ? '看中文，开口说' : 'See & Speak',
+      desc: locale === 'zh' ? '看中文单词，用麦克风说出来。练习发音和口语表达。' : 'Read Chinese words aloud with speech recognition.',
+      bgClass: 'bg-red-50 hover:bg-red-100 border-red-200',
+      btnClass: 'bg-red-500 hover:bg-red-600',
+    },
+    {
+      href: '/reading',
+      emoji: '📖',
+      title: locale === 'zh' ? '读' : 'Read',
+      subtitle: locale === 'zh' ? '读文章，学词汇' : 'Read & Learn',
+      desc: locale === 'zh' ? '阅读分级文章，学习新单词。配合艾宾浩斯遗忘曲线科学记忆。' : 'Read leveled articles and learn words with spaced repetition.',
+      bgClass: 'bg-orange-50 hover:bg-orange-100 border-orange-200',
+      btnClass: 'bg-orange-500 hover:bg-orange-600',
+    },
+  ]
 
   return (
-    <div className="max-w-5xl mx-auto px-4">
-      {/* Hero section */}
-      <section className="text-center py-16 md:py-24">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-          {t('home.hero.title')} <span className="text-4xl">🎉</span>
+    <div className="max-w-5xl mx-auto px-4 py-12 md:py-20">
+      {/* Tagline */}
+      <div className="text-center mb-12 md:mb-16">
+        <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-3">
+          🐼 {locale === 'zh' ? '熊猫汉语' : 'Panda Chinese'}
         </h1>
-        <p className="text-lg text-gray-500 max-w-xl mx-auto mb-8">
-          {t('home.hero.subtitle')}
+        <p className="text-gray-500 text-lg">
+          {locale === 'zh' ? '听说读，三步学好中文' : 'Listen, Speak, Read — Three steps to Chinese'}
         </p>
-        <Link
-          href="/reading"
-          className="inline-flex items-center gap-2 bg-orange-500 text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-orange-600 transition-colors shadow-lg shadow-orange-200"
-        >
-          {t('home.hero.cta')} 📚
-        </Link>
-      </section>
+      </div>
 
-      <AdBanner />
-
-      {/* Levels section */}
-      <section className="mb-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          {t('home.levels.title')}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {levels.map((level) => (
-            <LevelCardInline key={level.id} level={level} t={t} />
-          ))}
-        </div>
-      </section>
-
-      <AdBanner />
-
-      {/* Recent articles */}
-      <section className="mb-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">{t('home.recent.title')}</h2>
+      {/* Three pillars */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        {sections.map((s) => (
           <Link
-            href="/reading"
-            className="text-orange-500 hover:text-orange-600 font-medium text-sm"
+            key={s.href}
+            href={s.href}
+            className={`group rounded-2xl border-2 ${s.bgClass} p-8 md:p-10 flex flex-col items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
           >
-            {t('home.recent.viewAll')} →
+            <span className="text-5xl md:text-6xl mb-4">{s.emoji}</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-1">{s.title}</h2>
+            <p className="text-sm font-medium text-gray-500 mb-4">{s.subtitle}</p>
+            <p className="text-sm text-gray-600 leading-relaxed mb-6">{s.desc}</p>
+            <span className={`inline-block px-6 py-2.5 rounded-full text-white font-medium text-sm transition-colors ${s.btnClass} group-hover:shadow-lg`}>
+              {locale === 'zh' ? '开始学习 →' : 'Start →'}
+            </span>
           </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {recentArticles.map((article) => (
-            <ArticleCardInline key={article.id} article={article} t={t} />
-          ))}
-        </div>
-      </section>
+        ))}
+      </div>
     </div>
-  )
-}
-
-function LevelCardInline({ level, t }: { level: Level; t: (key: string) => string }) {
-  return (
-    <Link
-      href={`/reading?level=${level.id}`}
-      className="block rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-      style={{ backgroundColor: level.color + '18' }}
-    >
-      <div className="text-4xl mb-3">{level.emoji}</div>
-      <h3 className="text-xl font-bold text-gray-800 mb-1">
-        {t(`level.${level.id}.name`)}
-      </h3>
-      <p className="text-sm text-gray-500 mb-2">{level.ageRange}</p>
-      <p className="text-sm text-gray-600 leading-relaxed">
-        {t(`level.${level.id}.desc`)}
-      </p>
-      <div
-        className="mt-3 inline-block text-xs font-medium px-3 py-1 rounded-full text-white"
-        style={{ backgroundColor: level.color }}
-      >
-        {level.charCount}
-      </div>
-    </Link>
-  )
-}
-
-function ArticleCardInline({ article, t }: { article: Article; t: (key: string) => string }) {
-  return (
-    <Link
-      href={`/reading/${article.id}`}
-      className="block bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-    >
-      <div className="flex items-start gap-3">
-        <span className="text-3xl">{article.emoji}</span>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-gray-800 truncate">{article.title}</h3>
-          <p className="text-sm text-gray-400 mt-0.5">{article.titleEn}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <span
-              className="text-xs px-2 py-0.5 rounded-full text-white font-medium"
-              style={{ backgroundColor: '#999' }}
-            >
-              {t(`level.${article.level}.name`)}
-            </span>
-            <span className="text-xs text-gray-400">
-              {article.vocabulary.length} {t('reading.newWords')}
-            </span>
-          </div>
-        </div>
-      </div>
-    </Link>
   )
 }
