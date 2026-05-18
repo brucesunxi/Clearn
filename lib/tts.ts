@@ -1,11 +1,13 @@
 'use client'
 
 let cachedVoice: SpeechSynthesisVoice | null = null
+let voiceReady = false
 
 function findBestVoice(): SpeechSynthesisVoice | null {
   if (typeof window === 'undefined') return null
 
   const voices = window.speechSynthesis.getVoices()
+  if (!voices.length) return null
 
   // Priority 1: Google 普通话 (Chrome, most natural)
   const googleZH = voices.find((v) => v.name.includes('Google 普通话'))
@@ -31,24 +33,55 @@ function findBestVoice(): SpeechSynthesisVoice | null {
   const anyZH = voices.find((v) => v.lang.startsWith('zh'))
   if (anyZH) return anyZH
 
-  // Fallback: 默认语音
-  return voices[0] || null
+  // Fallback: macOS Sin-Ji or default
+  const sinji = voices.find((v) => v.name.includes('Sin-Ji'))
+  if (sinji) return sinji
+
+  return null
+}
+
+/** Ensure voice cache is populated. Call early (e.g. on first user interaction). */
+export function initVoice() {
+  if (typeof window === 'undefined' || voiceReady) return
+
+  // Try immediately (works if voices already loaded)
+  const v = findBestVoice()
+  if (v) {
+    cachedVoice = v
+    voiceReady = true
+    return
+  }
+
+  // Listen for voice load event and retry
+  const onChanged = () => {
+    const found = findBestVoice()
+    if (found) {
+      cachedVoice = found
+      voiceReady = true
+      window.speechSynthesis.removeEventListener('voiceschanged', onChanged)
+    }
+  }
+  window.speechSynthesis.addEventListener('voiceschanged', onChanged)
 }
 
 export function speak(text: string, options?: { rate?: number; onEnd?: () => void }) {
   if (typeof window === 'undefined') return
 
-  // Some browsers (Chrome) need the voices reloaded
-  if (!cachedVoice) {
-    cachedVoice = findBestVoice()
+  // Re-check voice each time if not yet ready
+  if (!voiceReady) {
+    const v = findBestVoice()
+    if (v) {
+      cachedVoice = v
+      voiceReady = true
+    }
   }
 
   window.speechSynthesis.cancel()
 
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'zh-CN'
-  utterance.rate = options?.rate ?? 0.88
-  utterance.pitch = 1.05
+  utterance.rate = options?.rate ?? 0.85
+  utterance.pitch = 1.0
 
   if (cachedVoice) {
     utterance.voice = cachedVoice

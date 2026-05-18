@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
 import { getCoins } from '@/lib/pet'
+import { initVoice } from '@/lib/tts'
 import SiteLogo from './SiteLogo'
 
 export default function Header() {
@@ -15,6 +16,9 @@ export default function Header() {
     const interval = setInterval(() => setCoins(getCoins()), 3000)
     return () => clearInterval(interval)
   }, [])
+
+  // Initialize TTS voice early on page load
+  useEffect(() => { initVoice() }, [])
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">

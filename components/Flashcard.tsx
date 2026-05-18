@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
-import { speak } from '@/lib/tts'
+import { speak, initVoice } from '@/lib/tts'
 import type { VocabularyItem } from '@/lib/types'
 
 export type Judgment = 'remember' | 'forgot' | null
@@ -17,6 +17,9 @@ export default function Flashcard({ word, onResult }: FlashcardProps) {
   const { t } = useTranslation()
   const [judgment, setJudgment] = useState<Judgment>(null)
   const [showingVerification, setShowingVerification] = useState(false)
+
+  // Initialize TTS voice early so it's ready for user interaction
+  useEffect(() => { initVoice() }, [])
 
   const handleRemember = () => {
     setJudgment('remember')
