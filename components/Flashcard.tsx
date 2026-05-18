@@ -23,26 +23,19 @@ export default function Flashcard({ word, onResult }: FlashcardProps) {
   // Initialize TTS voice early
   useEffect(() => { initVoice() }, [])
 
-  // Auto-speak when a new word appears (after user clicks "Next")
+  // Auto-speak when a new word appears
   useEffect(() => {
     if (!spokenRef.current) {
       spokenRef.current = true
-      // Small delay to let the component mount completely
       const timer = setTimeout(() => {
-        setPlaying(true)
-        speak(word.word, {
-          onEnd: () => setPlaying(false),
-        })
+        speak(word.word)
       }, 200)
       return () => clearTimeout(timer)
     }
   }, [word.word])
 
   const playAudio = () => {
-    setPlaying(true)
-    speak(word.word, {
-      onEnd: () => setPlaying(false),
-    })
+    speak(word.word)
   }
 
   const handleRemember = () => {
