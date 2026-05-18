@@ -213,8 +213,8 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
                   {sentence.text}
                 </div>
 
-                {/* Translation — shown after reveal + toggle */}
-                {isRevealed && transVisible && (
+                {/* Translation — shown when toggled, regardless of reveal state */}
+                {transVisible && (
                   <div className="mt-2 pl-4 border-l-2 border-indigo-300">
                     <p className="text-sm text-gray-400 italic leading-relaxed">{sentence.translation}</p>
                   </div>
@@ -231,18 +231,16 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
                       {playing ? '🔊' : '🔈'} {locale === 'zh' ? '重听' : 'Replay'}
                     </button>
 
-                    {isRevealed && (
-                      <button
-                        onClick={() => handleToggleTrans(idx)}
-                        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          transVisible
-                            ? 'bg-indigo-100 text-indigo-600'
-                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                        }`}
-                      >
-                        🌐 {locale === 'zh' ? '翻译' : 'Translate'}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleToggleTrans(idx)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        transVisible
+                          ? 'bg-indigo-100 text-indigo-600'
+                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                      }`}
+                    >
+                      🌐 {locale === 'zh' ? '翻译' : 'Translate'}
+                    </button>
 
                     {isRevealed ? (
                       <button
