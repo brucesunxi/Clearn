@@ -256,12 +256,20 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
                           : (locale === 'zh' ? '查看结果' : 'See Results')}
                       </button>
                     ) : (
-                      <button
-                        onClick={() => handleReveal(idx)}
-                        className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 text-sm font-medium transition-colors"
-                      >
-                        {locale === 'zh' ? '点击擦除查看' : 'Tap to reveal'}
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleReveal(idx)}
+                          className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 text-sm font-medium transition-colors"
+                        >
+                          {locale === 'zh' ? '点击擦除查看' : 'Tap to reveal'}
+                        </button>
+                        <button
+                          onClick={() => { cancelSpeech(); handleNext() }}
+                          className="px-3 py-2 rounded-lg text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                          {locale === 'zh' ? '跳过 →' : 'Skip →'}
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
