@@ -30,30 +30,33 @@ export default function ReadingPageClient({
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('reading.title')}</h1>
-      <p className="text-gray-400 mb-4">{t('reading.subtitle')}</p>
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-1">📖 {t('reading.title')}</h1>
+        <p className="text-gray-400 text-sm">{t('reading.subtitle')}</p>
+      </div>
 
       {/* Stats bar */}
       <div className="flex gap-3 mb-6">
-        <div className="bg-sky-50 rounded-xl px-4 py-2.5 flex items-center gap-2">
-          <span className="text-lg">📖</span>
+        <div className="bg-gradient-to-br from-sky-50 to-sky-100/50 rounded-xl px-4 py-2.5 flex items-center gap-2 flex-1">
+          <span className="text-xl">📚</span>
           <div>
-            <div className="text-sm font-bold text-sky-600">{articles.length}</div>
-            <div className="text-[10px] text-sky-400">{locale === 'zh' ? '文章' : 'Articles'}</div>
+            <div className="text-lg font-bold text-sky-700">{articles.length}</div>
+            <div className="text-[10px] text-sky-500 font-medium">{locale === 'zh' ? '文章' : 'Articles'}</div>
           </div>
         </div>
-        <div className="bg-emerald-50 rounded-xl px-4 py-2.5 flex items-center gap-2">
-          <span className="text-lg">📝</span>
+        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 rounded-xl px-4 py-2.5 flex items-center gap-2 flex-1">
+          <span className="text-xl">📝</span>
           <div>
-            <div className="text-sm font-bold text-emerald-600">{totalWords}</div>
-            <div className="text-[10px] text-emerald-400">{locale === 'zh' ? '已学单词' : 'Learned'}</div>
+            <div className="text-lg font-bold text-emerald-700">{totalWords}</div>
+            <div className="text-[10px] text-emerald-500 font-medium">{locale === 'zh' ? '已学单词' : 'Learned'}</div>
           </div>
         </div>
-        <div className="bg-violet-50 rounded-xl px-4 py-2.5 flex items-center gap-2">
-          <span className="text-lg">✅</span>
+        <div className="bg-gradient-to-br from-violet-50 to-violet-100/50 rounded-xl px-4 py-2.5 flex items-center gap-2 flex-1">
+          <span className="text-xl">✅</span>
           <div>
-            <div className="text-sm font-bold text-violet-600">{mastered}</div>
-            <div className="text-[10px] text-violet-400">{locale === 'zh' ? '已掌握' : 'Mastered'}</div>
+            <div className="text-lg font-bold text-violet-700">{mastered}</div>
+            <div className="text-[10px] text-violet-500 font-medium">{locale === 'zh' ? '已掌握' : 'Mastered'}</div>
           </div>
         </div>
       </div>
@@ -62,22 +65,22 @@ export default function ReadingPageClient({
       <div className="flex flex-wrap gap-2 mb-8">
         <Link
           href="/reading"
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
             !selectedLevelId
-              ? 'bg-gray-800 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ? 'bg-gray-800 text-white shadow-sm'
+              : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
           }`}
         >
-          {t('reading.all')}
+          🌐 {t('reading.all')}
         </Link>
         {levels.map((l) => (
           <Link
             key={l.id}
             href={`/reading?level=${l.id}`}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
               selectedLevelId === l.id
-                ? 'text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'text-white shadow-sm'
+                : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
             }`}
             style={selectedLevelId === l.id ? { backgroundColor: l.color } : undefined}
           >
@@ -86,26 +89,23 @@ export default function ReadingPageClient({
         ))}
       </div>
 
-      {/* Selected level header */}
+      {/* Selected level description */}
       {selectedLevel && (
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800">
-            {selectedLevel.emoji} {t(`level.${selectedLevel.id}.name`)}
-          </h2>
-          <p className="text-sm text-gray-400 mt-1">{t(`level.${selectedLevel.id}.desc`)}</p>
+        <div className="mb-6 bg-gray-50 rounded-xl px-5 py-3">
+          <p className="text-sm text-gray-500">{t(`level.${selectedLevel.id}.desc`)}</p>
         </div>
       )}
 
       {/* Article list */}
       {articles.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-4xl mb-4">📝</p>
-          <p>{t('reading.noArticles')}</p>
+        <div className="text-center py-20 text-gray-400">
+          <p className="text-5xl mb-4">📝</p>
+          <p className="text-lg">{t('reading.noArticles')}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {articles.map((article) => (
-            <ArticleCardClient key={article.id} article={article} t={t} />
+            <ArticleCardClient key={article.id} article={article} locale={locale} t={t} />
           ))}
         </div>
       )}
@@ -115,31 +115,60 @@ export default function ReadingPageClient({
 
 function ArticleCardClient({
   article,
+  locale,
   t,
 }: {
   article: Article
+  locale: string
   t: (key: string, params?: Record<string, string | number>) => string
 }) {
+  // Get the first paragraph as a preview
+  const preview = article.paragraphs[0]?.text.slice(0, 80) || ''
+
   return (
     <Link
       href={`/reading/${article.id}`}
-      className="block bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+      className="group block bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
     >
-      <div className="flex items-start gap-3">
-        <span className="text-3xl">{article.emoji}</span>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-gray-800 truncate">{article.title}</h3>
-          <p className="text-sm text-gray-400 mt-0.5">{article.titleEn}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium bg-gray-400">
-              {t(`level.${article.level}.name`)}
-            </span>
-            <span className="text-xs text-gray-400">
-              {article.vocabulary.length} {t('reading.newWords')}
-            </span>
+      {/* Top color bar */}
+      <div
+        className="h-1.5"
+        style={{ backgroundColor: article.level ? levelsColor[article.level - 1] : '#999' }}
+      />
+
+      <div className="p-5">
+        <div className="flex items-start gap-3 mb-3">
+          <span className="text-3xl shrink-0">{article.emoji}</span>
+          <div className="min-w-0">
+            <h3 className="text-lg font-bold text-gray-800 leading-tight">{article.title}</h3>
+            <p className="text-sm text-gray-400 mt-0.5">{article.titleEn}</p>
           </div>
+        </div>
+
+        {/* Text preview */}
+        <p className="text-sm text-gray-400 line-clamp-2 mb-3 leading-relaxed">
+          {preview}
+          {preview.length >= 80 && '...'}
+        </p>
+
+        {/* Tags row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span
+            className="text-xs px-2.5 py-0.5 rounded-full text-white font-medium"
+            style={{ backgroundColor: article.level ? levelsColor[article.level - 1] : '#999' }}
+          >
+            {t(`level.${article.level}.name`)}
+          </span>
+          <span className="text-xs text-gray-400">
+            📝 {article.vocabulary.length} {t('reading.newWords')}
+          </span>
+          <span className="text-xs text-gray-400 ml-auto group-hover:text-orange-500 transition-colors">
+            {locale === 'zh' ? '阅读 →' : 'Read →'}
+          </span>
         </div>
       </div>
     </Link>
   )
 }
+
+const levelsColor = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4']

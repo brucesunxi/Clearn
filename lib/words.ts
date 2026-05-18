@@ -30,7 +30,7 @@ export function getWordId(word: string, level: number, articleId: string): strin
   return `${word}_level-${level}_${articleId}`
 }
 
-function getAllProgress(): Record<string, WordProgress> {
+export function getAllProgress(): Record<string, WordProgress> {
   if (typeof window === 'undefined') return {}
   try {
     const raw = localStorage.getItem(STORAGE_KEY)

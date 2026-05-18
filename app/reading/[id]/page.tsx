@@ -31,7 +31,7 @@ export default function ArticlePage({ params }: ArticlePageProps) {
       <AdBanner />
 
       {/* Vocabulary list */}
-      <WordList vocabulary={article.vocabulary} />
+      <WordList vocabulary={article.vocabulary} articleId={article.id} />
 
       {/* Learn this lesson's words */}
       <div className="mt-8 text-center">

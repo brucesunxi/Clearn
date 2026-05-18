@@ -10,7 +10,7 @@ interface ArticleContentProps {
 }
 
 export default function ArticleContent({ article }: ArticleContentProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [selectedWord, setSelectedWord] = useState<VocabularyItem | null>(null)
   const [showTranslations, setShowTranslations] = useState(false)
 
@@ -53,31 +53,38 @@ export default function ArticleContent({ article }: ArticleContentProps) {
 
   return (
     <article className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
+      {/* Article header */}
+      <div className="text-center mb-10">
         <span className="text-5xl block mb-4">{article.emoji}</span>
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2 leading-tight">
           {article.title}
         </h1>
-        <p className="text-gray-400">{article.titleEn}</p>
+        <p className="text-base text-gray-400">{article.titleEn}</p>
       </div>
 
-      <div className="flex justify-center mb-6">
+      {/* Toolbar */}
+      <div className="flex items-center justify-center gap-3 mb-8">
         <button
           onClick={() => setShowTranslations(!showTranslations)}
-          className={`text-sm px-4 py-1.5 rounded-full border transition-colors ${
+          className={`text-sm px-4 py-2 rounded-full border transition-all font-medium ${
             showTranslations
-              ? 'bg-orange-500 text-white border-orange-500'
-              : 'bg-white text-gray-500 border-gray-200 hover:border-orange-300'
+              ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
+              : 'bg-white text-gray-500 border-gray-200 hover:border-orange-300 hover:text-orange-500'
           }`}
         >
+          {showTranslations ? '🕶️ ' : ''}
           {showTranslations ? t('article.hideTranslation') : t('article.showTranslation')}
         </button>
+        <span className="text-xs text-gray-300">
+          {locale === 'zh' ? `${article.vocabulary.length} 个生词` : `${article.vocabulary.length} words`}
+        </span>
       </div>
 
-      <div className="space-y-6">
+      {/* Paragraphs */}
+      <div className="space-y-8">
         {article.paragraphs.map((p, i) => (
           <div key={i}>
-            <p className="text-xl leading-[2.2] text-gray-800">
+            <p className="text-xl md:text-2xl leading-[2.4] text-gray-800 font-serif tracking-wide">
               {highlightText(p.text).map((part, j) =>
                 typeof part === 'string' ? (
                   <span key={j}>{part}</span>
@@ -94,14 +101,22 @@ export default function ArticleContent({ article }: ArticleContentProps) {
               )}
             </p>
             {showTranslations && (
-              <p className="text-sm text-gray-400 mt-1 italic">{p.translation}</p>
+              <div className="mt-2 pl-4 border-l-2 border-orange-200">
+                <p className="text-sm text-gray-400 italic leading-relaxed">{p.translation}</p>
+              </div>
             )}
           </div>
         ))}
       </div>
 
+      {/* Word popup */}
       {selectedWord && (
-        <WordCard word={selectedWord} onClose={() => setSelectedWord(null)} />
+        <WordCard
+          word={selectedWord}
+          articleId={article.id}
+          articleLevel={article.level}
+          onClose={() => setSelectedWord(null)}
+        />
       )}
     </article>
   )
