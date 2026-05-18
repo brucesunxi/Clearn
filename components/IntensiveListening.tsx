@@ -30,13 +30,17 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
   const splitSentences = useCallback((article: Article): SentenceItem[] => {
     const result: SentenceItem[] = []
     for (const p of article.paragraphs) {
-      const parts = p.text.split(/(?<=[。！？!?])/).filter(Boolean)
-      for (const part of parts) {
+      const chineseParts = p.text.split(/(?<=[。！？!?])/).filter(Boolean)
+      const transParts = p.translation.split(/(?<=[.!?])\s*/).filter(Boolean)
+      chineseParts.forEach((part, i) => {
         const trimmed = part.trim()
         if (trimmed) {
-          result.push({ text: trimmed, translation: p.translation })
+          result.push({
+            text: trimmed,
+            translation: transParts[i]?.trim() || p.translation,
+          })
         }
-      }
+      })
     }
     return result
   }, [])
