@@ -1,7 +1,8 @@
-import { getAllArticles } from '@/lib/content'
+import { getLevels, getAllArticles } from '@/lib/content'
 import LearnPageClient from '@/components/LearnPageClient'
 
 export default function LearnPage() {
+  const levels = getLevels()
   const articles = getAllArticles()
-  return <LearnPageClient articles={articles} />
+  return <LearnPageClient levels={levels} articles={articles} />
 }
