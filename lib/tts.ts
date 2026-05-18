@@ -10,7 +10,7 @@ export function speak(text: string, options?: { onEnd?: () => void }) {
   if (!('speechSynthesis' in window)) return
   if (!text) return
 
-  // Try to find a good Chinese voice
+  // Find best Chinese voice
   const voices = window.speechSynthesis.getVoices()
   const chineseVoice =
     voices.find((v) => v.name.includes('Google 普通话')) ||
@@ -18,8 +18,9 @@ export function speak(text: string, options?: { onEnd?: () => void }) {
     voices.find((v) => v.name.includes('Ting-Ting')) ||
     voices.find((v) => v.lang.startsWith('zh'))
 
-  window.speechSynthesis.cancel()
-
+  // IMPORTANT: Do NOT call cancel() before speak().
+  // Chrome bug: cancel+speak in the same execution context silences the audio.
+  // Chrome handles overlapping speech gracefully — a new speak() interrupts the previous one.
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'zh-CN'
   utterance.rate = 0.9
