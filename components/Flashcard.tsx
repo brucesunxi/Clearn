@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak, initVoice } from '@/lib/tts'
 import type { VocabularyItem } from '@/lib/types'
@@ -14,22 +14,44 @@ interface FlashcardProps {
 }
 
 export default function Flashcard({ word, onResult }: FlashcardProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [judgment, setJudgment] = useState<Judgment>(null)
   const [showingVerification, setShowingVerification] = useState(false)
+  const [playing, setPlaying] = useState(false)
+  const spokenRef = useRef(false)
 
-  // Initialize TTS voice early so it's ready for user interaction
+  // Initialize TTS voice early
   useEffect(() => { initVoice() }, [])
+
+  // Auto-speak when a new word appears (after user clicks "Next")
+  useEffect(() => {
+    if (!spokenRef.current) {
+      spokenRef.current = true
+      // Small delay to let the component mount completely
+      const timer = setTimeout(() => {
+        setPlaying(true)
+        speak(word.word, {
+          onEnd: () => setPlaying(false),
+        })
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [word.word])
+
+  const playAudio = () => {
+    setPlaying(true)
+    speak(word.word, {
+      onEnd: () => setPlaying(false),
+    })
+  }
 
   const handleRemember = () => {
     setJudgment('remember')
     setShowingVerification(true)
-    speak(word.word)
   }
 
   const handleForgot = () => {
     setJudgment('forgot')
-    speak(word.word)
   }
 
   const handleKnew = () => onResult(true)
@@ -39,7 +61,14 @@ export default function Flashcard({ word, onResult }: FlashcardProps) {
   if (judgment === null) {
     return (
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
-        <div className="text-5xl font-bold text-gray-800 mb-8 mt-4">{word.word}</div>
+        <button
+          onClick={playAudio}
+          className="text-5xl mb-4 hover:scale-110 transition-transform cursor-pointer"
+          title={locale === 'zh' ? '听发音' : 'Listen'}
+        >
+          {playing ? '🔊' : '🔇'}
+        </button>
+        <div className="text-5xl font-bold text-gray-800 mb-8 mt-2">{word.word}</div>
         <button
           onClick={handleRemember}
           className="w-full py-4 rounded-xl bg-green-500 hover:bg-green-600 text-white text-lg font-medium mb-3 transition-colors shadow-sm"
@@ -59,6 +88,13 @@ export default function Flashcard({ word, onResult }: FlashcardProps) {
   if (judgment === 'remember' && showingVerification) {
     return (
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+        <button
+          onClick={playAudio}
+          className="text-3xl mb-3 hover:scale-110 transition-transform cursor-pointer"
+          title={locale === 'zh' ? '听发音' : 'Listen'}
+        >
+          {playing ? '🔊' : '🔇'}
+        </button>
         <div className="text-4xl font-bold text-gray-800 mb-3">{word.word}</div>
         <div className="text-lg text-gray-500 mb-1">{word.pinyin}</div>
         <div className="text-xl text-gray-700 mb-6 font-medium">{word.meaning}</div>
@@ -84,6 +120,13 @@ export default function Flashcard({ word, onResult }: FlashcardProps) {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+      <button
+        onClick={playAudio}
+        className="text-3xl mb-3 hover:scale-110 transition-transform cursor-pointer"
+        title={locale === 'zh' ? '听发音' : 'Listen'}
+      >
+        {playing ? '🔊' : '🔇'}
+      </button>
       <div className="text-3xl font-bold text-gray-800 mb-2">{word.word}</div>
       <div className="text-base text-gray-500 mb-1">{word.pinyin}</div>
       <div className="text-lg text-gray-700 mb-6">{word.meaning}</div>
