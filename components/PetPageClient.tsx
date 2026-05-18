@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import {
   getPet, getInventory, feedPet, buyFood, buyAccessory, toggleEquip,
   FOOD_ITEMS, ACCESSORY_ITEMS, petStatsText,
 } from '@/lib/pet'
 import type { PetState, Inventory } from '@/lib/pet'
+
+const FOOD_QTY_OPTIONS = [1, 3, 5, 10]
 
 const ACCESSORY_POSITIONS: Record<string, { top: string; left: string; size: string }> = {
   red_scarf: { top: '62%', left: '40%', size: '28px' },
@@ -24,6 +26,7 @@ export default function PetPageClient() {
   const [inv, setInv] = useState<Inventory>(() => getInventory())
   const [feedMsg, setFeedMsg] = useState('')
   const [shopMsg, setShopMsg] = useState('')
+  const [foodQty, setFoodQty] = useState<Record<string, number>>({})
 
   const handleFeed = (foodId: string) => {
     const result = feedPet(foodId)
@@ -34,12 +37,14 @@ export default function PetPageClient() {
   }
 
   const handleBuyFood = (foodId: string) => {
-    const ok = buyFood(foodId)
+    const qty = foodQty[foodId] || 1
+    const totalPrice = (FOOD_ITEMS.find((f) => f.id === foodId)?.price || 0) * qty
+    const ok = buyFood(foodId, qty)
     if (ok) {
       setInv(getInventory())
-      setShopMsg('Purchased! 🎉')
+      setShopMsg(`Purchased ${qty}x! 🎉`)
     } else {
-      setShopMsg('Not enough coins!')
+      setShopMsg(`Not enough coins! Need 🪙 ${totalPrice}`)
     }
     setTimeout(() => setShopMsg(''), 2000)
   }
@@ -237,31 +242,61 @@ export default function PetPageClient() {
               🍽️ {locale === 'zh' ? '食物' : 'Food'}
             </h3>
             <div className="space-y-3">
-              {FOOD_ITEMS.map((food) => (
-                <div key={food.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{food.emoji}</span>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700">{food.name}</p>
-                      <p className="text-xs text-gray-400">
-                        {food.effect?.hunger ? `+${food.effect.hunger} 🍚` : ''}
-                        {food.effect?.hunger && food.effect?.happiness ? ' · ' : ''}
-                        {food.effect?.happiness ? `+${food.effect.happiness} 😊` : ''}
-                      </p>
+              {FOOD_ITEMS.map((food) => {
+                const qty = foodQty[food.id] || 1
+                const totalPrice = food.price * qty
+                const canAfford = inv.coins >= totalPrice
+                return (
+                  <div key={food.id} className="p-3 bg-gray-50 rounded-xl">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{food.emoji}</span>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">{food.name}</p>
+                          <p className="text-xs text-gray-400">
+                            {food.effect?.hunger ? `+${food.effect.hunger} 🍚` : ''}
+                            {food.effect?.hunger && food.effect?.happiness ? ' · ' : ''}
+                            {food.effect?.happiness ? `+${food.effect.happiness} 😊` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-yellow-600 font-medium">🪙 {food.price}/{locale === 'zh' ? '个' : 'each'}</span>
+                      </div>
+                    </div>
+                    {/* Quantity selector + Buy button */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1">
+                        {FOOD_QTY_OPTIONS.map((n) => (
+                          <button
+                            key={n}
+                            onClick={() => setFoodQty((prev) => ({ ...prev, [food.id]: n }))}
+                            className={`px-2.5 py-1 text-xs rounded-lg transition-colors ${
+                              qty === n
+                                ? 'bg-green-500 text-white'
+                                : 'bg-white text-gray-500 border border-gray-200 hover:border-green-300'
+                            }`}
+                          >
+                            ×{n}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-400">
+                          🪙 {totalPrice}
+                        </span>
+                        <button
+                          onClick={() => handleBuyFood(food.id)}
+                          disabled={!canAfford}
+                          className="px-4 py-1.5 text-sm rounded-lg bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                        >
+                          {locale === 'zh' ? '购买' : 'Buy'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-yellow-600 font-medium">🪙 {food.price}</span>
-                    <button
-                      onClick={() => handleBuyFood(food.id)}
-                      disabled={inv.coins < food.price}
-                      className="px-3 py-1.5 text-xs rounded-lg bg-green-500 text-white hover:bg-green-600 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
-                    >
-                      {locale === 'zh' ? '购买' : 'Buy'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 

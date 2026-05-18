@@ -176,14 +176,16 @@ export function spendCoins(amount: number): boolean {
   return true
 }
 
-export function buyFood(foodId: string): boolean {
+export function buyFood(foodId: string, quantity: number = 1): boolean {
   const item = FOOD_ITEMS.find((f) => f.id === foodId)
   if (!item) return false
-  if (!spendCoins(item.price)) return false
+
+  const totalPrice = item.price * quantity
+  if (!spendCoins(totalPrice)) return false
 
   const inv = getInventoryRaw()
   const newFood = { ...inv.food }
-  newFood[foodId] = (newFood[foodId] || 0) + 1
+  newFood[foodId] = (newFood[foodId] || 0) + quantity
   saveInventory({ ...inv, food: newFood })
   return true
 }
