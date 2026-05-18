@@ -36,14 +36,13 @@ function findBestVoice(): SpeechSynthesisVoice | null {
   return null
 }
 
-/** Ensure voice is loaded. Call early on page load. */
+/** Warm up the speech engine. Call early on page load. */
 export function initVoice() {
   if (typeof window === 'undefined' || voiceReady) return
 
-  // Trigger voice loading in Chrome (first call returns empty)
+  // Trigger Chrome to start loading voices
   window.speechSynthesis.getVoices()
 
-  // Try immediately in case voices already loaded
   const v = findBestVoice()
   if (v) {
     cachedVoice = v
@@ -51,7 +50,6 @@ export function initVoice() {
     return
   }
 
-  // Listen for voice load event
   const onChanged = () => {
     const found = findBestVoice()
     if (found) {
@@ -64,12 +62,12 @@ export function initVoice() {
 }
 
 export function speak(text: string, options?: { rate?: number; onEnd?: () => void }) {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined' || !text) return
 
-  // Chrome bug: speech synthesis can get stuck. resume() fixes it.
+  // Chrome can pause speech synthesis; resume() unsticks it
   window.speechSynthesis.resume()
 
-  // Re-check voice each call if not yet ready
+  // Keep trying to find a voice on each call
   if (!voiceReady) {
     const v = findBestVoice()
     if (v) {
@@ -78,12 +76,12 @@ export function speak(text: string, options?: { rate?: number; onEnd?: () => voi
     }
   }
 
-  // Cancel previous speech
+  // Cancel any previous speech
   window.speechSynthesis.cancel()
 
-  // Chrome bug: cancel + speak in same tick can fail.
-  // Defer to next tick so cancel completes first.
-  setTimeout(() => {
+  // Chrome bug: cancel() is processed async — speak() right after can silently fail.
+  // requestAnimationFrame fires after cancel is fully committed.
+  requestAnimationFrame(() => {
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = 'zh-CN'
     utterance.rate = options?.rate ?? 0.85
@@ -98,12 +96,12 @@ export function speak(text: string, options?: { rate?: number; onEnd?: () => voi
       utterance.onend = options.onEnd
     }
 
-    utterance.onerror = () => {
-      // Chrome may fire error during rapid navigation — safe to ignore
+    try {
+      window.speechSynthesis.speak(utterance)
+    } catch {
+      // Some mobile browsers may throw — silently ignore
     }
-
-    window.speechSynthesis.speak(utterance)
-  }, 50)
+  })
 }
 
 export function cancelSpeech() {
