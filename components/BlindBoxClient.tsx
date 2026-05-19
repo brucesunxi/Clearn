@@ -1,23 +1,57 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { generateBoxes, processPrize } from '@/lib/blindbox'
-import { useCoins } from '@/lib/use-coins'
 import type { DrawnPrize } from '@/lib/blindbox'
 
 const BOX_COST = 100
 
-/** Sync localStorage inventory to Redis via API */
+function userId(): string {
+  if (typeof window === 'undefined') return ''
+  let id = localStorage.getItem('chineselearn-user-id')
+  if (!id) {
+    id = `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+    localStorage.setItem('chineselearn-user-id', id)
+  }
+  return id
+}
+
+async function apiRefresh(): Promise<number> {
+  const res = await fetch('/api/coins', { headers: { 'x-user-id': userId() } })
+  if (res.ok) {
+    const data = await res.json()
+    return data.balance
+  }
+  return -1
+}
+
+async function apiSpend(amount: number): Promise<boolean> {
+  const res = await fetch('/api/coins/spend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-user-id': userId() },
+    body: JSON.stringify({ amount }),
+  })
+  return res.ok
+}
+
+async function apiAddCoins(amount: number): Promise<boolean> {
+  const res = await fetch('/api/coins', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-user-id': userId() },
+    body: JSON.stringify({ amount }),
+  })
+  return res.ok
+}
+
 async function syncInventoryToApi() {
   try {
     const raw = localStorage.getItem('panda-inventory')
     if (!raw) return
     const inv = JSON.parse(raw)
-    const userId = localStorage.getItem('chineselearn-user-id') || ''
     await fetch('/api/inventory', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+      headers: { 'Content-Type': 'application/json', 'x-user-id': userId() },
       body: JSON.stringify({
         inventory: { food: inv.food || {}, accessories: inv.accessories || {}, equipped: inv.equipped || [] },
       }),
@@ -29,10 +63,9 @@ async function syncPetToApi() {
   try {
     const raw = localStorage.getItem('panda-pet')
     if (!raw) return
-    const userId = localStorage.getItem('chineselearn-user-id') || ''
     await fetch('/api/inventory', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+      headers: { 'Content-Type': 'application/json', 'x-user-id': userId() },
       body: JSON.stringify({ pet: JSON.parse(raw) }),
     })
   } catch { /* silently fail */ }
@@ -40,27 +73,30 @@ async function syncPetToApi() {
 
 export default function BlindBoxClient() {
   const { locale } = useTranslation()
-  const { balance: coins, spend, add: addCoinsApi, refresh: refreshCoins } = useCoins()
+  const [coins, setCoins] = useState(0)
   const [phase, setPhase] = useState<'idle' | 'boxes'>('idle')
   const [boxes, setBoxes] = useState<DrawnPrize[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [message, setMessage] = useState('')
 
+  // Fetch balance on mount + periodic refresh
+  const refresh = useCallback(async () => {
+    const b = await apiRefresh()
+    if (b >= 0) setCoins(b)
+  }, [])
+  useEffect(() => { refresh(); const t = setInterval(refresh, 1000); return () => clearInterval(t) }, [refresh])
+
   const handleBuyBoxes = async () => {
-    try {
-      const ok = await spend(BOX_COST)
-      if (!ok) {
-        setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
-        return
-      }
-      await refreshCoins()
-      setBoxes(generateBoxes())
-      setSelectedIndex(null)
-      setMessage('')
-      setPhase('boxes')
-    } catch {
-      setMessage(locale === 'zh' ? '操作失败，请重试' : 'Operation failed, please try again.')
+    const ok = await apiSpend(BOX_COST)
+    if (!ok) {
+      setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
+      return
     }
+    await refresh()
+    setBoxes(generateBoxes())
+    setSelectedIndex(null)
+    setMessage('')
+    setPhase('boxes')
   }
 
   const handleOpen = async (index: number) => {
@@ -74,26 +110,22 @@ export default function BlindBoxClient() {
       return
     }
 
-    // Coin prizes → API first, then sync localStorage
     if (prize.type === 'coins' && prize.coinAmount) {
-      await addCoinsApi(prize.coinAmount)
-      await refreshCoins()
-      // Also update localStorage for consistency
+      await apiAddCoins(prize.coinAmount)
+      await refresh()
       const { addCoins } = await import('@/lib/pet')
       addCoins(prize.coinAmount)
       setMessage(locale === 'zh' ? `获得 ${prize.coinAmount} 金币！` : `Got ${prize.coinAmount} coins!`)
       return
     }
 
-    // Food / accessory / bundle → localStorage first (processPrize), then sync to API
     processPrize(prize)
 
     if (prize.type === 'bundle' && prize.bundleItems) {
-      const coinItems = prize.bundleItems.filter((i) => i.type === 'coins')
-      for (const ci of coinItems) {
-        await addCoinsApi(ci.amount)
+      for (const ci of prize.bundleItems.filter((i) => i.type === 'coins')) {
+        await apiAddCoins(ci.amount)
       }
-      await refreshCoins()
+      await refresh()
     }
 
     await syncInventoryToApi()
