@@ -158,6 +158,47 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
           </div>
         </Link>
       </div>
+
+      {/* DIY Import Section */}
+      <Link href="/import"
+        className="group mt-8 block bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-2xl border-2 border-dashed border-indigo-200 hover:border-indigo-400 p-6 md:p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          {/* Icon */}
+          <div className="shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
+            ✨
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-xl font-bold text-gray-800 mb-1">
+              {locale === 'zh' ? '🧩 自制学习素材' : '🧩 DIY Learning Materials'}
+            </h2>
+            <p className="text-sm text-gray-500 mb-3">
+              {locale === 'zh'
+                ? '粘贴中文文本或上传 .txt 文件，自动分析词汇、生成拼音，创建专属学习文章。素材自动应用到阅读、单词记忆、听力口语所有模块！'
+                : 'Paste Chinese text or upload a .txt file. Auto-extract vocabulary, generate pinyin, and create your own articles — usable across Reading, Word Memorization, Listening & Speaking!'}
+            </p>
+
+            {/* Steps */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs">
+              <span className="px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-600 font-medium">📝 {locale === 'zh' ? '粘贴文本' : 'Paste text'}</span>
+              <span className="text-gray-300 text-lg">→</span>
+              <span className="px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-600 font-medium">🔍 {locale === 'zh' ? '自动分析' : 'Auto-analyze'}</span>
+              <span className="text-gray-300 text-lg">→</span>
+              <span className="px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-600 font-medium">📖 {locale === 'zh' ? '生成文章' : 'Create article'}</span>
+              <span className="text-gray-300 text-lg">→</span>
+              <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-emerald-100 to-sky-100 text-emerald-600 font-medium">🎯 {locale === 'zh' ? '全模块使用' : 'All modules'}</span>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="shrink-0">
+            <span className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium shadow-sm group-hover:shadow-md group-hover:from-indigo-600 group-hover:to-purple-700 transition-all duration-300">
+              📥 {locale === 'zh' ? '开始导入' : 'Import Now'}
+            </span>
+          </div>
+        </div>
+      </Link>
     </div>
   )
 }
