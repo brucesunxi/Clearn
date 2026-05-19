@@ -8,6 +8,36 @@ import type { DrawnPrize } from '@/lib/blindbox'
 
 const BOX_COST = 100
 
+/** Sync localStorage inventory to Redis via API */
+async function syncInventoryToApi() {
+  try {
+    const raw = localStorage.getItem('panda-inventory')
+    if (!raw) return
+    const inv = JSON.parse(raw)
+    const userId = localStorage.getItem('chineselearn-user-id') || ''
+    await fetch('/api/inventory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+      body: JSON.stringify({
+        inventory: { food: inv.food || {}, accessories: inv.accessories || {}, equipped: inv.equipped || [] },
+      }),
+    })
+  } catch { /* silently fail */ }
+}
+
+async function syncPetToApi() {
+  try {
+    const raw = localStorage.getItem('panda-pet')
+    if (!raw) return
+    const userId = localStorage.getItem('chineselearn-user-id') || ''
+    await fetch('/api/inventory', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+      body: JSON.stringify({ pet: JSON.parse(raw) }),
+    })
+  } catch { /* silently fail */ }
+}
+
 export default function BlindBoxClient() {
   const { locale } = useTranslation()
   const { balance: coins, spend, add: addCoinsApi } = useCoins()
@@ -42,14 +72,18 @@ export default function BlindBoxClient() {
       await addCoinsApi(prize.coinAmount)
       setMessage(locale === 'zh' ? `获得 ${prize.coinAmount} 金币！` : `Got ${prize.coinAmount} coins!`)
     } else if (prize.type === 'bundle' && prize.bundleItems) {
-      processPrize(prize) // food/accessory → localStorage
+      processPrize(prize)
       const coinItems = prize.bundleItems.filter((i) => i.type === 'coins')
       for (const ci of coinItems) {
         await addCoinsApi(ci.amount)
       }
+      await syncInventoryToApi()
+      await syncPetToApi()
       setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
     } else {
-      processPrize(prize) // food/accessory → localStorage
+      processPrize(prize)
+      await syncInventoryToApi()
+      await syncPetToApi()
       setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
     }
   }
