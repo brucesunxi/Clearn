@@ -47,15 +47,19 @@ export default function BlindBoxClient() {
   const [message, setMessage] = useState('')
 
   const handleBuyBoxes = async () => {
-    const ok = await spend(BOX_COST)
-    if (!ok) {
-      setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
-      return
+    try {
+      const ok = await spend(BOX_COST)
+      if (!ok) {
+        setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
+        return
+      }
+      setBoxes(generateBoxes())
+      setSelectedIndex(null)
+      setMessage('')
+      setPhase('boxes')
+    } catch {
+      setMessage(locale === 'zh' ? '操作失败，请重试' : 'Operation failed, please try again.')
     }
-    setBoxes(generateBoxes())
-    setSelectedIndex(null)
-    setMessage('')
-    setPhase('boxes')
   }
 
   const handleOpen = async (index: number) => {

@@ -42,26 +42,30 @@ export function useCoins() {
 
   useEffect(() => {
     refresh()
-    const interval = setInterval(refresh, 5000)
+    const interval = setInterval(refresh, 1000)
     return () => clearInterval(interval)
   }, [refresh])
 
   const spend = useCallback(async (amount: number): Promise<boolean> => {
-    const res = await fetch('/api/coins/spend', {
-      method: 'POST',
-      headers: headers(),
-      body: JSON.stringify({ amount }),
-    })
-    if (res.ok) {
-      const data = await res.json()
-      setBalance(data.balance)
-      return true
+    try {
+      const res = await fetch('/api/coins/spend', {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify({ amount }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setBalance(data.balance)
+        return true
+      }
+      if (res.status === 402) {
+        const data = await res.json()
+        setBalance(data.balance)
+      }
+      return false
+    } catch {
+      return false
     }
-    if (res.status === 402) {
-      const data = await res.json()
-      setBalance(data.balance)
-    }
-    return false
   }, [])
 
   const add = useCallback(async (amount: number): Promise<number> => {
