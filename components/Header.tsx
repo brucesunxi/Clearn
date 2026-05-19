@@ -52,6 +52,12 @@ export default function Header() {
             📥 {locale === 'zh' ? '导入' : 'Import'}
           </Link>
           <Link
+            href="/blindbox"
+            className="text-gray-600 hover:text-purple-500 font-medium transition-colors text-sm"
+          >
+            🎁 {locale === 'zh' ? '盲盒' : 'Box'}
+          </Link>
+          <Link
             href="/pet"
             className="text-gray-600 hover:text-green-500 font-medium transition-colors text-sm"
           >
