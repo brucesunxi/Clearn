@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article, Paragraph, VocabularyItem } from '@/lib/types'
 import { saveCustomArticle } from '@/lib/custom-articles'
-import { buildVocabDict, splitIntoParagraphs, extractVocabulary, suggestNewWords } from '@/lib/chinese-text'
+import { buildVocabDict, splitIntoParagraphs, extractVocabulary, suggestNewWords, assessLevel } from '@/lib/chinese-text'
 
 interface ImportPageClientProps {
   levels: Level[]
@@ -34,33 +34,91 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   const [error, setError] = useState('')
   const [loadedFromPdf, setLoadedFromPdf] = useState(false)
   const [loadedFromUrl, setLoadedFromUrl] = useState(false)
+  const [originalEnglish, setOriginalEnglish] = useState('')
+  const [isTranslating, setIsTranslating] = useState(false)
 
   const dict = useMemo(() => buildVocabDict(articles), [articles])
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     const text = rawText.trim()
     if (!text) return
 
-    const paras = splitIntoParagraphs(text)
-    setParagraphs(paras)
+    setIsLoading(true)
+    setError('')
 
-    const knownVocab = extractVocabulary(text, dict)
-    const suggestions = suggestNewWords(text, dict)
-    const combined = [...knownVocab, ...suggestions.filter(
-      (s) => !knownVocab.find((v) => v.word === s.word)
-    )]
-    setVocabulary(combined)
-    setVocabPage(0)
+    try {
+      // Phase 1: Detect language and translate if needed
+      const chineseRatio = (text.match(/[一-鿿㐀-䶿豈-﫿]/g) || []).length / text.length
+      let chineseText = text
+      let englishText = ''
 
-    if (!title) {
-      const firstLine = text.split('\n')[0]?.trim().slice(0, 50) || ''
-      setTitle(firstLine)
+      if (chineseRatio < 0.1) {
+        setIsTranslating(true)
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        })
+        const data = await res.json()
+        if (data.error) {
+          setError(data.error)
+          setIsTranslating(false)
+          setIsLoading(false)
+          return
+        }
+        chineseText = data.translated
+        englishText = data.original || text
+        setRawText(data.translated)
+        setOriginalEnglish(englishText)
+        setIsTranslating(false)
+      }
+
+      // Phase 2: Analyze Chinese text
+      const paras = splitIntoParagraphs(chineseText)
+
+      if (englishText) {
+        // Pair Chinese paragraphs with English originals
+        const engParas = splitIntoParagraphs(englishText)
+        setParagraphs(paras.map((p, i) => ({
+          text: p.text,
+          translation: engParas[i]?.text || '',
+        })))
+      } else {
+        setParagraphs(paras)
+      }
+
+      const knownVocab = extractVocabulary(chineseText, dict)
+      const suggestions = suggestNewWords(chineseText, dict)
+      const combined = [...knownVocab, ...suggestions.filter(
+        (s) => !knownVocab.find((v) => v.word === s.word)
+      )]
+      setVocabulary(combined)
+      setVocabPage(0)
+
+      // Phase 3: Assess difficulty level
+      const suggestedLevel = assessLevel(chineseText)
+      setLevel(suggestedLevel)
+
+      // Auto-fill title
+      if (!title) {
+        const firstLine = chineseText.split('\n')[0]?.trim().slice(0, 50) || ''
+        setTitle(firstLine)
+      }
+      if (!titleEn) {
+        if (englishText) {
+          const firstLineEn = englishText.split('\n')[0]?.trim().slice(0, 50) || ''
+          setTitleEn(firstLineEn)
+        } else {
+          setTitleEn('Imported Article')
+        }
+      }
+
+      setStep('preview')
+    } catch {
+      setError(locale === 'zh' ? '处理失败，请重试' : 'Processing failed. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
-    if (!titleEn) {
-      setTitleEn('Imported Article')
-    }
-
-    setStep('preview')
   }
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -342,14 +400,34 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
           </div>
         )}
 
-        {/* Analyze button — enabled for all tabs once rawText is populated */}
+        {/* Analyze button */}
         <button
           onClick={handleAnalyze}
-          disabled={!rawText.trim()}
+          disabled={!rawText.trim() || isLoading}
           className="w-full py-3 rounded-xl text-base font-medium bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
         >
-          🔍 {locale === 'zh' ? '分析内容' : 'Analyze'}
+          {isTranslating
+            ? (locale === 'zh' ? '🌐 翻译中...' : '🌐 Translating...')
+            : `🔍 ${locale === 'zh' ? '分析内容' : 'Analyze'}`}
         </button>
+
+        {isTranslating && (
+          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500 bg-blue-50 rounded-xl px-4 py-3">
+            <span className="inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            {locale === 'zh' ? '正在翻译为中文...' : 'Translating to Chinese...'}
+          </div>
+        )}
+
+        {isLoading && !isTranslating && (
+          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500">
+            <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+            {locale === 'zh' ? '分析中...' : 'Analyzing...'}
+          </div>
+        )}
+
+        {error && (
+          <p className="mt-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{error}</p>
+        )}
       </div>
     )
   }
@@ -408,20 +486,28 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
               {locale === 'zh' ? '级别' : 'Level'}
             </label>
             <div className="flex gap-2">
-              {levels.map((l) => (
-                <button
-                  key={l.id}
-                  onClick={() => setLevel(l.id)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    level === l.id
-                      ? 'text-white shadow-sm'
-                      : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                  }`}
-                  style={level === l.id ? { backgroundColor: l.color } : undefined}
-                >
-                  {l.emoji} {t(`level.${l.id}.name`)}
-                </button>
-              ))}
+              {levels.map((l) => {
+                const selected = level === l.id
+                return (
+                  <button
+                    key={l.id}
+                    onClick={() => setLevel(l.id)}
+                    className={`relative flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      selected
+                        ? 'text-white shadow-sm'
+                        : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                    }`}
+                    style={selected ? { backgroundColor: l.color } : undefined}
+                  >
+                    {l.emoji} {t(`level.${l.id}.name`)}
+                    {selected && (
+                      <span className="absolute -top-2 -right-1 text-[9px] px-1.5 py-0.5 rounded-full bg-amber-400 text-white font-bold shadow-sm">
+                        {locale === 'zh' ? '推荐' : 'REC'}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
           <div>

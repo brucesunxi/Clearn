@@ -94,3 +94,30 @@ export function suggestNewWords(
 
   return newWords
 }
+
+export function assessLevel(chineseText: string): number {
+  const chars = chineseText.match(/[一-鿿]/g) || []
+  if (chars.length === 0) return 1
+
+  const sentences = chineseText.split(/[。！？.!?]+/).filter((s) => s.trim().length > 0)
+  const sentencesCount = Math.max(sentences.length, 1)
+  const avgSentenceLen = chars.length / sentencesCount
+
+  let score = 0
+
+  // Average sentence length: longer sentences → harder
+  if (avgSentenceLen > 12) score += 3
+  else if (avgSentenceLen > 8) score += 2
+  else if (avgSentenceLen > 5) score += 1
+
+  // Total character count: longer texts → harder
+  if (chars.length > 500) score += 3
+  else if (chars.length > 200) score += 2
+  else if (chars.length > 80) score += 1
+
+  // Map score to level 1-4
+  if (score <= 1) return 1
+  if (score <= 3) return 2
+  if (score <= 5) return 3
+  return 4
+}
