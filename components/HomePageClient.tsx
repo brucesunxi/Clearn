@@ -199,6 +199,38 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
           </div>
         </div>
       </Link>
+
+      {/* AI Battle Section */}
+      <Link href="/ai-battle"
+        className="group mt-8 block bg-gradient-to-br from-orange-50 via-white to-amber-50 rounded-2xl border-2 border-orange-200 hover:border-orange-400 p-6 md:p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          <div className="shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
+            ⚔️
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-xl font-bold text-gray-800 mb-1">
+              {locale === 'zh' ? '🎮 AI 单词对战' : '🎮 AI Word Battle'}
+            </h2>
+            <p className="text-sm text-gray-500 mb-3">
+              {locale === 'zh'
+                ? '和 AI 比拼词汇！选择简单/中等/困难三个级别的 AI 对手，比正确率、比速度，综合评分决出胜负！'
+                : 'Battle AI with Chinese vocabulary! Choose Easy/Medium/Hard AI, compete on accuracy and speed, and see who wins!'}
+            </p>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs">
+              <span className="px-3 py-1.5 rounded-full bg-orange-100 text-orange-600 font-medium">🐣 {locale === 'zh' ? '简单' : 'Easy'}</span>
+              <span className="text-gray-300 text-lg">→</span>
+              <span className="px-3 py-1.5 rounded-full bg-orange-100 text-orange-600 font-medium">🤖 {locale === 'zh' ? '中等' : 'Medium'}</span>
+              <span className="text-gray-300 text-lg">→</span>
+              <span className="px-3 py-1.5 rounded-full bg-orange-100 text-orange-600 font-medium">🧠 {locale === 'zh' ? '困难' : 'Hard'}</span>
+            </div>
+          </div>
+          <div className="shrink-0">
+            <span className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium shadow-sm group-hover:shadow-md group-hover:from-orange-600 group-hover:to-red-600 transition-all duration-300">
+              ⚔️ {locale === 'zh' ? '开始对战' : 'Battle Now'}
+            </span>
+          </div>
+        </div>
+      </Link>
     </div>
   )
 }
