@@ -50,6 +50,7 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
       (s) => !knownVocab.find((v) => v.word === s.word)
     )]
     setVocabulary(combined)
+    setVocabPage(0)
 
     if (!title) {
       const firstLine = text.split('\n')[0]?.trim().slice(0, 50) || ''
@@ -161,6 +162,14 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
       return next
     })
   }
+
+  const VOCAB_PAGE_SIZE = 15
+  const [vocabPage, setVocabPage] = useState(0)
+  const totalVocabPages = Math.max(1, Math.ceil(vocabulary.length / VOCAB_PAGE_SIZE))
+  const paginatedVocab = vocabulary.slice(
+    vocabPage * VOCAB_PAGE_SIZE,
+    (vocabPage + 1) * VOCAB_PAGE_SIZE
+  )
 
   if (step === 'input') {
     return (
@@ -481,40 +490,66 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
         </div>
 
         <div className="space-y-2">
-          {vocabulary.map((v, i) => (
-            <div key={i} className="flex items-center gap-2 border border-gray-100 rounded-lg p-2">
-              <input
-                value={v.word}
-                onChange={(e) => updateVocab(i, 'word', e.target.value)}
-                placeholder={locale === 'zh' ? '词' : 'Word'}
-                className="flex-[2] border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-              />
-              <input
-                value={v.pinyin}
-                onChange={(e) => updateVocab(i, 'pinyin', e.target.value)}
-                placeholder="pinyin"
-                className="flex-[2] border border-gray-200 rounded px-2 py-1.5 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-              />
-              <input
-                value={v.meaning}
-                onChange={(e) => updateVocab(i, 'meaning', e.target.value)}
-                placeholder={locale === 'zh' ? '意思' : 'Meaning'}
-                className="flex-[3] border border-gray-200 rounded px-2 py-1.5 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-              />
-              <button
-                onClick={() => removeVocab(i)}
-                className="shrink-0 w-7 h-7 rounded-full text-red-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors text-sm"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+          {paginatedVocab.map((v, i) => {
+            const realIdx = vocabPage * VOCAB_PAGE_SIZE + i
+            return (
+              <div key={realIdx} className="flex items-center gap-2 border border-gray-100 rounded-lg p-2">
+                <input
+                  value={v.word}
+                  onChange={(e) => updateVocab(realIdx, 'word', e.target.value)}
+                  placeholder={locale === 'zh' ? '词' : 'Word'}
+                  className="flex-[2] border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                />
+                <input
+                  value={v.pinyin}
+                  onChange={(e) => updateVocab(realIdx, 'pinyin', e.target.value)}
+                  placeholder="pinyin"
+                  className="flex-[2] border border-gray-200 rounded px-2 py-1.5 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                />
+                <input
+                  value={v.meaning}
+                  onChange={(e) => updateVocab(realIdx, 'meaning', e.target.value)}
+                  placeholder={locale === 'zh' ? '意思' : 'Meaning'}
+                  className="flex-[3] border border-gray-200 rounded px-2 py-1.5 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                />
+                <button
+                  onClick={() => removeVocab(realIdx)}
+                  className="shrink-0 w-7 h-7 rounded-full text-red-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors text-sm"
+                >
+                  ✕
+                </button>
+              </div>
+            )
+          })}
           {vocabulary.length === 0 && (
             <p className="text-sm text-gray-400 text-center py-4">
               {locale === 'zh' ? '暂未识别到词汇' : 'No vocabulary detected'}
             </p>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalVocabPages > 1 && (
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+            <button
+              onClick={() => setVocabPage((p) => Math.max(0, p - 1))}
+              disabled={vocabPage === 0}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              ← {locale === 'zh' ? '上一页' : 'Prev'}
+            </button>
+            <span className="text-sm text-gray-400">
+              {vocabPage + 1} / {totalVocabPages}
+            </span>
+            <button
+              onClick={() => setVocabPage((p) => Math.min(totalVocabPages - 1, p + 1))}
+              disabled={vocabPage >= totalVocabPages - 1}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              {locale === 'zh' ? '下一页' : 'Next'} →
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Save button */}
