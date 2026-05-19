@@ -28,6 +28,12 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   const [paragraphs, setParagraphs] = useState<Paragraph[]>([])
   const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([])
   const [saving, setSaving] = useState(false)
+  const [inputType, setInputType] = useState<'text' | 'pdf' | 'url'>('text')
+  const [urlInput, setUrlInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [loadedFromPdf, setLoadedFromPdf] = useState(false)
+  const [loadedFromUrl, setLoadedFromUrl] = useState(false)
 
   const dict = useMemo(() => buildVocabDict(articles), [articles])
 
@@ -65,6 +71,55 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
       setRawText(text)
     }
     reader.readAsText(file)
+  }
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsLoading(true)
+    setError('')
+    setLoadedFromPdf(false)
+    try {
+      const { extractPdfText } = await import('@/lib/parse-pdf')
+      const text = await extractPdfText(file)
+      if (!text) {
+        setError(locale === 'zh' ? '未能从 PDF 中提取到文字，请确认文件包含可提取的文本' : 'No text could be extracted from this PDF')
+        return
+      }
+      setRawText(text)
+      setLoadedFromPdf(true)
+    } catch {
+      setError(locale === 'zh' ? 'PDF 解析失败，请确认文件包含可提取的文字' : 'Failed to parse PDF. Make sure it contains extractable text')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleFetchUrl = async () => {
+    const u = urlInput.trim()
+    if (!u) return
+    setIsLoading(true)
+    setError('')
+    setLoadedFromUrl(false)
+    try {
+      const res = await fetch('/api/fetch-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: u }),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setError(data.error)
+        return
+      }
+      setRawText(data.text)
+      if (data.title && !title) setTitle(data.title)
+      setLoadedFromUrl(true)
+    } catch {
+      setError(locale === 'zh' ? '获取内容失败，请检查 URL 是否正确' : 'Failed to fetch URL. Please check the URL.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleSave = () => {
@@ -116,36 +171,169 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
           </h1>
           <p className="text-sm text-gray-400">
             {locale === 'zh'
-              ? '粘贴中文文本或上传 .txt 文件，自动分析生成学习素材'
-              : 'Paste Chinese text or upload a .txt file to generate learning materials'}
+              ? '粘贴文本、上传 PDF 或输入网页链接，自动分析生成学习素材'
+              : 'Paste text, upload PDF, or enter a URL to generate learning materials'}
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-          <label className="block text-sm font-medium text-gray-600 mb-2">
-            {locale === 'zh' ? '粘贴中文文本' : 'Paste Chinese Text'}
-          </label>
-          <textarea
-            value={rawText}
-            onChange={(e) => setRawText(e.target.value)}
-            placeholder={locale === 'zh' ? '在此粘贴中文内容...' : 'Paste Chinese text here...'}
-            rows={12}
-            className="w-full border border-gray-200 rounded-xl p-4 text-base resize-y focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
-          />
+        {/* Input type tabs */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => { setInputType('text'); setError('') }}
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+              inputType === 'text'
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            📝 {locale === 'zh' ? '粘贴文本' : 'Paste Text'}
+          </button>
+          <button
+            onClick={() => { setInputType('pdf'); setError('') }}
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+              inputType === 'pdf'
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            📄 PDF
+          </button>
+          <button
+            onClick={() => { setInputType('url'); setError('') }}
+            className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+              inputType === 'url'
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            🔗 {locale === 'zh' ? '网页链接' : 'Web URL'}
+          </button>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-          <label className="block text-sm font-medium text-gray-600 mb-2">
-            {locale === 'zh' ? '或上传 .txt 文件' : 'Or upload a .txt file'}
-          </label>
-          <input
-            type="file"
-            accept=".txt"
-            onChange={handleFileUpload}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100"
-          />
-        </div>
+        {/* Text tab */}
+        {inputType === 'text' && (
+          <>
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                {locale === 'zh' ? '粘贴中文文本' : 'Paste Chinese Text'}
+              </label>
+              <textarea
+                value={rawText}
+                onChange={(e) => setRawText(e.target.value)}
+                placeholder={locale === 'zh' ? '在此粘贴中文内容...' : 'Paste Chinese text here...'}
+                rows={12}
+                className="w-full border border-gray-200 rounded-xl p-4 text-base resize-y focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+              />
+            </div>
 
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                {locale === 'zh' ? '或上传 .txt 文件' : 'Or upload a .txt file'}
+              </label>
+              <input
+                type="file"
+                accept=".txt"
+                onChange={handleFileUpload}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100"
+              />
+            </div>
+          </>
+        )}
+
+        {/* PDF tab */}
+        {inputType === 'pdf' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              📄 {locale === 'zh' ? '上传 PDF 文件' : 'Upload PDF File'}
+            </label>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handlePdfUpload}
+              disabled={isLoading}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 disabled:opacity-40"
+            />
+
+            {isLoading && (
+              <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                <span className="inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                {locale === 'zh' ? '正在解析 PDF...' : 'Parsing PDF...'}
+              </div>
+            )}
+
+            {error && (
+              <p className="mt-4 text-sm text-red-500 bg-red-50 rounded-lg px-4 py-2">{error}</p>
+            )}
+
+            {loadedFromPdf && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-600 mb-2">
+                  {locale === 'zh' ? '提取的文本（可编辑）' : 'Extracted text (editable)'}
+                </label>
+                <textarea
+                  value={rawText}
+                  onChange={(e) => setRawText(e.target.value)}
+                  rows={10}
+                  className="w-full border border-gray-200 rounded-xl p-4 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* URL tab */}
+        {inputType === 'url' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              🔗 {locale === 'zh' ? '输入网页链接' : 'Enter Web URL'}
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="https://example.com/article"
+                className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+              />
+              <button
+                onClick={handleFetchUrl}
+                disabled={!urlInput.trim() || isLoading}
+                className="px-5 py-3 rounded-xl text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
+              >
+                {isLoading
+                  ? (locale === 'zh' ? '加载中...' : 'Loading...')
+                  : (locale === 'zh' ? '获取内容' : 'Fetch')}
+              </button>
+            </div>
+
+            {isLoading && (
+              <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                <span className="inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                {locale === 'zh' ? '正在抓取网页内容...' : 'Fetching content...'}
+              </div>
+            )}
+
+            {error && (
+              <p className="mt-4 text-sm text-red-500 bg-red-50 rounded-lg px-4 py-2">{error}</p>
+            )}
+
+            {loadedFromUrl && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-600 mb-2">
+                  {locale === 'zh' ? '抓取的内容（可编辑）' : 'Fetched content (editable)'}
+                </label>
+                <textarea
+                  value={rawText}
+                  onChange={(e) => setRawText(e.target.value)}
+                  rows={10}
+                  className="w-full border border-gray-200 rounded-xl p-4 text-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Analyze button — enabled for all tabs once rawText is populated */}
         <button
           onClick={handleAnalyze}
           disabled={!rawText.trim()}
