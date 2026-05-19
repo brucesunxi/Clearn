@@ -41,7 +41,7 @@ async function syncPetToApi() {
 export default function BlindBoxClient() {
   const { locale } = useTranslation()
   const { balance: coins, spend, add: addCoinsApi } = useCoins()
-  const [phase, setPhase] = useState<'idle' | 'boxes' | 'reveal'>('idle')
+  const [phase, setPhase] = useState<'idle' | 'boxes'>('idle')
   const [boxes, setBoxes] = useState<DrawnPrize[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [message, setMessage] = useState('')
@@ -61,7 +61,6 @@ export default function BlindBoxClient() {
   const handleOpen = async (index: number) => {
     if (selectedIndex !== null) return
     setSelectedIndex(index)
-    setPhase('reveal')
 
     const prize = boxes[index].prize
 
