@@ -42,7 +42,7 @@ const AI_CONFIGS: Record<AiLevel, AiConfig> = {
   },
 }
 
-const TOTAL_ROUNDS = 10
+const ROUND_OPTIONS = [5, 10, 15, 20]
 
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -65,6 +65,15 @@ function formatTime(ms: number): string {
 export default function AiBattleGame() {
   const { locale } = useTranslation()
   const allWords = useMemo(() => WORD_BOOKS.flatMap((wb) => wb.words), [])
+
+  const [selectedBookId, setSelectedBookId] = useState<number | null>(null)
+  const [totalRounds, setTotalRounds] = useState(10)
+
+  const sourceWords = useMemo(() => {
+    if (selectedBookId === null) return allWords
+    const book = WORD_BOOKS.find((b) => b.id === selectedBookId)
+    return book ? book.words : allWords
+  }, [allWords, selectedBookId])
 
   // Phase: level selection → playing → result
   const [phase, setPhase] = useState<'select' | 'playing' | 'result'>('select')
@@ -102,8 +111,8 @@ export default function AiBattleGame() {
   useEffect(() => cleanup, [cleanup])
 
   const pickWord = useCallback(() => {
-    const available = allWords.filter((w) => !usedWordIds.current.has(w.word))
-    const pool = available.length > 0 ? available : allWords
+    const available = sourceWords.filter((w) => !usedWordIds.current.has(w.word))
+    const pool = available.length > 0 ? available : sourceWords
     const sorted = shuffleArray(pool)
     const word = sorted[0]
 
@@ -127,7 +136,7 @@ export default function AiBattleGame() {
     setUserTime(0)
     setAiTime(0)
     roundStartRef.current = Date.now()
-  }, [allWords])
+  }, [sourceWords, allWords])
 
   const startGame = () => {
     usedWordIds.current = new Set()
@@ -176,7 +185,7 @@ export default function AiBattleGame() {
 
   const handleNext = () => {
     const next = round + 1
-    if (next >= TOTAL_ROUNDS) {
+    if (next >= totalRounds) {
       cleanup()
       setPhase('result')
       return
@@ -186,7 +195,7 @@ export default function AiBattleGame() {
   }
 
   // Format scores for display
-  const maxScore = TOTAL_ROUNDS * 130
+  const maxScore = totalRounds * 130
   const userWon = userScore > aiScore
   const tie = userScore === aiScore
 
@@ -248,6 +257,72 @@ export default function AiBattleGame() {
           )}
         </div>
 
+        {/* Textbook selection */}
+        <div className="mb-6 max-w-md mx-auto">
+          <label className="block text-xs font-medium text-gray-500 mb-2">
+            📚 {locale === 'zh' ? '选择词库' : 'Vocabulary Book'}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedBookId(null)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                selectedBookId === null
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : 'bg-white text-gray-500 border border-gray-200 hover:bg-orange-50'
+              }`}
+            >
+              📚 {locale === 'zh' ? '全部' : 'All'}
+            </button>
+            {WORD_BOOKS.map((book) => (
+              <button
+                key={book.id}
+                onClick={() => setSelectedBookId(book.id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  selectedBookId === book.id
+                    ? 'text-white shadow-sm'
+                    : 'bg-white text-gray-500 border border-gray-200 hover:bg-orange-50'
+                }`}
+                style={selectedBookId === book.id ? { backgroundColor: book.color } : undefined}
+              >
+                {book.emoji} {locale === 'zh' ? book.name : book.name}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-400 mt-1">
+            {selectedBookId === null
+              ? (locale === 'zh' ? `全部词库 · ${sourceWords.length} 个词` : `All books · ${sourceWords.length} words`)
+              : `${WORD_BOOKS.find((b) => b.id === selectedBookId)?.emoji || ''} ${sourceWords.length} ${locale === 'zh' ? '个词' : 'words'}`}
+          </p>
+        </div>
+
+        {/* Round count selector */}
+        <div className="mb-6 max-w-md mx-auto">
+          <label className="block text-xs font-medium text-gray-500 mb-2">
+            🎯 {locale === 'zh' ? '题目数量' : 'Number of Questions'}
+          </label>
+          <div className="flex gap-2">
+            {ROUND_OPTIONS.map((n) => (
+              <button
+                key={n}
+                onClick={() => setTotalRounds(n)}
+                disabled={n > sourceWords.length}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  totalRounds === n
+                    ? 'bg-orange-500 text-white shadow-sm'
+                    : 'bg-white text-gray-500 border border-gray-200 hover:bg-orange-50'
+                } ${n > sourceWords.length ? 'opacity-30 cursor-not-allowed' : ''}`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-400 mt-1">
+            {totalRounds > sourceWords.length
+              ? (locale === 'zh' ? `词库仅 ${sourceWords.length} 个词，请减少题量或选择更大词库` : `Only ${sourceWords.length} words available, choose fewer questions or a larger book`)
+              : (locale === 'zh' ? `共 ${totalRounds} 题，答完后 AI 同步作答` : `${totalRounds} questions, AI answers after you`)}
+          </p>
+        </div>
+
         <div className="text-center">
           <button
             onClick={startGame}
@@ -255,9 +330,6 @@ export default function AiBattleGame() {
           >
             ⚔️ {locale === 'zh' ? '开始对战' : 'Start Battle'}
           </button>
-          <p className="text-xs text-gray-400 mt-2">
-            {locale === 'zh' ? `共 ${TOTAL_ROUNDS} 道题，每道题限时答完后 AI 作答` : `${TOTAL_ROUNDS} questions. AI answers after you.`}
-          </p>
         </div>
       </div>
     )
@@ -290,14 +362,14 @@ export default function AiBattleGame() {
             <p className="text-xs text-gray-400 mb-1">{locale === 'zh' ? '你的得分' : 'Your Score'}</p>
             <p className="text-2xl font-bold text-emerald-600">{userScore}</p>
             <p className="text-xs text-gray-400 mt-1">
-              ✅ {userCorrect}/{TOTAL_ROUNDS} {locale === 'zh' ? '正确' : 'correct'}
+              ✅ {userCorrect}/{totalRounds} {locale === 'zh' ? '正确' : 'correct'}
             </p>
           </div>
           <div className="bg-white rounded-xl p-4 text-center border-2 border-orange-200">
             <p className="text-xs text-gray-400 mb-1">{locale === 'zh' ? 'AI 得分' : 'AI Score'}</p>
             <p className="text-2xl font-bold text-orange-600">{aiScore}</p>
             <p className="text-xs text-gray-400 mt-1">
-              ✅ {aiCorrect}/{TOTAL_ROUNDS} {locale === 'zh' ? '正确' : 'correct'}
+              ✅ {aiCorrect}/{totalRounds} {locale === 'zh' ? '正确' : 'correct'}
             </p>
           </div>
         </div>
@@ -324,7 +396,7 @@ export default function AiBattleGame() {
   const isCorrect = selectedAnswer === currentWord?.meaning
   const aiIsCorrect = aiPicked === currentWord?.meaning
   const allDone = userDone && aiDone
-  const progress = (round / TOTAL_ROUNDS) * 100
+  const progress = (round / totalRounds) * 100
 
   return (
     <div className="bg-gradient-to-br from-orange-50 via-white to-amber-50 rounded-2xl border-2 border-orange-200 p-6 md:p-8">
@@ -332,7 +404,7 @@ export default function AiBattleGame() {
       <div className="mb-4">
         <div className="flex justify-between text-xs text-gray-400 mb-1.5">
           <span>
-            {locale === 'zh' ? `第 ${round + 1}/${TOTAL_ROUNDS} 题` : `Round ${round + 1}/${TOTAL_ROUNDS}`}
+            {locale === 'zh' ? `第 ${round + 1}/${totalRounds} 题` : `Round ${round + 1}/${totalRounds}`}
           </span>
           <span>
             {aiConfig.emoji} {locale === 'zh' ? aiConfig.labelZh : aiConfig.label}
@@ -344,6 +416,14 @@ export default function AiBattleGame() {
             style={{ width: `${progress}%` }}
           />
         </div>
+        <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+          <span>
+            {selectedBookId === null
+              ? '📚 ' + (locale === 'zh' ? '全部词库' : 'All books')
+              : `${WORD_BOOKS.find((b) => b.id === selectedBookId)?.emoji || '📚'} ${WORD_BOOKS.find((b) => b.id === selectedBookId)?.name || ''}`}
+          </span>
+          <span>{sourceWords.length} {locale === 'zh' ? '词' : 'words'}</span>
+        </div>
       </div>
 
       {/* Score board */}
@@ -352,7 +432,7 @@ export default function AiBattleGame() {
           <p className="text-xs text-gray-400">{locale === 'zh' ? '你' : 'You'}</p>
           <p className="text-xl font-bold text-emerald-600">{userScore}</p>
           <p className="text-[10px] text-gray-400">
-            ✅ {userCorrect}/{Math.min(round + (userDone ? 1 : 0), TOTAL_ROUNDS)}
+            ✅ {userCorrect}/{Math.min(round + (userDone ? 1 : 0), totalRounds)}
           </p>
         </div>
         <div className="text-center px-4">
@@ -362,7 +442,7 @@ export default function AiBattleGame() {
           <p className="text-xs text-gray-400">{aiConfig.emoji} AI</p>
           <p className="text-xl font-bold text-orange-600">{aiScore}</p>
           <p className="text-[10px] text-gray-400">
-            ✅ {aiCorrect}/{Math.min(round + (aiDone ? 1 : 0), TOTAL_ROUNDS)}
+            ✅ {aiCorrect}/{Math.min(round + (aiDone ? 1 : 0), totalRounds)}
           </p>
         </div>
       </div>
@@ -445,7 +525,7 @@ export default function AiBattleGame() {
           onClick={handleNext}
           className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-sm transition-all"
         >
-          {round + 1 >= TOTAL_ROUNDS
+          {round + 1 >= totalRounds
             ? (locale === 'zh' ? '🏆 查看结果' : '🏆 See Results')
             : (locale === 'zh' ? '下一题 →' : 'Next →')}
         </button>
