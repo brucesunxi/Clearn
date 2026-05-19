@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article } from '@/lib/types'
 import { getMasteredCount, getTotalWordsCount } from '@/lib/words'
+import { getCustomArticles } from '@/lib/custom-articles'
 
 interface ReadingPageClientProps {
   levels: Level[]
@@ -22,10 +23,12 @@ export default function ReadingPageClient({
   const { t, locale } = useTranslation()
   const [mastered, setMastered] = useState(0)
   const [totalWords, setTotalWords] = useState(0)
+  const [customArticles, setCustomArticles] = useState<Article[]>([])
 
   useEffect(() => {
     setMastered(getMasteredCount())
     setTotalWords(getTotalWordsCount())
+    setCustomArticles(getCustomArticles())
   }, [])
 
   return (
@@ -109,6 +112,20 @@ export default function ReadingPageClient({
           ))}
         </div>
       )}
+
+      {/* Custom articles from imports */}
+      {customArticles.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            📥 {locale === 'zh' ? '我的导入' : 'My Imports'}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {customArticles.map((article) => (
+              <CustomArticleCard key={article.id} article={article} locale={locale} t={t} />
+            ))}
+          </div>
+        </div>
+      )}
     </>
   )
 }
@@ -163,6 +180,50 @@ function ArticleCardClient({
             📝 {article.vocabulary.length} {t('reading.newWords')}
           </span>
           <span className="text-xs text-gray-400 ml-auto group-hover:text-orange-500 transition-colors">
+            {locale === 'zh' ? '阅读 →' : 'Read →'}
+          </span>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function CustomArticleCard({
+  article,
+  locale,
+  t,
+}: {
+  article: Article
+  locale: string
+  t: (key: string, params?: Record<string, string | number>) => string
+}) {
+  const preview = article.paragraphs[0]?.text.slice(0, 80) || ''
+
+  return (
+    <Link
+      href={`/reading/custom/${article.id}`}
+      className="group block bg-gradient-to-br from-indigo-50 to-white rounded-xl border border-indigo-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+    >
+      <div className="p-5">
+        <div className="flex items-start gap-3 mb-3">
+          <span className="text-3xl shrink-0">{article.emoji}</span>
+          <div className="min-w-0">
+            <h3 className="text-lg font-bold text-gray-800 leading-tight">{article.title}</h3>
+            <p className="text-sm text-gray-400 mt-0.5">{article.titleEn}</p>
+          </div>
+        </div>
+        <p className="text-sm text-gray-400 line-clamp-2 mb-3 leading-relaxed">
+          {preview}
+          {preview.length >= 80 && '...'}
+        </p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-600 font-medium">
+            📥 {locale === 'zh' ? '已导入' : 'Imported'}
+          </span>
+          <span className="text-xs text-gray-400">
+            📝 {article.vocabulary.length} {t('reading.newWords')}
+          </span>
+          <span className="text-xs text-gray-400 ml-auto group-hover:text-indigo-500 transition-colors">
             {locale === 'zh' ? '阅读 →' : 'Read →'}
           </span>
         </div>

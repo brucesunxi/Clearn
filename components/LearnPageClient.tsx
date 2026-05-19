@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article, VocabularyItem } from '@/lib/types'
+import { useCustomArticles } from '@/lib/use-custom-articles'
 import {
   getCheckInData, getDailyGoal, setDailyGoal,
   getTodayProgress, incrementTodayProgress, isCheckedInToday,
@@ -61,6 +62,7 @@ function wordBookToArticles(wordBookId: number): Article[] {
 
 export default function LearnPageClient({ levels, articles }: LearnPageClientProps) {
   const { t, locale } = useTranslation()
+  articles = useCustomArticles(articles)
   const [mode, setMode] = useState<Mode>('flashcard')
   const [goal, setGoalState] = useState(10)
   const [progress, setProgress] = useState({ done: 0, goal: 10 })

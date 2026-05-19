@@ -46,6 +46,12 @@ export default function Header() {
             📖 {locale === 'zh' ? '读' : 'Read'}
           </Link>
           <Link
+            href="/import"
+            className="text-gray-600 hover:text-indigo-500 font-medium transition-colors text-sm"
+          >
+            📥 {locale === 'zh' ? '导入' : 'Import'}
+          </Link>
+          <Link
             href="/pet"
             className="text-gray-600 hover:text-green-500 font-medium transition-colors text-sm"
           >

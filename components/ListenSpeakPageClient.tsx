@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Article } from '@/lib/types'
+import { useCustomArticles } from '@/lib/use-custom-articles'
 import ListenSession from './ListenSession'
 import SpeakSession from './SpeakSession'
 import IntensiveListening from './IntensiveListening'
@@ -15,6 +16,7 @@ type Tab = 'listen' | 'speak' | 'intensive'
 
 export default function ListenSpeakPageClient({ articles }: ListenSpeakPageClientProps) {
   const { t, locale } = useTranslation()
+  articles = useCustomArticles(articles)
   const [tab, setTab] = useState<Tab>('listen')
 
   return (

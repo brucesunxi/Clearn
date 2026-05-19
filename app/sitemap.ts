@@ -23,6 +23,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/practice`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/pet`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.4,
+    },
   ]
 
   // Level-filtered reading pages

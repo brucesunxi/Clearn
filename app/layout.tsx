@@ -2,13 +2,16 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import { I18nProvider } from '@/lib/i18n/context'
-import { GAScript } from '@/lib/ga'
 import TranslationUpdater from '@/components/TranslationUpdater'
 
 export const metadata: Metadata = {
-  title: '熊猫汉语 - 海外华裔儿童中文学习',
+  title: {
+    template: '%s | 熊猫汉语 Panda Chinese',
+    default: '熊猫汉语 - 海外华裔儿童中文学习',
+  },
   description:
-    '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
+    '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。A leveled Chinese reading platform for overseas children.',
+  metadataBase: new URL('https://pandahan.xyz'),
   icons: {
     icon: [
       {
@@ -16,6 +19,19 @@ export const metadata: Metadata = {
         type: 'image/svg+xml',
       },
     ],
+  },
+  openGraph: {
+    title: '熊猫汉语 - 海外华裔儿童中文学习',
+    description: '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
+    url: 'https://pandahan.xyz',
+    siteName: '熊猫汉语',
+    locale: 'zh_CN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '熊猫汉语 - 海外华裔儿童中文学习',
+    description: '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
   },
 }
 
@@ -27,8 +43,17 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <head>
-        <GAScript />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9711589934416529" crossOrigin="anonymous" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-9K8RD1K13S" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'G-9K8RD1K13S');`,
+          }}
+        />
       </head>
       <body>
         <I18nProvider>
