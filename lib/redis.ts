@@ -20,7 +20,7 @@ export function getCoinsKey(userId: string): string {
   return `coins:${userId}`
 }
 
-const STARTING_COINS = 200
+const STARTING_COINS = 500
 
 export async function getCoins(userId: string): Promise<number> {
   const redis = getRedis()
