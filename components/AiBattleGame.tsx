@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { WORD_BOOKS } from '@/lib/wordbooks'
 import { useTranslation } from '@/lib/i18n/context'
+import type { Article } from '@/lib/types'
 
 type AiLevel = 'easy' | 'medium' | 'hard'
 
@@ -62,18 +63,41 @@ function formatTime(ms: number): string {
   return (ms / 1000).toFixed(1) + 's'
 }
 
-export default function AiBattleGame() {
+export default function AiBattleGame({ articles = [] }: { articles?: Article[] }) {
   const { locale } = useTranslation()
   const allWords = useMemo(() => WORD_BOOKS.flatMap((wb) => wb.words), [])
 
+  const [sourceType, setSourceType] = useState<'wordbook' | 'article'>('wordbook')
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null)
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
   const [totalRounds, setTotalRounds] = useState(10)
 
+  // Read articleId from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('articleId')
+    if (id) {
+      const article = articles.find((a) => a.id === id)
+      if (article && article.vocabulary.length > 0) {
+        setSelectedArticleId(id)
+        setSourceType('article')
+      }
+    }
+  }, [articles])
+
+  const selectedArticle = useMemo(
+    () => articles.find((a) => a.id === selectedArticleId) || null,
+    [articles, selectedArticleId]
+  )
+
   const sourceWords = useMemo(() => {
+    if (sourceType === 'article' && selectedArticle) {
+      return selectedArticle.vocabulary.length > 0 ? selectedArticle.vocabulary : allWords
+    }
     if (selectedBookId === null) return allWords
     const book = WORD_BOOKS.find((b) => b.id === selectedBookId)
     return book ? book.words : allWords
-  }, [allWords, selectedBookId])
+  }, [allWords, selectedBookId, sourceType, selectedArticle])
 
   // Phase: level selection → playing → result
   const [phase, setPhase] = useState<'select' | 'playing' | 'result'>('select')
@@ -257,43 +281,108 @@ export default function AiBattleGame() {
           )}
         </div>
 
-        {/* Textbook selection */}
-        <div className="mb-6 max-w-md mx-auto">
-          <label className="block text-xs font-medium text-gray-500 mb-2">
-            📚 {locale === 'zh' ? '选择词库' : 'Vocabulary Book'}
-          </label>
-          <div className="flex flex-wrap gap-2">
+        {/* Source type toggle */}
+        <div className="mb-4 max-w-md mx-auto">
+          <div className="flex gap-2 bg-white rounded-xl p-1 border border-gray-200">
             <button
-              onClick={() => setSelectedBookId(null)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                selectedBookId === null
+              onClick={() => setSourceType('wordbook')}
+              className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
+                sourceType === 'wordbook'
                   ? 'bg-orange-500 text-white shadow-sm'
-                  : 'bg-white text-gray-500 border border-gray-200 hover:bg-orange-50'
+                  : 'text-gray-500 hover:bg-orange-50'
               }`}
             >
-              📚 {locale === 'zh' ? '全部' : 'All'}
+              📚 {locale === 'zh' ? '按词库' : 'Word Book'}
             </button>
-            {WORD_BOOKS.map((book) => (
+            <button
+              onClick={() => setSourceType('article')}
+              className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
+                sourceType === 'article'
+                  ? 'bg-orange-500 text-white shadow-sm'
+                  : 'text-gray-500 hover:bg-orange-50'
+              }`}
+            >
+              📖 {locale === 'zh' ? '按文章' : 'Article'}
+            </button>
+          </div>
+        </div>
+
+        {/* Word book selection */}
+        {sourceType === 'wordbook' && (
+          <div className="mb-4 max-w-md mx-auto">
+            <label className="block text-xs font-medium text-gray-500 mb-2">
+              📚 {locale === 'zh' ? '选择词库' : 'Vocabulary Book'}
+            </label>
+            <div className="flex flex-wrap gap-2">
               <button
-                key={book.id}
-                onClick={() => setSelectedBookId(book.id)}
+                onClick={() => setSelectedBookId(null)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  selectedBookId === book.id
-                    ? 'text-white shadow-sm'
+                  selectedBookId === null
+                    ? 'bg-orange-500 text-white shadow-sm'
                     : 'bg-white text-gray-500 border border-gray-200 hover:bg-orange-50'
                 }`}
-                style={selectedBookId === book.id ? { backgroundColor: book.color } : undefined}
               >
-                {book.emoji} {locale === 'zh' ? book.name : book.name}
+                📚 {locale === 'zh' ? '全部' : 'All'}
               </button>
-            ))}
+              {WORD_BOOKS.map((book) => (
+                <button
+                  key={book.id}
+                  onClick={() => setSelectedBookId(book.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    selectedBookId === book.id
+                      ? 'text-white shadow-sm'
+                      : 'bg-white text-gray-500 border border-gray-200 hover:bg-orange-50'
+                  }`}
+                  style={selectedBookId === book.id ? { backgroundColor: book.color } : undefined}
+                >
+                  {book.emoji} {locale === 'zh' ? book.name : book.name}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-gray-400 mt-1">
+              {selectedBookId === null
+                ? (locale === 'zh' ? `全部词库 · ${sourceWords.length} 个词` : `All books · ${sourceWords.length} words`)
+                : `${WORD_BOOKS.find((b) => b.id === selectedBookId)?.emoji || ''} ${sourceWords.length} ${locale === 'zh' ? '个词' : 'words'}`}
+            </p>
           </div>
-          <p className="text-[10px] text-gray-400 mt-1">
-            {selectedBookId === null
-              ? (locale === 'zh' ? `全部词库 · ${sourceWords.length} 个词` : `All books · ${sourceWords.length} words`)
-              : `${WORD_BOOKS.find((b) => b.id === selectedBookId)?.emoji || ''} ${sourceWords.length} ${locale === 'zh' ? '个词' : 'words'}`}
-          </p>
-        </div>
+        )}
+
+        {/* Article selection */}
+        {sourceType === 'article' && (
+          <div className="mb-4 max-w-md mx-auto">
+            <label className="block text-xs font-medium text-gray-500 mb-2">
+              📖 {locale === 'zh' ? '选择文章' : 'Select Article'}
+            </label>
+            {selectedArticle ? (
+              <div className="bg-white rounded-xl border border-gray-200 p-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">
+                      {selectedArticle.emoji} {selectedArticle.title}
+                    </p>
+                    <p className="text-xs text-gray-400">{selectedArticle.titleEn}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">
+                      {selectedArticle.vocabulary.length} {locale === 'zh' ? '个单词' : 'words'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => window.location.href = '/ai-battle/article-select'}
+                    className="text-xs px-3 py-1.5 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-medium transition-colors"
+                  >
+                    {locale === 'zh' ? '更换' : 'Change'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <a
+                href="/ai-battle/article-select"
+                className="block text-center py-3 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-400 hover:border-orange-300 hover:text-orange-500 hover:bg-orange-50 transition-all"
+              >
+                📖 {locale === 'zh' ? '点击选择文章' : 'Click to select an article'}
+              </a>
+            )}
+          </div>
+        )}
 
         {/* Round count selector */}
         <div className="mb-6 max-w-md mx-auto">
@@ -418,9 +507,11 @@ export default function AiBattleGame() {
         </div>
         <div className="flex justify-between text-[10px] text-gray-400 mt-1">
           <span>
-            {selectedBookId === null
-              ? '📚 ' + (locale === 'zh' ? '全部词库' : 'All books')
-              : `${WORD_BOOKS.find((b) => b.id === selectedBookId)?.emoji || '📚'} ${WORD_BOOKS.find((b) => b.id === selectedBookId)?.name || ''}`}
+            {sourceType === 'article' && selectedArticle
+              ? `📖 ${selectedArticle.title}`
+              : selectedBookId === null
+                ? '📚 ' + (locale === 'zh' ? '全部词库' : 'All books')
+                : `${WORD_BOOKS.find((b) => b.id === selectedBookId)?.emoji || '📚'} ${WORD_BOOKS.find((b) => b.id === selectedBookId)?.name || ''}`}
           </span>
           <span>{sourceWords.length} {locale === 'zh' ? '词' : 'words'}</span>
         </div>

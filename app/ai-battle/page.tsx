@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { getAllArticles } from '@/lib/content'
 import AiBattleGame from '@/components/AiBattleGame'
 
 export const metadata: Metadata = {
@@ -11,9 +12,10 @@ export const metadata: Metadata = {
 }
 
 export default function AiBattlePage() {
+  const articles = getAllArticles()
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <AiBattleGame />
+      <AiBattleGame articles={articles} />
     </div>
   )
 }
