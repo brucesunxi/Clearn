@@ -39,7 +39,7 @@ export async function getCoins(userId: string): Promise<number> {
 
 export async function addCoins(userId: string, amount: number): Promise<number> {
   const redis = getRedis()
-  if (!redis) return STARTING_COINS
+  if (!redis) return STARTING_COINS + amount
   const current = await getCoins(userId)
   const newBalance = current + amount
   await redis.set(getCoinsKey(userId), newBalance)
@@ -48,7 +48,7 @@ export async function addCoins(userId: string, amount: number): Promise<number> 
 
 export async function spendCoins(userId: string, amount: number): Promise<{ success: boolean; balance: number }> {
   const redis = getRedis()
-  if (!redis) return { success: false, balance: STARTING_COINS }
+  if (!redis) return { success: true, balance: STARTING_COINS - amount }
   const current = await getCoins(userId)
   if (current < amount) {
     return { success: false, balance: current }
