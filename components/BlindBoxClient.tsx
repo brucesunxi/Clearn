@@ -1,25 +1,24 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { generateBoxes, processPrize } from '@/lib/blindbox'
-import { spendCoins, getCoins } from '@/lib/pet'
+import { useCoins } from '@/lib/use-coins'
 import type { DrawnPrize } from '@/lib/blindbox'
 
 const BOX_COST = 100
 
 export default function BlindBoxClient() {
   const { locale } = useTranslation()
+  const { balance: coins, spend, add: addCoinsApi } = useCoins()
   const [phase, setPhase] = useState<'idle' | 'boxes' | 'reveal'>('idle')
   const [boxes, setBoxes] = useState<DrawnPrize[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
-  const [coins, setCoins] = useState(0)
   const [message, setMessage] = useState('')
 
-  const refreshCoins = () => setCoins(getCoins())
-
-  const handleBuyBoxes = () => {
-    if (!spendCoins(BOX_COST)) {
+  const handleBuyBoxes = async () => {
+    const ok = await spend(BOX_COST)
+    if (!ok) {
       setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
       return
     }
@@ -27,24 +26,32 @@ export default function BlindBoxClient() {
     setSelectedIndex(null)
     setMessage('')
     setPhase('boxes')
-    refreshCoins()
   }
 
-  const handleOpen = (index: number) => {
+  const handleOpen = async (index: number) => {
     if (selectedIndex !== null) return
     setSelectedIndex(index)
     setPhase('reveal')
 
     const prize = boxes[index].prize
-    const result = processPrize(prize)
+
+    // Process prize: food/accessory goes to localStorage, coins go to API
     if (prize.type === 'junk') {
       setMessage(locale === 'zh' ? '啥也没有... 再试一次？' : 'Nothing... Try again?')
-    } else if (prize.type === 'coins') {
+    } else if (prize.type === 'coins' && prize.coinAmount) {
+      await addCoinsApi(prize.coinAmount)
       setMessage(locale === 'zh' ? `获得 ${prize.coinAmount} 金币！` : `Got ${prize.coinAmount} coins!`)
+    } else if (prize.type === 'bundle' && prize.bundleItems) {
+      processPrize(prize) // food/accessory → localStorage
+      const coinItems = prize.bundleItems.filter((i) => i.type === 'coins')
+      for (const ci of coinItems) {
+        await addCoinsApi(ci.amount)
+      }
+      setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
     } else {
+      processPrize(prize) // food/accessory → localStorage
       setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
     }
-    refreshCoins()
   }
 
   const handleTryAgain = () => {

@@ -1,21 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
-import { getCoins } from '@/lib/pet'
+import { useEffect } from 'react'
 import { initVoice } from '@/lib/tts'
+import { useCoins } from '@/lib/use-coins'
 import SiteLogo from './SiteLogo'
 
 export default function Header() {
   const { locale, setLocale } = useTranslation()
-  const [coins, setCoins] = useState(0)
-
-  useEffect(() => {
-    setCoins(getCoins())
-    const interval = setInterval(() => setCoins(getCoins()), 3000)
-    return () => clearInterval(interval)
-  }, [])
+  const { balance: coins } = useCoins()
 
   // Initialize TTS voice early on page load
   useEffect(() => { initVoice() }, [])
