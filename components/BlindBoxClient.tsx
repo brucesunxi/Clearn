@@ -40,7 +40,7 @@ async function syncPetToApi() {
 
 export default function BlindBoxClient() {
   const { locale } = useTranslation()
-  const { balance: coins, spend, add: addCoinsApi } = useCoins()
+  const { balance: coins, spend, add: addCoinsApi, refresh: refreshCoins } = useCoins()
   const [phase, setPhase] = useState<'idle' | 'boxes'>('idle')
   const [boxes, setBoxes] = useState<DrawnPrize[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -53,6 +53,7 @@ export default function BlindBoxClient() {
         setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
         return
       }
+      await refreshCoins()
       setBoxes(generateBoxes())
       setSelectedIndex(null)
       setMessage('')
@@ -76,6 +77,7 @@ export default function BlindBoxClient() {
     // Coin prizes → API first, then sync localStorage
     if (prize.type === 'coins' && prize.coinAmount) {
       await addCoinsApi(prize.coinAmount)
+      await refreshCoins()
       // Also update localStorage for consistency
       const { addCoins } = await import('@/lib/pet')
       addCoins(prize.coinAmount)
@@ -91,6 +93,7 @@ export default function BlindBoxClient() {
       for (const ci of coinItems) {
         await addCoinsApi(ci.amount)
       }
+      await refreshCoins()
     }
 
     await syncInventoryToApi()
