@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import {
   getPet, getInventory, feedPet, buyFood, buyAccessory, toggleEquip,
@@ -24,6 +24,33 @@ export default function PetPageClient() {
   const [inv, setInv] = useState<Inventory>(() => getInventory())
   const [feedMsg, setFeedMsg] = useState('')
   const [shopMsg, setShopMsg] = useState('')
+
+  // Sync coins and pet state from API/Redis on mount
+  useEffect(() => {
+    const userId = localStorage.getItem('chineselearn-user-id')
+    if (!userId) return
+    fetch('/api/inventory', { headers: { 'x-user-id': userId } })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return
+        // Sync coin balance from API to localStorage
+        const currentInv = getInventory()
+        currentInv.coins = data.coins
+        if (data.inventory) {
+          currentInv.food = { ...data.inventory.food }
+          currentInv.accessories = { ...data.inventory.accessories }
+          currentInv.equipped = [...data.inventory.equipped]
+        }
+        localStorage.setItem('panda-inventory', JSON.stringify(currentInv))
+        setInv({ ...currentInv })
+        // Sync pet state
+        if (data.pet) {
+          localStorage.setItem('panda-pet', JSON.stringify(data.pet))
+          setPet(data.pet)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const handleFeed = (foodId: string) => {
     const result = feedPet(foodId)
