@@ -36,7 +36,7 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   const [loadedFromUrl, setLoadedFromUrl] = useState(false)
   const [originalEnglish, setOriginalEnglish] = useState('')
   const [isTranslating, setIsTranslating] = useState(false)
-  const [useAiClean, setUseAiClean] = useState(false)
+  const [useAiClean, setUseAiClean] = useState(true)
   const [aiGeneratingTitle, setAiGeneratingTitle] = useState(false)
 
   const dict = useMemo(() => buildVocabDict(articles), [articles])
@@ -80,9 +80,14 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
         const cleanRes = await fetch('/api/deepseek', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'clean', text: chineseText }),
+          body: JSON.stringify({ action: 'clean', text: chineseText.slice(0, 10000) }),
         })
         const cleanData = await cleanRes.json()
+        if (cleanData.error) {
+          setError(cleanData.error)
+          setIsLoading(false)
+          return
+        }
         if (cleanData.cleaned) {
           chineseText = cleanData.cleaned
           setRawText(chineseText)
@@ -91,7 +96,7 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
           const cleanEnRes = await fetch('/api/deepseek', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'clean', text: englishText }),
+            body: JSON.stringify({ action: 'clean', text: englishText.slice(0, 10000) }),
           })
           const cleanEnData = await cleanEnRes.json()
           if (cleanEnData.cleaned) {
