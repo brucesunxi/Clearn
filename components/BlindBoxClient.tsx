@@ -65,27 +65,34 @@ export default function BlindBoxClient() {
 
     const prize = boxes[index].prize
 
-    // Process prize: food/accessory goes to localStorage, coins go to API
     if (prize.type === 'junk') {
       setMessage(locale === 'zh' ? '啥也没有... 再试一次？' : 'Nothing... Try again?')
-    } else if (prize.type === 'coins' && prize.coinAmount) {
+      return
+    }
+
+    // Coin prizes → API first, then sync localStorage
+    if (prize.type === 'coins' && prize.coinAmount) {
       await addCoinsApi(prize.coinAmount)
+      // Also update localStorage for consistency
+      const { addCoins } = await import('@/lib/pet')
+      addCoins(prize.coinAmount)
       setMessage(locale === 'zh' ? `获得 ${prize.coinAmount} 金币！` : `Got ${prize.coinAmount} coins!`)
-    } else if (prize.type === 'bundle' && prize.bundleItems) {
-      processPrize(prize)
+      return
+    }
+
+    // Food / accessory / bundle → localStorage first (processPrize), then sync to API
+    processPrize(prize)
+
+    if (prize.type === 'bundle' && prize.bundleItems) {
       const coinItems = prize.bundleItems.filter((i) => i.type === 'coins')
       for (const ci of coinItems) {
         await addCoinsApi(ci.amount)
       }
-      await syncInventoryToApi()
-      await syncPetToApi()
-      setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
-    } else {
-      processPrize(prize)
-      await syncInventoryToApi()
-      await syncPetToApi()
-      setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
     }
+
+    await syncInventoryToApi()
+    await syncPetToApi()
+    setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
   }
 
   const handleTryAgain = () => {

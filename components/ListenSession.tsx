@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
-import { addCoins } from '@/lib/pet'
+import { addCoins, syncCoinsToApi } from '@/lib/pet'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -89,7 +89,7 @@ export default function ListenSession({ articles }: ListenSessionProps) {
       setIdx((i) => i + 1); setSelected(null); setRevealed(false)
     } else {
       const earned = correct * 10 + 20
-      addCoins(earned); setCoinsEarned(earned); setStep('result')
+      addCoins(earned); syncCoinsToApi(earned); setCoinsEarned(earned); setStep('result')
     }
   }
 

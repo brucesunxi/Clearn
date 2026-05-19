@@ -99,7 +99,7 @@ export function generateBoxes(): DrawnPrize[] {
 
 /** Process the result of opening a box */
 export function processPrize(prize: PrizeDef): { added: boolean; message: string } {
-  const { spendCoins, addCoins, getInventoryRaw, saveInventory, FOOD_ITEMS, ACCESSORY_ITEMS } = require('./pet')
+  const { addCoins, getInventoryRaw, saveInventory } = require('./pet')
 
   if (prize.type === 'food' && prize.itemId) {
     const inv = getInventoryRaw()
@@ -132,9 +132,8 @@ export function processPrize(prize: PrizeDef): { added: boolean; message: string
         newFood[item.itemId] = (newFood[item.itemId] || 0) + item.amount
       } else if (item.type === 'accessory' && item.itemId) {
         newAcc[item.itemId] = true
-      } else if (item.type === 'coins') {
-        addCoins(item.amount)
       }
+      // Coins are handled by BlindBoxClient via API — omit here to avoid double-count
     }
 
     saveInventory({ ...inv, food: newFood, accessories: newAcc })

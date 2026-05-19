@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
-import { addCoins } from '@/lib/pet'
+import { addCoins, syncCoinsToApi } from '@/lib/pet'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -118,6 +118,7 @@ export default function QuizSession({ articles }: QuizSessionProps) {
       // Award coins: 10 per correct answer
       const coinsEarned = correctCount * 10 + 20 // bonus 20 for finishing
       addCoins(coinsEarned)
+      syncCoinsToApi(coinsEarned)
       setCoinsEarned(coinsEarned)
       setStep('result')
     }

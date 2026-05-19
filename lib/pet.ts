@@ -55,7 +55,7 @@ function defaultPet(): PetState {
 }
 
 function defaultInventory(): Inventory {
-  return { coins: 100, food: { bamboo: 2 }, accessories: {}, equipped: [] }
+  return { coins: 500, food: { bamboo: 2 }, accessories: {}, equipped: [] }
 }
 
 // ---- Pet State ----
@@ -167,6 +167,18 @@ export function addCoins(amount: number): number {
   const newCoins = inv.coins + amount
   saveInventory({ ...inv, coins: newCoins })
   return newCoins
+}
+
+/** Sync a coin reward to API/Redis (fire-and-forget, call after addCoins) */
+export function syncCoinsToApi(earnedAmount: number) {
+  if (typeof window === 'undefined') return
+  const userId = localStorage.getItem('chineselearn-user-id')
+  if (!userId) return
+  fetch('/api/coins', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+    body: JSON.stringify({ amount: earnedAmount }),
+  }).catch(() => {})
 }
 
 export function spendCoins(amount: number): boolean {

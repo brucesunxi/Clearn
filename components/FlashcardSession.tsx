@@ -6,7 +6,7 @@ import Flashcard from './Flashcard'
 import type { Article, VocabularyItem } from '@/lib/types'
 import { buildWordDatabase, getNewWords, getReviewWords, recordAnswer } from '@/lib/words'
 import { doCheckIn, incrementTodayProgress } from '@/lib/checkin'
-import { addCoins } from '@/lib/pet'
+import { addCoins, syncCoinsToApi } from '@/lib/pet'
 
 interface FlashcardSessionProps {
   articles: Article[]
@@ -80,6 +80,7 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
           doCheckIn()
           incrementTodayProgress(cards.length)
           addCoins(20)
+          syncCoinsToApi(20)
           onComplete?.()
           setStep('summary')
         } else {
