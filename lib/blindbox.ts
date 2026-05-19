@@ -1,11 +1,18 @@
+export interface BundleItem {
+  type: 'food' | 'accessory' | 'coins'
+  itemId?: string
+  amount: number
+}
+
 export interface PrizeDef {
-  type: 'food' | 'accessory' | 'coins' | 'junk'
+  type: 'food' | 'accessory' | 'coins' | 'junk' | 'bundle'
   nameZh: string
   nameEn: string
   emoji: string
   weight: number
   itemId?: string
   coinAmount?: number
+  bundleItems?: BundleItem[]
 }
 
 export interface DrawnPrize {
@@ -41,6 +48,29 @@ const PRIZE_POOL: PrizeDef[] = [
   { type: 'junk', nameZh: '一个空瓶', nameEn: 'Empty Bottle', emoji: '🧃', weight: 4 },
   { type: 'junk', nameZh: '旧袜子', nameEn: 'Old Sock', emoji: '🧦', weight: 3 },
   { type: 'junk', nameZh: '一颗石头', nameEn: 'A Rock', emoji: '🪨', weight: 3 },
+
+  // 🎉 Grand prize bundles — rare
+  {
+    type: 'bundle', nameZh: '🎉 食物大礼包', nameEn: '🎉 Food Bundle', emoji: '🎉', weight: 2,
+    bundleItems: [
+      { type: 'food', itemId: 'bamboo', amount: 3 },
+      { type: 'food', itemId: 'rice', amount: 2 },
+      { type: 'food', itemId: 'cake', amount: 1 },
+    ],
+  },
+  {
+    type: 'bundle', nameZh: '🎉 金币大礼包', nameEn: '🎉 Coin Bundle', emoji: '🎉', weight: 2,
+    bundleItems: [{ type: 'coins', amount: 100 }],
+  },
+  {
+    type: 'bundle', nameZh: '🎉 豪华大礼包', nameEn: '🎉 Luxury Bundle', emoji: '👑', weight: 1,
+    bundleItems: [
+      { type: 'food', itemId: 'bamboo', amount: 2 },
+      { type: 'food', itemId: 'dumpling', amount: 2 },
+      { type: 'coins', amount: 50 },
+      { type: 'accessory', itemId: 'crown', amount: 1 },
+    ],
+  },
 ]
 
 export function getPrizePool(): PrizeDef[] {
@@ -88,6 +118,26 @@ export function processPrize(prize: PrizeDef): { added: boolean; message: string
 
   if (prize.type === 'coins' && prize.coinAmount) {
     addCoins(prize.coinAmount)
+    return { added: true, message: '' }
+  }
+
+  // 🎉 Bundle — add multiple items
+  if (prize.type === 'bundle' && prize.bundleItems) {
+    const inv = getInventoryRaw()
+    const newFood = { ...inv.food }
+    const newAcc = { ...inv.accessories }
+
+    for (const item of prize.bundleItems) {
+      if (item.type === 'food' && item.itemId) {
+        newFood[item.itemId] = (newFood[item.itemId] || 0) + item.amount
+      } else if (item.type === 'accessory' && item.itemId) {
+        newAcc[item.itemId] = true
+      } else if (item.type === 'coins') {
+        addCoins(item.amount)
+      }
+    }
+
+    saveInventory({ ...inv, food: newFood, accessories: newAcc })
     return { added: true, message: '' }
   }
 

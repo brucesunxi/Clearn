@@ -102,10 +102,11 @@ export default function BlindBoxClient() {
               {locale === 'zh' ? '📋 查看奖池概率' : '📋 Prize pool odds'}
             </summary>
             <div className="mt-3 bg-white rounded-xl border border-gray-100 p-4 text-xs text-gray-500 space-y-1">
-              <p>🎋🥟🍙🧋 {locale === 'zh' ? '宠物食物' : 'Pet Food'} — 43%</p>
-              <p>🧣🎩🎀👓📿👑 {locale === 'zh' ? '宠物饰品' : 'Pet Accessories'} — 26%</p>
-              <p>🪙 {locale === 'zh' ? '金币返还' : 'Coin Rewards'} — 15%</p>
-              <p>🍂💇🗑️🧃🧦🪨 {locale === 'zh' ? '小垃圾' : 'Junk'} — 16%</p>
+              <p>🎋🥟🍙🧋 {locale === 'zh' ? '宠物食物' : 'Pet Food'} — ~37%</p>
+              <p>🧣🎩🎀👓📿👑 {locale === 'zh' ? '宠物饰品' : 'Pet Accessories'} — ~22%</p>
+              <p>🪙 {locale === 'zh' ? '金币返还' : 'Coin Rewards'} — ~13%</p>
+              <p>🎉🎉👑 {locale === 'zh' ? '大礼包' : 'Grand Prize'} — ~4%</p>
+              <p>🍂💇🗑️🧃🧦🪨 {locale === 'zh' ? '小垃圾' : 'Junk'} — ~24%</p>
             </div>
           </details>
         </div>
@@ -153,12 +154,39 @@ export default function BlindBoxClient() {
 
           {selectedIndex !== null && (
             <div className="text-center">
-              <div className="bg-white rounded-2xl border-2 border-yellow-200 shadow-sm p-6 mb-6">
-                <p className="text-4xl mb-3">{boxes[selectedIndex].prize.emoji}</p>
+              <div className={`rounded-2xl border-2 shadow-sm p-6 mb-6 ${
+                boxes[selectedIndex].prize.type === 'bundle'
+                  ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-300'
+                  : 'bg-white border-yellow-200'
+              }`}>
+                <p className={`${boxes[selectedIndex].prize.type === 'bundle' ? 'text-5xl' : 'text-4xl'} mb-3`}>
+                  {boxes[selectedIndex].prize.emoji}
+                </p>
                 <p className="text-lg font-bold text-gray-800 mb-1">
                   {locale === 'zh' ? boxes[selectedIndex].prize.nameZh : boxes[selectedIndex].prize.nameEn}
                 </p>
-                <p className={`text-sm ${message.includes('恭喜') || message.includes('Got') || message.includes('获得') || message.includes('coins') ? 'text-emerald-600' : 'text-gray-400'}`}>
+
+                {boxes[selectedIndex].prize.type === 'bundle' && boxes[selectedIndex].prize.bundleItems && (
+                  <div className="mt-3 flex flex-wrap justify-center gap-2">
+                    {boxes[selectedIndex].prize.bundleItems.map((item, bi) => {
+                      let icon = '🪙'
+                      if (item.type === 'food') {
+                        const foodMap: Record<string, string> = { bamboo: '🎋', rice: '🍙', dumpling: '🥟', cake: '🍰', milk: '🧋' }
+                        icon = foodMap[item.itemId || ''] || '🎋'
+                      } else if (item.type === 'accessory') {
+                        const accMap: Record<string, string> = { crown: '👑', red_scarf: '🧣', bamboo_hat: '🎩', glasses: '👓', bowtie: '🎀', necklace: '📿' }
+                        icon = accMap[item.itemId || ''] || '🎁'
+                      }
+                      return (
+                        <span key={bi} className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-yellow-200 text-xs text-gray-700">
+                          {icon} x{item.amount}
+                        </span>
+                      )
+                    })}
+                  </div>
+                )}
+
+                <p className={`text-sm mt-2 ${boxes[selectedIndex].prize.type === 'bundle' ? 'text-orange-600 font-semibold' : message.includes('coins') ? 'text-emerald-600' : 'text-gray-400'}`}>
                   {message}
                 </p>
               </div>
