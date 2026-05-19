@@ -1,18 +1,31 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
-import { useEffect } from 'react'
 import { initVoice } from '@/lib/tts'
-import { useCoins } from '@/lib/use-coins'
 import SiteLogo from './SiteLogo'
 
 export default function Header() {
   const { locale, setLocale } = useTranslation()
-  const { balance: coins } = useCoins()
+  const [coins, setCoins] = useState(500)
 
-  // Initialize TTS voice early on page load
-  useEffect(() => { initVoice() }, [])
+  // Read coins from localStorage + sync to API in background
+  useEffect(() => {
+    initVoice()
+    const read = () => {
+      try {
+        const raw = localStorage.getItem('panda-inventory')
+        if (raw) {
+          const inv = JSON.parse(raw)
+          setCoins((prev) => (prev !== inv.coins ? inv.coins : prev))
+        }
+      } catch {}
+    }
+    read()
+    const t = setInterval(read, 1000)
+    return () => clearInterval(t)
+  }, [])
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
