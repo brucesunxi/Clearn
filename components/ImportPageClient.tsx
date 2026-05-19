@@ -36,6 +36,8 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   const [loadedFromUrl, setLoadedFromUrl] = useState(false)
   const [originalEnglish, setOriginalEnglish] = useState('')
   const [isTranslating, setIsTranslating] = useState(false)
+  const [useAiClean, setUseAiClean] = useState(false)
+  const [aiGeneratingTitle, setAiGeneratingTitle] = useState(false)
 
   const dict = useMemo(() => buildVocabDict(articles), [articles])
 
@@ -73,6 +75,31 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
         setIsTranslating(false)
       }
 
+      // Phase 1.5: AI cleaning (optional)
+      if (useAiClean) {
+        const cleanRes = await fetch('/api/deepseek', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'clean', text: chineseText }),
+        })
+        const cleanData = await cleanRes.json()
+        if (cleanData.cleaned) {
+          chineseText = cleanData.cleaned
+          setRawText(chineseText)
+        }
+        if (englishText) {
+          const cleanEnRes = await fetch('/api/deepseek', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'clean', text: englishText }),
+          })
+          const cleanEnData = await cleanEnRes.json()
+          if (cleanEnData.cleaned) {
+            englishText = cleanEnData.cleaned
+          }
+        }
+      }
+
       // Phase 2: Analyze Chinese text
       const paras = splitIntoParagraphs(chineseText)
 
@@ -99,7 +126,19 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
       const suggestedLevel = assessLevel(chineseText)
       setLevel(suggestedLevel)
 
-      // Auto-fill title
+      // Phase 4: AI title generation (optional)
+      if (useAiClean) {
+        const titleRes = await fetch('/api/deepseek', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'title', text: chineseText }),
+        })
+        const titleData = await titleRes.json()
+        if (titleData.title) setTitle(titleData.title)
+        if (titleData.titleEn) setTitleEn(titleData.titleEn)
+      }
+
+      // Auto-fill title (fallback if AI didn't run or failed)
       if (!title) {
         const firstLine = chineseText.split('\n')[0]?.trim().slice(0, 50) || ''
         setTitle(firstLine)
@@ -178,6 +217,25 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
       setError(locale === 'zh' ? '获取内容失败，请检查 URL 是否正确' : 'Failed to fetch URL. Please check the URL.')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleAiTitle = async () => {
+    setAiGeneratingTitle(true)
+    try {
+      const fullText = paragraphs.map((p) => p.text).join('\n\n')
+      const res = await fetch('/api/deepseek', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'title', text: fullText || rawText }),
+      })
+      const data = await res.json()
+      if (data.title) setTitle(data.title)
+      if (data.titleEn) setTitleEn(data.titleEn)
+    } catch {
+      // silently fail
+    } finally {
+      setAiGeneratingTitle(false)
     }
   }
 
@@ -400,6 +458,26 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
           </div>
         )}
 
+        {/* AI cleaning toggle */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={useAiClean}
+              onChange={(e) => setUseAiClean(e.target.checked)}
+              className="w-4 h-4 text-blue-500 rounded accent-blue-500"
+            />
+            <div>
+              <span className="text-sm font-medium text-gray-700">
+                ✨ {locale === 'zh' ? 'AI 智能清洗' : 'AI Clean'}
+              </span>
+              <p className="text-xs text-gray-400">
+                {locale === 'zh' ? '自动去除噪音、修复段落分割、生成标题' : 'Auto-remove noise, fix paragraphs, generate titles'}
+              </p>
+            </div>
+          </label>
+        </div>
+
         {/* Analyze button */}
         <button
           onClick={handleAnalyze}
@@ -451,9 +529,20 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
 
       {/* Config section */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-4">
-          {locale === 'zh' ? '文章信息' : 'Article Info'}
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-800">
+            {locale === 'zh' ? '文章信息' : 'Article Info'}
+          </h2>
+          <button
+            onClick={handleAiTitle}
+            disabled={aiGeneratingTitle}
+            className="text-xs px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
+          >
+            {aiGeneratingTitle
+              ? (locale === 'zh' ? '生成中...' : 'Generating...')
+              : `✨ ${locale === 'zh' ? 'AI 生成标题' : 'AI Title'}`}
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
