@@ -69,35 +69,48 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
 
   const [sourceType, setSourceType] = useState<'wordbook' | 'article'>('wordbook')
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null)
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
+  const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
   const [totalRounds, setTotalRounds] = useState(10)
 
-  // Read articleId from URL on mount
+  // Read articleIds from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const id = params.get('articleId')
-    if (id) {
-      const article = articles.find((a) => a.id === id)
-      if (article && article.vocabulary.length > 0) {
-        setSelectedArticleId(id)
+    const ids = params.getAll('articleId')
+    if (ids.length > 0) {
+      const valid = ids.filter((id) => {
+        const a = articles.find((art) => art.id === id)
+        return a && a.vocabulary.length > 0
+      })
+      if (valid.length > 0) {
+        setSelectedArticleIds(valid.slice(0, 3))
         setSourceType('article')
       }
     }
   }, [articles])
 
-  const selectedArticle = useMemo(
-    () => articles.find((a) => a.id === selectedArticleId) || null,
-    [articles, selectedArticleId]
+  const selectedArticles = useMemo(
+    () => articles.filter((a) => selectedArticleIds.includes(a.id)),
+    [articles, selectedArticleIds]
   )
 
   const sourceWords = useMemo(() => {
-    if (sourceType === 'article' && selectedArticle) {
-      return selectedArticle.vocabulary.length > 0 ? selectedArticle.vocabulary : allWords
+    if (sourceType === 'article' && selectedArticles.length > 0) {
+      const seen = new Set<string>()
+      const merged: typeof allWords = []
+      for (const art of selectedArticles) {
+        for (const w of art.vocabulary) {
+          if (!seen.has(w.word)) {
+            seen.add(w.word)
+            merged.push(w)
+          }
+        }
+      }
+      return merged.length > 0 ? merged : allWords
     }
     if (selectedBookId === null) return allWords
     const book = WORD_BOOKS.find((b) => b.id === selectedBookId)
     return book ? book.words : allWords
-  }, [allWords, selectedBookId, sourceType, selectedArticle])
+  }, [allWords, selectedBookId, sourceType, selectedArticles])
 
   // Phase: level selection → playing → result
   const [phase, setPhase] = useState<'select' | 'playing' | 'result'>('select')
@@ -351,34 +364,35 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
         {sourceType === 'article' && (
           <div className="mb-4 max-w-md mx-auto">
             <label className="block text-xs font-medium text-gray-500 mb-2">
-              📖 {locale === 'zh' ? '选择文章' : 'Select Article'}
+              📖 {locale === 'zh' ? `选择文章 (${selectedArticles.length}/3)` : `Select Articles (${selectedArticles.length}/3)`}
             </label>
-            {selectedArticle ? (
-              <div className="bg-white rounded-xl border border-gray-200 p-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">
-                      {selectedArticle.emoji} {selectedArticle.title}
-                    </p>
-                    <p className="text-xs text-gray-400">{selectedArticle.titleEn}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">
-                      {selectedArticle.vocabulary.length} {locale === 'zh' ? '个单词' : 'words'}
-                    </p>
+            {selectedArticles.length > 0 ? (
+              <div className="space-y-2 mb-2">
+                {selectedArticles.map((art) => (
+                  <div key={art.id} className="bg-white rounded-xl border border-gray-200 p-3 flex items-center justify-between">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-800 truncate">
+                        {art.emoji} {art.title}
+                      </p>
+                      <p className="text-[10px] text-gray-400">
+                        {art.vocabulary.length} {locale === 'zh' ? '个单词' : 'words'}
+                      </p>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => window.location.href = '/ai-battle/article-select'}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-medium transition-colors"
-                  >
-                    {locale === 'zh' ? '更换' : 'Change'}
-                  </button>
-                </div>
+                ))}
+                <button
+                  onClick={() => window.location.href = '/ai-battle/article-select'}
+                  className="w-full text-xs py-2 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-100 font-medium transition-colors"
+                >
+                  {locale === 'zh' ? '更换文章' : 'Change Articles'}
+                </button>
               </div>
             ) : (
               <a
                 href="/ai-battle/article-select"
                 className="block text-center py-3 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-400 hover:border-orange-300 hover:text-orange-500 hover:bg-orange-50 transition-all"
               >
-                📖 {locale === 'zh' ? '点击选择文章' : 'Click to select an article'}
+                📖 {locale === 'zh' ? '点击选择文章（最多 3 篇）' : 'Click to select articles (max 3)'}
               </a>
             )}
           </div>
@@ -507,8 +521,8 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
         </div>
         <div className="flex justify-between text-[10px] text-gray-400 mt-1">
           <span>
-            {sourceType === 'article' && selectedArticle
-              ? `📖 ${selectedArticle.title}`
+            {sourceType === 'article' && selectedArticles.length > 0
+              ? `📖 ${selectedArticles.map((a) => a.title).join(', ')}`
               : selectedBookId === null
                 ? '📚 ' + (locale === 'zh' ? '全部词库' : 'All books')
                 : `${WORD_BOOKS.find((b) => b.id === selectedBookId)?.emoji || '📚'} ${WORD_BOOKS.find((b) => b.id === selectedBookId)?.name || ''}`}
