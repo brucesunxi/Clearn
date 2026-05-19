@@ -231,6 +231,38 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
           </div>
         </div>
       </Link>
+
+      {/* Blind Box Section */}
+      <Link href="/blindbox"
+        className="group mt-8 block bg-gradient-to-br from-purple-50 via-white to-pink-50 rounded-2xl border-2 border-purple-200 hover:border-purple-400 p-6 md:p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          <div className="shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
+            🎁
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h2 className="text-xl font-bold text-gray-800 mb-1">
+              {locale === 'zh' ? '🎲 神秘盲盒' : '🎲 Mystery Box'}
+            </h2>
+            <p className="text-sm text-gray-500 mb-3">
+              {locale === 'zh'
+                ? '花费 100 金币试试手气！有机会抽到宠物食物、饰品，还有概率获得大礼包！'
+                : 'Spend 100 coins to try your luck! Win pet food, accessories, or rare grand prizes!'}
+            </p>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs">
+              <span className="px-3 py-1.5 rounded-full bg-purple-100 text-purple-600 font-medium">🎋🥟🍙 {locale === 'zh' ? '食物' : 'Food'}</span>
+              <span className="text-gray-300 text-lg">·</span>
+              <span className="px-3 py-1.5 rounded-full bg-purple-100 text-purple-600 font-medium">🧣🎀👓 {locale === 'zh' ? '饰品' : 'Accessories'}</span>
+              <span className="text-gray-300 text-lg">·</span>
+              <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-600 font-medium">🎉 {locale === 'zh' ? '大礼包' : 'Grand Prize'}</span>
+            </div>
+          </div>
+          <div className="shrink-0">
+            <span className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium shadow-sm group-hover:shadow-md group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300">
+              🎁 {locale === 'zh' ? '试试手气' : 'Try Luck'}
+            </span>
+          </div>
+        </div>
+      </Link>
     </div>
   )
 }
