@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { generateBoxes, processPrize } from '@/lib/blindbox'
 import type { DrawnPrize } from '@/lib/blindbox'
+import { trackActivity } from '@/lib/activity'
 
 const BOX_COST = 100
 
@@ -139,6 +140,7 @@ export default function BlindBoxClient() {
 
     await syncInventoryToApi()
     await syncPetToApi()
+    trackActivity('box_open', { prizeType: prize.type, prizeId: prize.itemId || '', coinsCost: BOX_COST })
     setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
   }
 

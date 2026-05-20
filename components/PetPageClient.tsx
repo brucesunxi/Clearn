@@ -7,6 +7,7 @@ import {
   FOOD_ITEMS, ACCESSORY_ITEMS, petStatsText,
 } from '@/lib/pet'
 import type { PetState, Inventory } from '@/lib/pet'
+import { trackActivity } from '@/lib/activity'
 
 const ACCESSORY_POSITIONS: Record<string, { top: string; left: string; size: string }> = {
   red_scarf: { top: '62%', left: '40%', size: '28px' },
@@ -57,6 +58,7 @@ export default function PetPageClient() {
     setPet(result.pet)
     setInv(result.inventory)
     setFeedMsg(result.message)
+    trackActivity('pet_feed', { foodId })
     setTimeout(() => setFeedMsg(''), 2500)
   }
 
@@ -65,6 +67,7 @@ export default function PetPageClient() {
     if (ok) {
       setInv(getInventory())
       setShopMsg('+1 🎉')
+      trackActivity('shop_purchase', { itemId: foodId, type: 'food' })
     } else {
       setShopMsg('Not enough coins!')
     }
@@ -76,6 +79,8 @@ export default function PetPageClient() {
     if (ok) {
       setInv(getInventory())
       setShopMsg('Purchased! 🎉')
+      const item = ACCESSORY_ITEMS.find((a) => a.id === accId)
+      trackActivity('shop_purchase', { itemId: accId, type: 'accessory', price: item?.price || 0 })
     } else {
       setShopMsg('Not enough coins!')
     }

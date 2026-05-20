@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article, Paragraph, VocabularyItem } from '@/lib/types'
 import { saveCustomArticle } from '@/lib/custom-articles'
 import { buildVocabDict, splitIntoParagraphs, extractVocabulary, suggestNewWords, assessLevel } from '@/lib/chinese-text'
+import { trackActivity } from '@/lib/activity'
 
 interface ImportPageClientProps {
   levels: Level[]
@@ -257,6 +258,7 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
       vocabulary,
     }
     saveCustomArticle(article)
+    trackActivity('material_import', { wordCount: vocabulary.length, charCount: rawText.length })
     router.push(`/reading/custom/${id}`)
   }
 

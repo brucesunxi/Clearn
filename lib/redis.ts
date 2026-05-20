@@ -217,3 +217,65 @@ export async function deleteFeedback(id: string): Promise<boolean> {
   await redis.zrem(FEEDBACK_IDS_KEY, id)
   return true
 }
+
+// ---- Activity Tracking ----
+
+export interface ActivityEntry {
+  id: string
+  userId: string
+  action: string
+  detail: string
+  createdAt: string
+}
+
+const ACTIVITY_IDS_KEY = 'activity:ids'
+const ACTIVITY_TTL_SEC = 60 * 60 * 24 * 30 // 30 days
+
+function generateActivityId(): string {
+  return `act-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+function activityKey(id: string): string {
+  return `activity:${id}`
+}
+
+export async function createActivity(
+  userId: string,
+  action: string,
+  detail?: string,
+): Promise<ActivityEntry | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  const entry: ActivityEntry = {
+    id: generateActivityId(),
+    userId,
+    action,
+    detail: detail || '',
+    createdAt: new Date().toISOString(),
+  }
+  await redis.set(activityKey(entry.id), JSON.stringify(entry), { ex: ACTIVITY_TTL_SEC })
+  await redis.zadd(ACTIVITY_IDS_KEY, { score: Date.now(), member: entry.id })
+  return entry
+}
+
+export async function getActivityEntries(
+  page: number,
+  pageSize: number,
+): Promise<{ entries: ActivityEntry[]; total: number } | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  const total = await redis.zcard(ACTIVITY_IDS_KEY)
+  const start = (page - 1) * pageSize
+  const end = start + pageSize - 1
+  const ids = await redis.zrange<string[]>(ACTIVITY_IDS_KEY, start, end, { rev: true })
+  if (!ids || ids.length === 0) {
+    return { entries: [], total }
+  }
+  const rawEntries = await Promise.all(
+    ids.map((id: string) => redis.get<string>(activityKey(id))),
+  )
+  const entries = rawEntries
+    .filter((e): e is string => e !== null && e !== undefined)
+    .map((e: string) => JSON.parse(e) as ActivityEntry)
+  return { entries, total }
+}

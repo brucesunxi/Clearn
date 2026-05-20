@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 
+// ---- Types ----
+
 interface FeedbackEntry {
   id: string
   userId: string
@@ -11,12 +13,34 @@ interface FeedbackEntry {
   read: boolean
 }
 
-interface FeedbackResult {
-  entries: FeedbackEntry[]
-  total: number
+interface ActivityEntry {
+  id: string
+  userId: string
+  action: string
+  detail: string
+  createdAt: string
 }
 
-type FilterType = 'all' | 'unread'
+type AdminTab = 'feedback' | 'activity'
+type FeedbackFilter = 'all' | 'unread'
+
+const ACTION_META: Record<string, { emoji: string; label: string }> = {
+  study_complete:  { emoji: '📝', label: 'Study' },
+  quiz_complete:   { emoji: '🎯', label: 'Quiz' },
+  battle_complete: { emoji: '⚔️', label: 'Battle' },
+  listen_complete: { emoji: '🎧', label: 'Listen' },
+  speak_complete:  { emoji: '🗣️', label: 'Speak' },
+  checkin:         { emoji: '✅', label: 'Check-in' },
+  box_open:        { emoji: '🎁', label: 'Box' },
+  pet_feed:        { emoji: '🍙', label: 'Feed' },
+  shop_purchase:   { emoji: '🛒', label: 'Shop' },
+  article_read:    { emoji: '📖', label: 'Read' },
+  material_import: { emoji: '📥', label: 'Import' },
+}
+
+const ACTION_KEYS = Object.keys(ACTION_META)
+
+// ---- Component ----
 
 export default function AdminFeedbackClient() {
   const [step, setStep] = useState<'password' | 'authenticated'>('password')
@@ -25,17 +49,29 @@ export default function AdminFeedbackClient() {
   const [authError, setAuthError] = useState('')
   const [authLoading, setAuthLoading] = useState(false)
 
-  const [entries, setEntries] = useState<FeedbackEntry[]>([])
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const [filter, setFilter] = useState<FilterType>('all')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [actionMsg, setActionMsg] = useState('')
+  // Tab
+  const [tab, setTab] = useState<AdminTab>('feedback')
 
+  // Feedback state
+  const [fbEntries, setFbEntries] = useState<FeedbackEntry[]>([])
+  const [fbTotal, setFbTotal] = useState(0)
+  const [fbPage, setFbPage] = useState(1)
+  const [fbFilter, setFbFilter] = useState<FeedbackFilter>('all')
+  const [fbLoading, setFbLoading] = useState(false)
+  const [fbError, setFbError] = useState('')
+
+  // Activity state
+  const [actEntries, setActEntries] = useState<ActivityEntry[]>([])
+  const [actTotal, setActTotal] = useState(0)
+  const [actPage, setActPage] = useState(1)
+  const [actFilter, setActFilter] = useState('')
+  const [actLoading, setActLoading] = useState(false)
+  const [actError, setActError] = useState('')
+
+  const [actionMsg, setActionMsg] = useState('')
   const pageSize = 20
 
-  // Try to restore admin key from sessionStorage
+  // Restore session
   useEffect(() => {
     const saved = sessionStorage.getItem('admin-key')
     if (saved) {
@@ -44,40 +80,56 @@ export default function AdminFeedbackClient() {
     }
   }, [])
 
+  // ---- Feedback fetch ----
   const fetchFeedback = useCallback(async (p: number) => {
-    setLoading(true)
-    setError('')
+    setFbLoading(true)
+    setFbError('')
     try {
       const params = new URLSearchParams({ page: String(p), pageSize: String(pageSize) })
-      if (filter === 'unread') params.set('filter', 'unread')
       const res = await fetch(`/api/admin/feedback?${params}`, {
         headers: { 'x-admin-key': adminKey },
       })
-      if (res.status === 401) {
-        setAuthError('Session expired. Please re-enter password.')
-        sessionStorage.removeItem('admin-key')
-        setStep('password')
-        setAdminKey('')
-        return
-      }
-      if (!res.ok) throw new Error('Failed to load')
-      const data: FeedbackResult = await res.json()
-      const filtered = filter === 'unread' ? data.entries.filter((e) => !e.read) : data.entries
-      setEntries(filtered)
-      setTotal(filter === 'unread' ? filtered.length : data.total)
-    } catch {
-      setError('Failed to load feedback')
-    } finally {
-      setLoading(false)
-    }
-  }, [adminKey, filter])
+      if (res.status === 401) return handleSessionExpired()
+      if (!res.ok) throw new Error()
+      const data: { entries: FeedbackEntry[]; total: number } = await res.json()
+      const filtered = fbFilter === 'unread' ? data.entries.filter((e) => !e.read) : data.entries
+      setFbEntries(filtered)
+      setFbTotal(fbFilter === 'unread' ? filtered.length : data.total)
+    } catch { setFbError('Failed to load feedback') }
+    finally { setFbLoading(false) }
+  }, [adminKey, fbFilter])
 
   useEffect(() => {
-    if (step === 'authenticated' && adminKey) {
-      fetchFeedback(page)
+    if (step === 'authenticated' && adminKey && tab === 'feedback') {
+      fetchFeedback(fbPage)
     }
-  }, [step, adminKey, page, filter, fetchFeedback])
+  }, [step, adminKey, tab, fbPage, fbFilter, fetchFeedback])
 
+  // ---- Activity fetch ----
+  const fetchActivity = useCallback(async (p: number) => {
+    setActLoading(true)
+    setActError('')
+    try {
+      const params = new URLSearchParams({ page: String(p), pageSize: String(pageSize) })
+      const res = await fetch(`/api/admin/activity?${params}`, {
+        headers: { 'x-admin-key': adminKey },
+      })
+      if (res.status === 401) return handleSessionExpired()
+      if (!res.ok) throw new Error()
+      const data: { entries: ActivityEntry[]; total: number } = await res.json()
+      setActEntries(data.entries)
+      setActTotal(data.total)
+    } catch { setActError('Failed to load activity') }
+    finally { setActLoading(false) }
+  }, [adminKey])
+
+  useEffect(() => {
+    if (step === 'authenticated' && adminKey && tab === 'activity') {
+      fetchActivity(actPage)
+    }
+  }, [step, adminKey, tab, actPage, actFilter, fetchActivity])
+
+  // ---- Auth ----
   const handleAuth = async () => {
     if (!passwordInput.trim()) return
     setAuthLoading(true)
@@ -95,13 +147,27 @@ export default function AdminFeedbackClient() {
       } else {
         setAuthError('Service unavailable')
       }
-    } catch {
-      setAuthError('Network error')
-    } finally {
-      setAuthLoading(false)
-    }
+    } catch { setAuthError('Network error') }
+    finally { setAuthLoading(false) }
   }
 
+  const handleSessionExpired = () => {
+    setAuthError('Session expired. Please re-enter password.')
+    sessionStorage.removeItem('admin-key')
+    setStep('password')
+    setAdminKey('')
+  }
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('admin-key')
+    setAdminKey('')
+    setStep('password')
+    setPasswordInput('')
+    setFbEntries([])
+    setActEntries([])
+  }
+
+  // ---- Feedback actions ----
   const handleMarkRead = async (id: string) => {
     const res = await fetch('/api/admin/feedback', {
       method: 'PATCH',
@@ -109,7 +175,7 @@ export default function AdminFeedbackClient() {
       body: JSON.stringify({ id }),
     })
     if (res.ok) {
-      setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, read: true } : e)))
+      setFbEntries((prev) => prev.map((e) => (e.id === id ? { ...e, read: true } : e)))
       setActionMsg('Marked as read')
     }
     setTimeout(() => setActionMsg(''), 2000)
@@ -123,22 +189,14 @@ export default function AdminFeedbackClient() {
       body: JSON.stringify({ id }),
     })
     if (res.ok) {
-      setEntries((prev) => prev.filter((e) => e.id !== id))
-      setTotal((prev) => prev - 1)
+      setFbEntries((prev) => prev.filter((e) => e.id !== id))
+      setFbTotal((prev) => prev - 1)
       setActionMsg('Deleted')
     }
     setTimeout(() => setActionMsg(''), 2000)
   }
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('admin-key')
-    setAdminKey('')
-    setStep('password')
-    setPasswordInput('')
-    setEntries([])
-    setPage(1)
-  }
-
+  // ---- Helpers ----
   const formatDate = (iso: string) => {
     const d = new Date(iso)
     return d.toLocaleString('zh-CN', {
@@ -146,16 +204,18 @@ export default function AdminFeedbackClient() {
     })
   }
 
-  const unreadCount = entries.filter((e) => !e.read).length
+  const unreadCount = fbEntries.filter((e) => !e.read).length
 
-  // === Password prompt ===
+  // =====================
+  // Password prompt
+  // =====================
   if (step === 'password') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 w-full max-w-sm">
           <div className="text-center mb-6">
             <p className="text-3xl mb-2">🔐</p>
-            <h1 className="text-xl font-bold text-gray-800">Feedback Admin</h1>
+            <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
             <p className="text-sm text-gray-400 mt-1">Enter admin password to continue</p>
           </div>
           <input
@@ -182,20 +242,38 @@ export default function AdminFeedbackClient() {
     )
   }
 
-  // === Dashboard ===
-  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  // =====================
+  // Dashboard
+  // =====================
+  const fbTotalPages = Math.max(1, Math.ceil(fbTotal / pageSize))
+  const actTotalPages = Math.max(1, Math.ceil(actTotal / pageSize))
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">💬 Feedback</h1>
-            <p className="text-sm text-gray-400 mt-1">
-              Total: {total} · Unread: {entries.filter((e) => !e.read).length}
-            </p>
-          </div>
+        {/* Tab bar */}
+        <div className="flex items-center gap-2 mb-6">
+          <button
+            onClick={() => setTab('feedback')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'feedback'
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            💬 Feedback
+          </button>
+          <button
+            onClick={() => setTab('activity')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              tab === 'activity'
+                ? 'bg-blue-500 text-white shadow-sm'
+                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            📊 Activity
+          </button>
+          <div className="flex-1" />
           <button
             onClick={handleLogout}
             className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
@@ -209,116 +287,166 @@ export default function AdminFeedbackClient() {
           <p className="mb-4 text-sm text-green-600 bg-green-50 rounded-lg px-4 py-2 text-center">{actionMsg}</p>
         )}
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 mb-4">
-          {(['all', 'unread'] as FilterType[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => { setFilter(f); setPage(1) }}
-              className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                filter === f
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {f === 'all' ? 'All' : `Unread (${unreadCount})`}
-            </button>
-          ))}
-        </div>
+        {/* ======================== */}
+        {/* Feedback Tab */}
+        {/* ======================== */}
+        {tab === 'feedback' && (
+          <>
+            {/* Stats */}
+            <p className="text-sm text-gray-400 mb-3">
+              Total: {fbTotal} · Unread: {unreadCount}
+            </p>
 
-        {/* Error */}
-        {error && (
-          <p className="mb-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{error}</p>
-        )}
+            {/* Filter */}
+            <div className="flex gap-2 mb-4">
+              {(['all', 'unread'] as FeedbackFilter[]).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => { setFbFilter(f); setFbPage(1) }}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    fbFilter === f
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {f === 'all' ? 'All' : `Unread (${unreadCount})`}
+                </button>
+              ))}
+            </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-12 text-gray-400">Loading...</div>
-        )}
+            {fbError && <p className="mb-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{fbError}</p>}
 
-        {/* Empty */}
-        {!loading && entries.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-4xl mb-3">📭</p>
-            <p className="text-gray-400">No feedback yet</p>
-          </div>
-        )}
+            {fbLoading && <div className="text-center py-12 text-gray-400">Loading...</div>}
 
-        {/* Feedback list */}
-        {!loading && entries.length > 0 && (
-          <div className="space-y-3">
-            {entries.map((entry) => (
-              <div
-                key={entry.id}
-                className={`bg-white rounded-xl border p-4 transition-all ${
-                  !entry.read ? 'border-blue-200 shadow-sm' : 'border-gray-100'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    {/* Meta */}
-                    <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
-                      <span className="font-mono">{entry.userId.slice(0, 8)}...</span>
-                      <span>·</span>
-                      <span>{formatDate(entry.createdAt)}</span>
-                      {!entry.read && (
-                        <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-600">New</span>
-                      )}
-                    </div>
-                    {/* Message */}
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{entry.message}</p>
-                    {/* Contact */}
-                    {entry.contact && (
-                      <p className="mt-1 text-xs text-gray-400">
-                        📧 {entry.contact}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-1 shrink-0">
-                    {!entry.read && (
-                      <button
-                        onClick={() => handleMarkRead(entry.id)}
-                        className="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-                        title="Mark as read"
-                      >
-                        ✓
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDelete(entry.id)}
-                      className="px-2.5 py-1 rounded-lg text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
-                      title="Delete"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
+            {!fbLoading && fbEntries.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-4xl mb-3">📭</p>
+                <p className="text-gray-400">No feedback yet</p>
               </div>
-            ))}
-          </div>
+            )}
+
+            {!fbLoading && fbEntries.length > 0 && (
+              <div className="space-y-3">
+                {fbEntries.map((entry) => (
+                  <div key={entry.id} className={`bg-white rounded-xl border p-4 transition-all ${
+                    !entry.read ? 'border-blue-200 shadow-sm' : 'border-gray-100'
+                  }`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+                          <span className="font-mono">{entry.userId.slice(0, 8)}...</span>
+                          <span>·</span>
+                          <span>{formatDate(entry.createdAt)}</span>
+                          {!entry.read && (
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-600">New</span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{entry.message}</p>
+                        {entry.contact && (
+                          <p className="mt-1 text-xs text-gray-400">📧 {entry.contact}</p>
+                        )}
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        {!entry.read && (
+                          <button onClick={() => handleMarkRead(entry.id)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">✓</button>
+                        )}
+                        <button onClick={() => handleDelete(entry.id)}
+                          className="px-2.5 py-1 rounded-lg text-xs font-medium bg-red-50 text-red-500 hover:bg-red-100 transition-colors">✕</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {fbTotalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <button onClick={() => setFbPage((p) => Math.max(1, p - 1))} disabled={fbPage <= 1}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">← Prev</button>
+                <span className="text-xs text-gray-400">{fbPage} / {fbTotalPages}</span>
+                <button onClick={() => setFbPage((p) => Math.min(fbTotalPages, p + 1))} disabled={fbPage >= fbTotalPages}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">Next →</button>
+              </div>
+            )}
+          </>
         )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-3 mt-6">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              ← Prev
-            </button>
-            <span className="text-xs text-gray-400">{page} / {totalPages}</span>
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              Next →
-            </button>
-          </div>
+        {/* ======================== */}
+        {/* Activity Tab */}
+        {/* ======================== */}
+        {tab === 'activity' && (
+          <>
+            {/* Stats + filter */}
+            <div className="flex items-center gap-3 mb-4">
+              <p className="text-sm text-gray-400">Total: {actTotal}</p>
+              <select
+                value={actFilter}
+                onChange={(e) => { setActFilter(e.target.value); setActPage(1) }}
+                className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option value="">All actions</option>
+                {ACTION_KEYS.map((key) => (
+                  <option key={key} value={key}>{ACTION_META[key].emoji} {ACTION_META[key].label}</option>
+                ))}
+              </select>
+            </div>
+
+            {actError && <p className="mb-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{actError}</p>}
+
+            {actLoading && <div className="text-center py-12 text-gray-400">Loading...</div>}
+
+            {!actLoading && actEntries.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-4xl mb-3">📊</p>
+                <p className="text-gray-400">No activity yet</p>
+              </div>
+            )}
+
+            {!actLoading && actEntries.length > 0 && (
+              <div className="space-y-2">
+                {actEntries
+                  .filter((e) => !actFilter || e.action === actFilter)
+                  .map((entry) => {
+                    const meta = ACTION_META[entry.action] || { emoji: '❓', label: entry.action }
+                    let detailText = ''
+                    try {
+                      if (entry.detail) {
+                        const d = JSON.parse(entry.detail)
+                        detailText = Object.entries(d).map(([k, v]) => `${k}: ${v}`).join(' · ')
+                      }
+                    } catch {}
+                    return (
+                      <div key={entry.id} className="bg-white rounded-xl border border-gray-100 p-3 flex items-start gap-3">
+                        <span className="text-lg mt-0.5 shrink-0">{meta.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 text-xs text-gray-400 mb-0.5">
+                            <span className="font-medium text-gray-600">{meta.label}</span>
+                            <span>·</span>
+                            <span className="font-mono">{entry.userId.slice(0, 8)}...</span>
+                            <span>·</span>
+                            <span>{formatDate(entry.createdAt)}</span>
+                          </div>
+                          {detailText && (
+                            <p className="text-xs text-gray-500">{detailText}</p>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            )}
+
+            {actTotalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <button onClick={() => setActPage((p) => Math.max(1, p - 1))} disabled={actPage <= 1}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">← Prev</button>
+                <span className="text-xs text-gray-400">{actPage} / {actTotalPages}</span>
+                <button onClick={() => setActPage((p) => Math.min(actTotalPages, p + 1))} disabled={actPage >= actTotalPages}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">Next →</button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

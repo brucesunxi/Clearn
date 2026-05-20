@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { WORD_BOOKS } from '@/lib/wordbooks'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Article } from '@/lib/types'
+import { trackActivity } from '@/lib/activity'
 
 type AiLevel = 'easy' | 'medium' | 'hard'
 
@@ -224,6 +225,7 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
     const next = round + 1
     if (next >= totalRounds) {
       cleanup()
+      trackActivity('battle_complete', { userScore, aiScore, userCorrect, aiCorrect, aiLevel, totalRounds })
       setPhase('result')
       return
     }

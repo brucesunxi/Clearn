@@ -7,6 +7,7 @@ import type { Article, VocabularyItem } from '@/lib/types'
 import { buildWordDatabase, getNewWords, getReviewWords, recordAnswer } from '@/lib/words'
 import { doCheckIn, incrementTodayProgress } from '@/lib/checkin'
 import { addCoins, syncCoinsToApi } from '@/lib/pet'
+import { trackActivity } from '@/lib/activity'
 
 interface FlashcardSessionProps {
   articles: Article[]
@@ -82,6 +83,8 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
           addCoins(20)
           syncCoinsToApi(20)
           onComplete?.()
+          const cr = results.filter(r => r.correct === true).length + (correct ? 1 : 0)
+          trackActivity('study_complete', { correct: cr, wrong: results.length + 1 - cr, total: cards.length, accuracy: Math.round((cr / (results.length + 1)) * 100) })
           setStep('summary')
         } else {
           setCurrentIndex(idx + 1)
@@ -97,6 +100,8 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
             doCheckIn()
             incrementTodayProgress(cards.length)
             onComplete?.()
+            const cr = results.filter(r => r.correct === true).length
+            trackActivity('study_complete', { correct: cr, wrong: results.length + 1 - cr, total: cards.length, accuracy: Math.round((cr / (results.length + 1)) * 100) })
             setStep('summary')
           } else {
             setCurrentIndex(idx + 1)
