@@ -22,9 +22,15 @@ export default function FeedbackWidget() {
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
-  const userId = typeof window !== 'undefined'
-    ? localStorage.getItem('chineselearn-user-id') || ''
-    : ''
+  const getUserId = () => {
+    if (typeof window === 'undefined') return ''
+    let id = localStorage.getItem('chineselearn-user-id')
+    if (!id) {
+      id = `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+      localStorage.setItem('chineselearn-user-id', id)
+    }
+    return id
+  }
 
   const handleSubmit = async () => {
     if (!message.trim()) return
@@ -35,7 +41,7 @@ export default function FeedbackWidget() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-user-id': userId,
+          'x-user-id': getUserId(),
         },
         body: JSON.stringify({ message: message.trim(), contact: contact.trim() }),
       })
