@@ -100,6 +100,17 @@
   "listenspeak.listenDesc": "听中文，选意思",
   "listenspeak.speakDesc": "看中文，开口说",
 
+  "feedback.title": "发送反馈",
+  "feedback.message": "您的留言",
+  "feedback.messagePlaceholder": "请告诉我们您的想法...",
+  "feedback.contact": "邮箱（选填）",
+  "feedback.contactPlaceholder": "your@email.com",
+  "feedback.submit": "提交",
+  "feedback.submitting": "提交中...",
+  "feedback.success": "感谢您的反馈！我们已收到。",
+  "feedback.error": "提交失败，请稍后重试。",
+  "feedback.close": "关闭",
+
   "home.wordMem": "单词记忆",
   "home.wordMemDesc": "闪卡学习 · 艾宾浩斯遗忘曲线",
   "home.reading": "阅读",

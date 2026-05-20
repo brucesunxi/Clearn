@@ -135,3 +135,85 @@ export async function setCheckin(userId: string, data: CheckinData): Promise<voi
   if (!redis) return
   await redis.set(checkinKey(userId), JSON.stringify(data))
 }
+
+// ---- Feedback ----
+
+export interface FeedbackEntry {
+  id: string
+  userId: string
+  message: string
+  contact: string
+  createdAt: string
+  read: boolean
+}
+
+function generateFeedbackId(): string {
+  return `fb-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+const FEEDBACK_IDS_KEY = 'feedback:ids'
+
+function feedbackKey(id: string): string {
+  return `feedback:${id}`
+}
+
+export async function createFeedback(
+  userId: string,
+  message: string,
+  contact: string,
+): Promise<FeedbackEntry | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  const entry: FeedbackEntry = {
+    id: generateFeedbackId(),
+    userId,
+    message,
+    contact,
+    createdAt: new Date().toISOString(),
+    read: false,
+  }
+  await redis.set(feedbackKey(entry.id), JSON.stringify(entry))
+  await redis.zadd(FEEDBACK_IDS_KEY, { score: Date.now(), member: entry.id })
+  return entry
+}
+
+export async function getFeedbackEntries(
+  page: number,
+  pageSize: number,
+): Promise<{ entries: FeedbackEntry[]; total: number } | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  const total = await redis.zcard(FEEDBACK_IDS_KEY)
+  const start = (page - 1) * pageSize
+  const end = start + pageSize - 1
+  const ids = await redis.zrange<string[]>(FEEDBACK_IDS_KEY, start, end, { rev: true })
+  if (!ids || ids.length === 0) {
+    return { entries: [], total }
+  }
+  const rawEntries = await Promise.all(
+    ids.map((id: string) => redis.get<string>(feedbackKey(id))),
+  )
+  const entries = rawEntries
+    .filter((e): e is string => e !== null && e !== undefined)
+    .map((e: string) => JSON.parse(e) as FeedbackEntry)
+  return { entries, total }
+}
+
+export async function markFeedbackRead(id: string): Promise<boolean> {
+  const redis = getRedis()
+  if (!redis) return false
+  const raw = await redis.get<string>(feedbackKey(id))
+  if (!raw) return false
+  const entry = JSON.parse(raw) as FeedbackEntry
+  entry.read = true
+  await redis.set(feedbackKey(id), JSON.stringify(entry))
+  return true
+}
+
+export async function deleteFeedback(id: string): Promise<boolean> {
+  const redis = getRedis()
+  if (!redis) return false
+  await redis.del(feedbackKey(id))
+  await redis.zrem(FEEDBACK_IDS_KEY, id)
+  return true
+}

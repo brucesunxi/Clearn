@@ -100,6 +100,17 @@
   "listenspeak.listenDesc": "Listen to Chinese, pick the meaning",
   "listenspeak.speakDesc": "Read Chinese, speak aloud",
 
+  "feedback.title": "Send Feedback",
+  "feedback.message": "Your message",
+  "feedback.messagePlaceholder": "Tell us what you think...",
+  "feedback.contact": "Email (optional)",
+  "feedback.contactPlaceholder": "your@email.com",
+  "feedback.submit": "Submit",
+  "feedback.submitting": "Submitting...",
+  "feedback.success": "Thank you! Your feedback has been received.",
+  "feedback.error": "Something went wrong. Please try again.",
+  "feedback.close": "Close",
+
   "home.wordMem": "Word Memorization",
   "home.wordMemDesc": "Flashcards with spaced repetition",
   "home.reading": "Reading",
