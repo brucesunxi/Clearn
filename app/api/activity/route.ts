@@ -22,17 +22,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
-    const entry = await createActivity(
+    // Try to persist to Redis; silently succeed if unavailable
+    await createActivity(
       userId.slice(0, 100),
       action,
       typeof detail === 'string' ? detail.slice(0, 1000) : '',
     )
-    if (!entry) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
-    }
 
     return NextResponse.json({ success: true }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: 'Failed to record activity' }, { status: 500 })
+    return NextResponse.json({ success: true }, { status: 201 })
   }
 }

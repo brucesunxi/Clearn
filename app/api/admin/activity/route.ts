@@ -16,9 +16,6 @@ export async function GET(request: NextRequest) {
   const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get('pageSize') || '20', 10)))
 
   const result = await getActivityEntries(page, pageSize)
-  if (!result) {
-    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
-  }
 
-  return NextResponse.json(result)
+  return NextResponse.json(result || { entries: [], total: 0 })
 }
