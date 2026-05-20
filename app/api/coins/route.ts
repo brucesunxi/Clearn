@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCoins, addCoins } from '@/lib/redis'
-
-function getUserId(request: NextRequest): string | null {
-  return request.headers.get('x-user-id') || null
-}
+import { getCoins, addCoins, addCoinHistory } from '@/lib/redis'
+import { getUserIdFromRequest } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
-  const userId = getUserId(request)
+  const userId = await getUserIdFromRequest(request)
   if (!userId) {
     return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
   }
@@ -15,17 +12,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const userId = getUserId(request)
+  const userId = await getUserIdFromRequest(request)
   if (!userId) {
     return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
   }
 
   try {
-    const { amount } = await request.json()
+    const { amount, reason } = await request.json()
     if (typeof amount !== 'number' || amount <= 0) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
     const balance = await addCoins(userId, amount)
+    // Record history (fire-and-forget)
+    addCoinHistory(userId, amount, reason || 'earn', balance)
     return NextResponse.json({ balance })
   } catch {
     return NextResponse.json({ error: 'Failed to add coins' }, { status: 500 })

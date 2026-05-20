@@ -37,6 +37,18 @@ export async function getCoins(userId: string): Promise<number> {
   }
 }
 
+/** Get coins from Redis only if the key already exists; never creates a default entry. */
+export async function peekCoins(userId: string): Promise<number | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const val = await redis.get<number>(getCoinsKey(userId))
+    return val ?? null
+  } catch {
+    return null
+  }
+}
+
 export async function addCoins(userId: string, amount: number): Promise<number> {
   const redis = getRedis()
   if (!redis) return STARTING_COINS + amount
@@ -58,6 +70,142 @@ export async function spendCoins(userId: string, amount: number): Promise<{ succ
   return { success: true, balance: newBalance }
 }
 
+// ---- Coin History ----
+
+export interface CoinHistoryEntry {
+  id: string
+  amount: number
+  reason: string
+  balance: number
+  createdAt: string
+}
+
+function coinHistoryIndexKey(userId: string): string {
+  return `coins:history:${userId}`
+}
+
+function coinHistoryEntryKey(id: string): string {
+  return `coins:history:entry:${id}`
+}
+
+function generateHistoryEntryId(): string {
+  return `ch-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+export async function addCoinHistory(
+  userId: string,
+  amount: number,
+  reason: string,
+  balance: number,
+): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  const entry: CoinHistoryEntry = {
+    id: generateHistoryEntryId(),
+    amount,
+    reason,
+    balance,
+    createdAt: new Date().toISOString(),
+  }
+  try {
+    await redis.set(coinHistoryEntryKey(entry.id), JSON.stringify(entry))
+    await appendToArrayIndex(redis, coinHistoryIndexKey(userId), entry.id)
+  } catch {
+    // Coin history unavailable; non-critical
+  }
+}
+
+export async function getCoinHistory(userId: string): Promise<CoinHistoryEntry[]> {
+  const redis = getRedis()
+  if (!redis) return []
+  try {
+    const ids = await readArrayIndex(redis, coinHistoryIndexKey(userId))
+    if (ids.length === 0) return []
+    const rawEntries = await Promise.all(
+      ids.map((id) => redis.get<any>(coinHistoryEntryKey(id))),
+    )
+    return rawEntries
+      .filter((e) => e !== null && e !== undefined)
+      .map((e) => {
+        if (typeof e === 'string') return JSON.parse(e) as CoinHistoryEntry
+        return e as CoinHistoryEntry
+      })
+  } catch {
+    return []
+  }
+}
+
+// ---- User Accounts ----
+
+export interface UserRecord {
+  userId: string
+  email: string
+  passwordHash: string
+  createdAt: string
+}
+
+function userEmailKey(email: string): string {
+  return `user:email:${email.toLowerCase().trim()}`
+}
+
+function userKey(userId: string): string {
+  return `user:${userId}`
+}
+
+/**
+ * Create a new user account. Returns false if the email is already taken.
+ * Uses SET NX to atomically check-and-set the email index.
+ */
+export async function createUser(
+  userId: string,
+  email: string,
+  passwordHash: string,
+): Promise<boolean> {
+  const redis = getRedis()
+  if (!redis) return false
+  try {
+    const emailLookup = userEmailKey(email)
+    // SET NX — only succeeds if key doesn't exist
+    const nxResult = await redis.set(emailLookup, userId, { nx: true })
+    if (nxResult !== 'OK') return false // email already taken
+
+    await redis.set(userKey(userId), JSON.stringify({
+      userId,
+      email: email.toLowerCase().trim(),
+      passwordHash,
+      createdAt: new Date().toISOString(),
+    } satisfies UserRecord))
+    return true
+  } catch {
+    return false
+  }
+}
+
+export async function getUserByEmail(email: string): Promise<UserRecord | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const userId = await redis.get<string>(userEmailKey(email))
+    if (!userId) return null
+    return getUser(userId)
+  } catch {
+    return null
+  }
+}
+
+export async function getUser(userId: string): Promise<UserRecord | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const raw = await redis.get<any>(userKey(userId))
+    if (!raw) return null
+    if (typeof raw === 'string') return JSON.parse(raw) as UserRecord
+    return raw as UserRecord
+  } catch {
+    return null
+  }
+}
+
 // ---- Inventory ----
 
 export interface InventoryData {
@@ -72,9 +220,10 @@ export async function getInventory(userId: string): Promise<InventoryData | null
   const redis = getRedis()
   if (!redis) return null
   try {
-    const raw = await redis.get<string>(invKey(userId))
+    const raw = await redis.get<any>(invKey(userId))
     if (!raw) return null
-    return JSON.parse(raw) as InventoryData
+    if (typeof raw === 'string') return JSON.parse(raw) as InventoryData
+    return raw as InventoryData
   } catch { return null }
 }
 
@@ -98,9 +247,10 @@ export async function getPet(userId: string): Promise<PetData | null> {
   const redis = getRedis()
   if (!redis) return null
   try {
-    const raw = await redis.get<string>(petKey(userId))
+    const raw = await redis.get<any>(petKey(userId))
     if (!raw) return null
-    return JSON.parse(raw) as PetData
+    if (typeof raw === 'string') return JSON.parse(raw) as PetData
+    return raw as PetData
   } catch { return null }
 }
 
@@ -124,9 +274,10 @@ export async function getCheckin(userId: string): Promise<CheckinData | null> {
   const redis = getRedis()
   if (!redis) return null
   try {
-    const raw = await redis.get<string>(checkinKey(userId))
+    const raw = await redis.get<any>(checkinKey(userId))
     if (!raw) return null
-    return JSON.parse(raw) as CheckinData
+    if (typeof raw === 'string') return JSON.parse(raw) as CheckinData
+    return raw as CheckinData
   } catch { return null }
 }
 
@@ -134,6 +285,42 @@ export async function setCheckin(userId: string, data: CheckinData): Promise<voi
   const redis = getRedis()
   if (!redis) return
   await redis.set(checkinKey(userId), JSON.stringify(data))
+}
+
+// ---- Generic array-index helpers (avoids JSON auto-parse in @upstash/redis v1.x) ----
+
+async function readArrayIndex(redis: Redis, key: string): Promise<string[]> {
+  try {
+    const raw = await redis.get<string>(key)
+    if (!raw) return []
+    // Stored as pipe-delimited string to avoid @upstash/redis auto-parsing JSON arrays
+    return raw.split('|').filter(Boolean)
+  } catch {
+    // Key may be a sorted set from old code; delete and start fresh
+    try { await redis.del(key) } catch { /* ignore */ }
+    return []
+  }
+}
+
+async function appendToArrayIndex(redis: Redis, key: string, id: string): Promise<void> {
+  try {
+    const ids = await readArrayIndex(redis, key)
+    ids.push(id)
+    await redis.set(key, ids.join('|'))
+  } catch {
+    // Index unavailable
+  }
+}
+
+async function removeFromArrayIndex(redis: Redis, key: string, id: string): Promise<void> {
+  try {
+    const ids = await readArrayIndex(redis, key)
+    const idx = ids.indexOf(id)
+    if (idx !== -1) ids.splice(idx, 1)
+    await redis.set(key, ids.join('|'))
+  } catch {
+    // Index unavailable
+  }
 }
 
 // ---- Feedback ----
@@ -172,8 +359,12 @@ export async function createFeedback(
     createdAt: new Date().toISOString(),
     read: false,
   }
-  await redis.set(feedbackKey(entry.id), JSON.stringify(entry))
-  await redis.zadd(FEEDBACK_IDS_KEY, { score: Date.now(), member: entry.id })
+  try {
+    await redis.set(feedbackKey(entry.id), JSON.stringify(entry))
+    await appendToArrayIndex(redis, FEEDBACK_IDS_KEY, entry.id)
+  } catch {
+    // Redis unavailable; data won't persist but user still gets success response
+  }
   return entry
 }
 
@@ -183,28 +374,36 @@ export async function getFeedbackEntries(
 ): Promise<{ entries: FeedbackEntry[]; total: number } | null> {
   const redis = getRedis()
   if (!redis) return null
-  const total = await redis.zcard(FEEDBACK_IDS_KEY)
-  const start = (page - 1) * pageSize
-  const end = start + pageSize - 1
-  const ids = await redis.zrange<string[]>(FEEDBACK_IDS_KEY, start, end, { rev: true })
-  if (!ids || ids.length === 0) {
-    return { entries: [], total }
+  try {
+    const ids = await readArrayIndex(redis, FEEDBACK_IDS_KEY)
+    const total = ids.length
+    const start = (page - 1) * pageSize
+    const end = start + pageSize - 1
+    // Show newest first (reverse)
+    const pageIds = ids.slice(start, end + 1).reverse()
+    if (pageIds.length === 0) return { entries: [], total }
+    const rawEntries = await Promise.all(
+      pageIds.map((id: string) => redis.get<string>(feedbackKey(id))),
+    )
+    const entries = rawEntries
+      .filter((e) => e !== null && e !== undefined)
+      .map((e) => {
+        // @upstash/redis auto-parses JSON strings, so e may already be an object
+        if (typeof e === 'string') return JSON.parse(e) as FeedbackEntry
+        return e as unknown as FeedbackEntry
+      })
+    return { entries, total }
+  } catch {
+    return { entries: [], total: 0 }
   }
-  const rawEntries = await Promise.all(
-    ids.map((id: string) => redis.get<string>(feedbackKey(id))),
-  )
-  const entries = rawEntries
-    .filter((e): e is string => e !== null && e !== undefined)
-    .map((e: string) => JSON.parse(e) as FeedbackEntry)
-  return { entries, total }
 }
 
 export async function markFeedbackRead(id: string): Promise<boolean> {
   const redis = getRedis()
   if (!redis) return false
-  const raw = await redis.get<string>(feedbackKey(id))
+  const raw = await redis.get<any>(feedbackKey(id))
   if (!raw) return false
-  const entry = JSON.parse(raw) as FeedbackEntry
+  const entry = (typeof raw === 'string' ? JSON.parse(raw) : raw) as FeedbackEntry
   entry.read = true
   await redis.set(feedbackKey(id), JSON.stringify(entry))
   return true
@@ -213,9 +412,13 @@ export async function markFeedbackRead(id: string): Promise<boolean> {
 export async function deleteFeedback(id: string): Promise<boolean> {
   const redis = getRedis()
   if (!redis) return false
-  await redis.del(feedbackKey(id))
-  await redis.zrem(FEEDBACK_IDS_KEY, id)
-  return true
+  try {
+    await redis.del(feedbackKey(id))
+    await removeFromArrayIndex(redis, FEEDBACK_IDS_KEY, id)
+    return true
+  } catch {
+    return false
+  }
 }
 
 // ---- Activity Tracking ----
@@ -253,8 +456,12 @@ export async function createActivity(
     detail: detail || '',
     createdAt: new Date().toISOString(),
   }
-  await redis.set(activityKey(entry.id), JSON.stringify(entry), { ex: ACTIVITY_TTL_SEC })
-  await redis.zadd(ACTIVITY_IDS_KEY, { score: Date.now(), member: entry.id })
+  try {
+    await redis.set(activityKey(entry.id), JSON.stringify(entry), { ex: ACTIVITY_TTL_SEC })
+    await appendToArrayIndex(redis, ACTIVITY_IDS_KEY, entry.id)
+  } catch {
+    // Redis unavailable
+  }
   return entry
 }
 
@@ -264,18 +471,24 @@ export async function getActivityEntries(
 ): Promise<{ entries: ActivityEntry[]; total: number } | null> {
   const redis = getRedis()
   if (!redis) return null
-  const total = await redis.zcard(ACTIVITY_IDS_KEY)
-  const start = (page - 1) * pageSize
-  const end = start + pageSize - 1
-  const ids = await redis.zrange<string[]>(ACTIVITY_IDS_KEY, start, end, { rev: true })
-  if (!ids || ids.length === 0) {
-    return { entries: [], total }
+  try {
+    const ids = await readArrayIndex(redis, ACTIVITY_IDS_KEY)
+    const total = ids.length
+    const start = (page - 1) * pageSize
+    const end = start + pageSize - 1
+    const pageIds = ids.slice(start, end + 1).reverse()
+    if (pageIds.length === 0) return { entries: [], total }
+    const rawEntries = await Promise.all(
+      pageIds.map((id: string) => redis.get<string>(activityKey(id))),
+    )
+    const entries = rawEntries
+      .filter((e) => e !== null && e !== undefined)
+      .map((e) => {
+        if (typeof e === 'string') return JSON.parse(e) as ActivityEntry
+        return e as unknown as ActivityEntry
+      })
+    return { entries, total }
+  } catch {
+    return { entries: [], total: 0 }
   }
-  const rawEntries = await Promise.all(
-    ids.map((id: string) => redis.get<string>(activityKey(id))),
-  )
-  const entries = rawEntries
-    .filter((e): e is string => e !== null && e !== undefined)
-    .map((e: string) => JSON.parse(e) as ActivityEntry)
-  return { entries, total }
 }

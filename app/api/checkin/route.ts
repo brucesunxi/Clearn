@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRedis, getCheckin, setCheckin, addCoins } from '@/lib/redis'
-import type { CheckinData } from '@/lib/redis'
-
-function userId(req: NextRequest): string | null {
-  return req.headers.get('x-user-id')
-}
+import { getRedis, getCheckin, setCheckin, addCoins, addCoinHistory } from '@/lib/redis'
+import { getUserIdFromRequest } from '@/lib/auth'
 
 function today(): string {
   const d = new Date()
@@ -22,7 +18,7 @@ function formatDate(date: Date): string {
 }
 
 export async function GET(request: NextRequest) {
-  const uid = userId(request)
+  const uid = await getUserIdFromRequest(request)
   if (!uid) return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
 
   const data = await getCheckin(uid)
@@ -33,7 +29,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const uid = userId(request)
+  const uid = await getUserIdFromRequest(request)
   if (!uid) return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
 
   const redis = getRedis()
@@ -74,6 +70,7 @@ export async function POST(request: NextRequest) {
 
   // Reward 20 coins for check-in
   const coins = await addCoins(uid, 20)
+  addCoinHistory(uid, 20, 'checkin', coins)
 
   return NextResponse.json({ checkin: data, checkedInToday: true, coins })
 }

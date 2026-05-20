@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { spendCoins } from '@/lib/redis'
+import { spendCoins, addCoinHistory } from '@/lib/redis'
+import { getUserIdFromRequest } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
-  const userId = request.headers.get('x-user-id')
+  const userId = await getUserIdFromRequest(request)
   if (!userId) {
     return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
   }
 
   try {
-    const { amount } = await request.json()
+    const { amount, reason } = await request.json()
     if (typeof amount !== 'number' || amount <= 0) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
@@ -17,6 +18,9 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       return NextResponse.json({ error: 'Insufficient coins', balance: result.balance }, { status: 402 })
     }
+
+    // Record history (fire-and-forget)
+    addCoinHistory(userId, -amount, reason || 'spend', result.balance)
 
     return NextResponse.json({ balance: result.balance })
   } catch {

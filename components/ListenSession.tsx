@@ -89,7 +89,7 @@ export default function ListenSession({ articles }: ListenSessionProps) {
       setIdx((i) => i + 1); setSelected(null); setRevealed(false)
     } else {
       const earned = correct * 10 + 20
-      addCoins(earned); syncCoinsToApi(earned); setCoinsEarned(earned); setStep('result')
+      addCoins(earned); syncCoinsToApi(earned, 'listen_complete'); setCoinsEarned(earned); setStep('result')
     }
   }
 

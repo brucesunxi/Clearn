@@ -170,14 +170,26 @@ export function addCoins(amount: number): number {
 }
 
 /** Sync a coin reward to API/Redis (fire-and-forget, call after addCoins) */
-export function syncCoinsToApi(earnedAmount: number) {
+export function syncCoinsToApi(earnedAmount: number, reason: string = 'earn') {
   if (typeof window === 'undefined') return
   const userId = localStorage.getItem('chineselearn-user-id')
   if (!userId) return
   fetch('/api/coins', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
-    body: JSON.stringify({ amount: earnedAmount }),
+    body: JSON.stringify({ amount: earnedAmount, reason }),
+  }).catch(() => {})
+}
+
+/** Sync a coin spend to API/Redis (fire-and-forget, call after spendCoins) */
+export function syncSpendToApi(amount: number, reason: string = 'spend') {
+  if (typeof window === 'undefined') return
+  const userId = localStorage.getItem('chineselearn-user-id')
+  if (!userId) return
+  fetch('/api/coins/spend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+    body: JSON.stringify({ amount, reason }),
   }).catch(() => {})
 }
 

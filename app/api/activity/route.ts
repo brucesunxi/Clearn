@@ -8,13 +8,16 @@ const VALID_ACTIONS = [
   'article_read', 'material_import',
 ]
 
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for')
+  if (forwarded) return forwarded.split(',')[0].trim()
+  return request.headers.get('x-real-ip') || 'unknown'
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { userId, action, detail } = await request.json()
+    const { action, detail } = await request.json()
 
-    if (!userId || typeof userId !== 'string') {
-      return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
-    }
     if (!action || typeof action !== 'string') {
       return NextResponse.json({ error: 'Missing action' }, { status: 400 })
     }
@@ -22,9 +25,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
+    const ip = getClientIp(request)
+
     // Try to persist to Redis; silently succeed if unavailable
     await createActivity(
-      userId.slice(0, 100),
+      ip.slice(0, 100),
       action,
       typeof detail === 'string' ? detail.slice(0, 1000) : '',
     )

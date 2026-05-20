@@ -118,7 +118,7 @@ export default function QuizSession({ articles }: QuizSessionProps) {
       // Award coins: 10 per correct answer
       const coinsEarned = correctCount * 10 + 20 // bonus 20 for finishing
       addCoins(coinsEarned)
-      syncCoinsToApi(coinsEarned)
+      syncCoinsToApi(coinsEarned, 'quiz_complete')
       setCoinsEarned(coinsEarned)
       setStep('result')
     }

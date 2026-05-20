@@ -94,12 +94,15 @@ export default function BlindBoxClient() {
     } catch {}
   }
 
-  const handleBuyBoxes = () => {
+  const handleBuyBoxes = async () => {
     if (coins < BOX_COST) {
       setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
       return
     }
     updateCoins(coins - BOX_COST)
+    // Record box purchase in coin history
+    const { syncSpendToApi } = await import('@/lib/pet')
+    syncSpendToApi(BOX_COST, 'box_open')
     setBoxes(generateBoxes())
     setSelectedIndex(null)
     setMessage('')
@@ -119,8 +122,9 @@ export default function BlindBoxClient() {
 
     // Coin prizes → add to localStorage + sync to API
     if (prize.type === 'coins' && prize.coinAmount) {
-      const { addCoins } = await import('@/lib/pet')
+      const { addCoins, syncCoinsToApi } = await import('@/lib/pet')
       addCoins(prize.coinAmount)
+      syncCoinsToApi(prize.coinAmount, 'box_prize')
       setCoins((prev: number) => prev + prize.coinAmount!)
       setMessage(locale === 'zh' ? `获得 ${prize.coinAmount} 金币！` : `Got ${prize.coinAmount} coins!`)
       return

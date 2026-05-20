@@ -104,7 +104,7 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
       setIdx((i) => i + 1); setHeard(''); setResult(null); setStatus('idle')
     } else {
       const earned = correct * 15 + 30
-      addCoins(earned); syncCoinsToApi(earned); setCoinsEarned(earned); setStep('result')
+      addCoins(earned); syncCoinsToApi(earned, 'speak_complete'); setCoinsEarned(earned); setStep('result')
     }
   }
 

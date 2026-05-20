@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import {
   getPet, getInventory, feedPet, buyFood, buyAccessory, toggleEquip,
-  FOOD_ITEMS, ACCESSORY_ITEMS, petStatsText,
+  FOOD_ITEMS, ACCESSORY_ITEMS, petStatsText, syncSpendToApi,
 } from '@/lib/pet'
 import type { PetState, Inventory } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
@@ -26,6 +26,24 @@ export default function PetPageClient() {
   const [feedMsg, setFeedMsg] = useState('')
   const [shopMsg, setShopMsg] = useState('')
 
+  // Periodically recalculate decay for display (without saving, so accumulated decay isn't lost)
+  useEffect(() => {
+    const t = setInterval(() => {
+      setPet((prev) => {
+        const now = Date.now()
+        const last = new Date(prev.lastUpdated).getTime()
+        const hours = (now - last) / (1000 * 60 * 60)
+        if (hours <= 0) return prev
+        return {
+          hunger: Math.max(0, prev.hunger - Math.floor(hours * 2)),
+          happiness: Math.max(0, prev.happiness - Math.floor(hours * 1)),
+          lastUpdated: prev.lastUpdated, // keep original timestamp so decay accumulates
+        }
+      })
+    }, 10000)
+    return () => clearInterval(t)
+  }, [])
+
   // Sync coins and pet state from API/Redis on mount
   useEffect(() => {
     const userId = localStorage.getItem('chineselearn-user-id')
@@ -34,16 +52,6 @@ export default function PetPageClient() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data) return
-        // Sync coin balance from API to localStorage
-        const currentInv = getInventory()
-        currentInv.coins = data.coins
-        if (data.inventory) {
-          currentInv.food = { ...data.inventory.food }
-          currentInv.accessories = { ...data.inventory.accessories }
-          currentInv.equipped = [...data.inventory.equipped]
-        }
-        localStorage.setItem('panda-inventory', JSON.stringify(currentInv))
-        setInv({ ...currentInv })
         // Sync pet state
         if (data.pet) {
           localStorage.setItem('panda-pet', JSON.stringify(data.pet))
@@ -67,6 +75,8 @@ export default function PetPageClient() {
     if (ok) {
       setInv(getInventory())
       setShopMsg('+1 🎉')
+      const item = FOOD_ITEMS.find((f) => f.id === foodId)
+      if (item) syncSpendToApi(item.price, 'shop_purchase')
       trackActivity('shop_purchase', { itemId: foodId, type: 'food' })
     } else {
       setShopMsg('Not enough coins!')
@@ -80,6 +90,7 @@ export default function PetPageClient() {
       setInv(getInventory())
       setShopMsg('Purchased! 🎉')
       const item = ACCESSORY_ITEMS.find((a) => a.id === accId)
+      if (item) syncSpendToApi(item.price, 'shop_purchase')
       trackActivity('shop_purchase', { itemId: accId, type: 'accessory', price: item?.price || 0 })
     } else {
       setShopMsg('Not enough coins!')

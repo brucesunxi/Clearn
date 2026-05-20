@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRedis, getCoins, getInventory, setInventory, getPet, setPet } from '@/lib/redis'
+import { getRedis, peekCoins, getInventory, setInventory, getPet, setPet } from '@/lib/redis'
 import type { PetData, InventoryData } from '@/lib/redis'
+import { getUserIdFromRequest } from '@/lib/auth'
 
 const HOUR_DECAY_HUNGER = 2
 const HOUR_DECAY_HAPPINESS = 1
@@ -17,19 +18,15 @@ function applyDecay(pet: PetData): PetData {
   }
 }
 
-function userId(req: NextRequest): string | null {
-  return req.headers.get('x-user-id')
-}
-
 export async function GET(request: NextRequest) {
-  const uid = userId(request)
+  const uid = await getUserIdFromRequest(request)
   if (!uid) return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
 
   const redis = getRedis()
   if (!redis) return NextResponse.json({ error: 'Redis unavailable' }, { status: 503 })
 
   // Fetch all data in parallel
-  const [coins, inv, pet] = await Promise.all([getCoins(uid), getInventory(uid), getPet(uid)])
+  const [coins, inv, pet] = await Promise.all([peekCoins(uid), getInventory(uid), getPet(uid)])
 
   return NextResponse.json({
     coins,
@@ -39,7 +36,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const uid = userId(request)
+  const uid = await getUserIdFromRequest(request)
   if (!uid) return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
 
   const redis = getRedis()

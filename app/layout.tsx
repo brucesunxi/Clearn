@@ -4,6 +4,8 @@ import Header from '@/components/Header'
 import FeedbackWidget from '@/components/FeedbackWidget'
 import { I18nProvider } from '@/lib/i18n/context'
 import TranslationUpdater from '@/components/TranslationUpdater'
+import { AuthProvider } from '@/lib/auth-context'
+import { ThemeProvider } from '@/lib/theme-context'
 
 export const metadata: Metadata = {
   title: {
@@ -56,15 +58,19 @@ gtag('config', 'G-9K8RD1K13S');`,
           }}
         />
       </head>
-      <body>
+      <body className="bg-[#FFFBF5] dark:bg-gray-900 dark:text-gray-100 transition-colors">
         <I18nProvider>
+          <ThemeProvider>
+          <AuthProvider>
           <TranslationUpdater />
           <Header />
           <main className="min-h-screen">{children}</main>
           <FeedbackWidget />
-          <footer className="bg-white border-t mt-16 py-8 text-center text-sm text-gray-400" id="site-footer">
+          <footer className="bg-white border-t mt-16 py-8 text-center text-sm text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-500 transition-colors" id="site-footer">
             🐼 熊猫汉语
           </footer>
+        </AuthProvider>
+        </ThemeProvider>
         </I18nProvider>
       </body>
     </html>

@@ -13,20 +13,8 @@ export type ActionType =
   | 'article_read'
   | 'material_import'
 
-function getUserId(): string {
-  if (typeof window === 'undefined') return ''
-  let id = localStorage.getItem('chineselearn-user-id')
-  if (!id) {
-    id = `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
-    localStorage.setItem('chineselearn-user-id', id)
-  }
-  return id
-}
-
 export function trackActivity(action: ActionType, detail?: Record<string, unknown>): void {
   if (typeof window === 'undefined') return
-  const userId = getUserId()
-  if (!userId) return
 
   const controller = new AbortController()
   setTimeout(() => controller.abort(), 3000)
@@ -35,7 +23,6 @@ export function trackActivity(action: ActionType, detail?: Record<string, unknow
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      userId,
       action,
       detail: detail ? JSON.stringify(detail) : '',
     }),

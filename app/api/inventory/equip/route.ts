@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getRedis, getInventory, setInventory } from '@/lib/redis'
 import type { InventoryData } from '@/lib/redis'
-
-function userId(req: NextRequest): string | null {
-  return req.headers.get('x-user-id')
-}
+import { getUserIdFromRequest } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
-  const uid = userId(request)
+  const uid = await getUserIdFromRequest(request)
   if (!uid) return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
 
   const redis = getRedis()

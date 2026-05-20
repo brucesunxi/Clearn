@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getRedis, getCoinsKey, getInventory, setInventory, getPet, setPet } from '@/lib/redis'
 import type { InventoryData, PetData } from '@/lib/redis'
+import { getUserIdFromRequest } from '@/lib/auth'
 
 const FOOD_ITEMS: Record<string, { hunger: number; happiness: number }> = {
   bamboo: { hunger: 30, happiness: 5 },
@@ -10,12 +11,8 @@ const FOOD_ITEMS: Record<string, { hunger: number; happiness: number }> = {
   milk: { hunger: 10, happiness: 15 },
 }
 
-function userId(req: NextRequest): string | null {
-  return req.headers.get('x-user-id')
-}
-
 export async function POST(request: NextRequest) {
-  const uid = userId(request)
+  const uid = await getUserIdFromRequest(request)
   if (!uid) return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
 
   const redis = getRedis()

@@ -16,6 +16,16 @@ body {
   background-color: #FFFBF5;
 }
 
+.dark body,
+.dark {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.dark body {
+  background-color: #0f172a;
+}
+
 .word-highlight {
   cursor: pointer;
   border-bottom: 2px dashed #FFD93D;

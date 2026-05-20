@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createFeedback } from '@/lib/redis'
 
-export async function POST(request: NextRequest) {
-  const userId = request.headers.get('x-user-id')
-  if (!userId) {
-    return NextResponse.json({ error: 'Missing user ID' }, { status: 400 })
-  }
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for')
+  if (forwarded) return forwarded.split(',')[0].trim()
+  return request.headers.get('x-real-ip') || 'unknown'
+}
 
+export async function POST(request: NextRequest) {
   try {
     const { message, contact } = await request.json()
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -16,9 +17,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message too long' }, { status: 400 })
     }
 
+    const ip = getClientIp(request)
     const sanitizedContact = typeof contact === 'string' ? contact.trim().slice(0, 200) : ''
-    // Try to persist to Redis; silently succeed if unavailable
-    await createFeedback(userId, message.trim(), sanitizedContact)
+    await createFeedback(ip, message.trim(), sanitizedContact)
 
     return NextResponse.json({ success: true }, { status: 201 })
   } catch {
