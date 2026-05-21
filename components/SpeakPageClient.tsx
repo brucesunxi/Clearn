@@ -18,11 +18,14 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
   const [started, setStarted] = useState(false)
 
-  const filteredArticles = selectedArticleIds.length > 0
+  // Display: level-filtered only (always show all articles in the grid)
+  const displayArticles = selectedLevelId !== null
+    ? articles.filter((a) => a.level === selectedLevelId)
+    : articles
+  // Session: use selected articles, or all if none selected
+  const sessionArticles = selectedArticleIds.length > 0
     ? articles.filter((a) => selectedArticleIds.includes(a.id))
-    : selectedLevelId !== null
-      ? articles.filter((a) => a.level === selectedLevelId)
-      : articles
+    : displayArticles
 
   useEffect(() => { setStarted(false) }, [selectedLevelId, selectedArticleIds])
 
@@ -33,7 +36,7 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
           className="mb-4 text-sm text-gray-500 hover:text-gray-700 transition-colors">
           ← {locale === 'zh' ? '返回选文' : 'Back to articles'}
         </button>
-        <SpeakSession key={selectedArticleIds.join(',') || 'all'} articles={filteredArticles} />
+        <SpeakSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />
       </div>
     )
   }
@@ -74,14 +77,14 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
       )}
 
       {/* Article cards */}
-      {filteredArticles.length === 0 ? (
+      {displayArticles.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <p className="text-5xl mb-4">🗣️</p>
           <p className="text-lg">{locale === 'zh' ? '暂无文章' : 'No articles'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          {filteredArticles.map((article) => {
+          {displayArticles.map((article) => {
             const selected = selectedArticleIds.includes(article.id)
             const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
             return (
@@ -126,7 +129,7 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
       <button onClick={() => setStarted(true)}
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 shadow-sm transition-all">
         {selectedArticleIds.length > 0
-          ? (locale === 'zh' ? `🗣️ 开始口语 (${filteredArticles.length}篇)` : `🗣️ Start Speaking (${filteredArticles.length} articles)`)
+          ? (locale === 'zh' ? `🗣️ 开始口语 (${sessionArticles.length}篇)` : `🗣️ Start Speaking (${sessionArticles.length} articles)`)
           : (locale === 'zh' ? '🗣️ 开始口语' : '🗣️ Start Speaking')}
       </button>
     </div>

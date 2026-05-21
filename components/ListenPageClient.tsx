@@ -18,11 +18,14 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
   const [started, setStarted] = useState(false)
 
-  const filteredArticles = selectedArticleIds.length > 0
+  // Display: level-filtered only (always show all articles in the grid)
+  const displayArticles = selectedLevelId !== null
+    ? articles.filter((a) => a.level === selectedLevelId)
+    : articles
+  // Session: use selected articles, or all if none selected
+  const sessionArticles = selectedArticleIds.length > 0
     ? articles.filter((a) => selectedArticleIds.includes(a.id))
-    : selectedLevelId !== null
-      ? articles.filter((a) => a.level === selectedLevelId)
-      : articles
+    : displayArticles
 
   // Reset started when selection changes
   useEffect(() => { setStarted(false) }, [selectedLevelId, selectedArticleIds])
@@ -36,7 +39,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         >
           ← {locale === 'zh' ? '返回选文' : 'Back to articles'}
         </button>
-        <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={filteredArticles} />
+        <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />
       </div>
     )
   }
@@ -85,14 +88,14 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       )}
 
       {/* Article grid */}
-      {filteredArticles.length === 0 ? (
+      {displayArticles.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
           <p className="text-5xl mb-4">🎧</p>
           <p className="text-lg">{locale === 'zh' ? '该范围暂无文章' : 'No articles found'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          {filteredArticles.map((article) => {
+          {displayArticles.map((article) => {
             const selected = selectedArticleIds.includes(article.id)
             const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
             const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
@@ -152,7 +155,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all"
       >
         {selectedArticleIds.length > 0
-          ? (locale === 'zh' ? `🎧 开始听力 (${filteredArticles.length}篇)` : `🎧 Start Listening (${filteredArticles.length} articles)`)
+          ? (locale === 'zh' ? `🎧 开始听力 (${sessionArticles.length}篇)` : `🎧 Start Listening (${sessionArticles.length} articles)`)
           : (locale === 'zh' ? '🎧 开始听力' : '🎧 Start Listening')}
       </button>
     </div>

@@ -94,18 +94,18 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
   }, [refreshStats])
 
   // Filter articles by level and/or selected articles
-  const articleFiltered = selectedArticleIds.length > 0
-    ? articles.filter((a) => selectedArticleIds.includes(a.id))
-    : articles
-
   const levelFiltered = selectedLevelId === null
-    ? articleFiltered
-    : articleFiltered.filter((a) => a.level === selectedLevelId)
+    ? articles
+    : articles.filter((a) => a.level === selectedLevelId)
 
   // When a specific word book is selected, use its virtual articles.
   // For "All Words", use the article-derived vocabulary.
+  const sessionArticles = selectedArticleIds.length > 0
+    ? articles.filter((a) => selectedArticleIds.includes(a.id))
+    : levelFiltered
+
   const filteredArticles = wordBook === null
-    ? levelFiltered
+    ? sessionArticles
     : wordBookToArticles(wordBook)
 
   // Count total vocab in the selected source

@@ -22,11 +22,14 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
 
-  const filteredArticles = selectedArticleIds.length > 0
+  // Display: level-filtered only (always show all articles in the grid)
+  const displayArticles = selectedLevelId !== null
+    ? articles.filter((a) => a.level === selectedLevelId)
+    : articles
+  // Session: use selected articles, or all if none selected
+  const sessionArticles = selectedArticleIds.length > 0
     ? articles.filter((a) => selectedArticleIds.includes(a.id))
-    : selectedLevelId !== null
-      ? articles.filter((a) => a.level === selectedLevelId)
-      : articles
+    : displayArticles
 
   const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
 
@@ -65,7 +68,7 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
       {/* Article cards grid (collapsible) */}
       <div className="mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto">
-          {filteredArticles.map((article) => {
+          {displayArticles.map((article) => {
             const selected = selectedArticleIds.includes(article.id)
             return (
               <button key={article.id} onClick={() => {
@@ -121,9 +124,9 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
       </div>
 
       {/* Content */}
-      {tab === 'listen' && <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={filteredArticles} />}
-      {tab === 'intensive' && <IntensiveListening articles={filteredArticles} />}
-      {tab === 'speak' && <SpeakSession articles={filteredArticles} />}
+      {tab === 'listen' && <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />}
+      {tab === 'intensive' && <IntensiveListening articles={sessionArticles} />}
+      {tab === 'speak' && <SpeakSession articles={sessionArticles} />}
     </div>
   )
 }
