@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-14",
+  "title": "搭积木",
+  "titleEn": "Building with Blocks",
+  "emoji": "🧱",
+  "paragraphs": [
+    {
+      "text": "今天爸爸给我买了一盒新积木。积木有各种形状：有长方形的、正方形的、三角形的。",
+      "translation": "Today Dad bought me a new box of building blocks. The blocks come in various shapes: rectangular, square, triangular."
+    },
+    {
+      "text": "我用积木搭了一座高高的城堡。城堡有城门和塔楼，还有一堵围墙。",
+      "translation": "I built a tall castle with the blocks. The castle had a gate, towers, and a surrounding wall."
+    },
+    {
+      "text": "弟弟也想玩，不小心碰倒了我搭的城堡。虽然有点难过，但我没有生气，我们一起重新搭了一个更大的。",
+      "translation": "My brother wanted to play too and accidentally knocked down my castle. Although I was a bit upset, I didn't get angry. We built an even bigger one together."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "积木",
+      "pinyin": "jī mù",
+      "meaning": "building blocks"
+    },
+    {
+      "word": "形状",
+      "pinyin": "xíng zhuàng",
+      "meaning": "shape"
+    },
+    {
+      "word": "长方形",
+      "pinyin": "cháng fāng xíng",
+      "meaning": "rectangle"
+    },
+    {
+      "word": "城堡",
+      "pinyin": "chéng bǎo",
+      "meaning": "castle"
+    },
+    {
+      "word": "塔楼",
+      "pinyin": "tǎ lóu",
+      "meaning": "tower"
+    },
+    {
+      "word": "碰倒",
+      "pinyin": "pèng dǎo",
+      "meaning": "to knock over"
+    },
+    {
+      "word": "生气",
+      "pinyin": "shēng qì",
+      "meaning": "to get angry"
+    }
+  ]
+}

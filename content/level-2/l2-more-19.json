@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-19",
+  "title": "养蚕宝宝",
+  "titleEn": "Raising Silkworms",
+  "emoji": "🐛",
+  "paragraphs": [
+    {
+      "text": "科学课上，老师给我们每人发了一些蚕卵。我小心翼翼地拿回家，放在纸盒里。",
+      "translation": "In science class, the teacher gave each of us some silkworm eggs. I carefully took them home and placed them in a paper box."
+    },
+    {
+      "text": "过了几天，小蚕从卵里钻出来了，黑黑的像小蚂蚁。我每天给它们摘新鲜的桑叶吃。",
+      "translation": "After a few days, little silkworms hatched from the eggs, black like tiny ants. I picked fresh mulberry leaves for them every day."
+    },
+    {
+      "text": "蚕宝宝越长越大，最后开始吐丝结茧。老师说蚕丝可以用来做衣服。养蚕真有趣！",
+      "translation": "The silkworms grew bigger and bigger, finally spinning silk and forming cocoons. The teacher said silk can be used to make clothes. Raising silkworms is so interesting!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "蚕",
+      "pinyin": "cán",
+      "meaning": "silkworm"
+    },
+    {
+      "word": "卵",
+      "pinyin": "luǎn",
+      "meaning": "egg"
+    },
+    {
+      "word": "小心翼翼",
+      "pinyin": "xiǎo xīn yì yì",
+      "meaning": "very carefully"
+    },
+    {
+      "word": "桑叶",
+      "pinyin": "sāng yè",
+      "meaning": "mulberry leaf"
+    },
+    {
+      "word": "吐丝",
+      "pinyin": "tǔ sī",
+      "meaning": "to spin silk"
+    },
+    {
+      "word": "结茧",
+      "pinyin": "jié jiǎn",
+      "meaning": "to form a cocoon"
+    },
+    {
+      "word": "蚕丝",
+      "pinyin": "cán sī",
+      "meaning": "silk (from silkworm)"
+    }
+  ]
+}

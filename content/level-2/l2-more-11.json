@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-11",
+  "title": "看牙医",
+  "titleEn": "Visiting the Dentist",
+  "emoji": "🦷",
+  "paragraphs": [
+    {
+      "text": "今天妈妈带我去看牙医。我的牙齿有一颗有点疼，可能蛀牙了。",
+      "translation": "Today Mom took me to the dentist. One of my teeth hurts a little, it might be a cavity."
+    },
+    {
+      "text": "牙医叔叔让我躺在椅子上，张大嘴巴。他看了看说：有一个小洞，需要补一下。",
+      "translation": "The dentist uncle told me to lie on the chair and open my mouth wide. He looked and said: There's a small hole, needs a filling."
+    },
+    {
+      "text": "补牙的时候有点酸酸的，但不疼。牙医叔叔说以后要少吃糖，每天认真刷牙。",
+      "translation": "The filling felt a bit sour but didn't hurt. The dentist uncle said to eat less candy and brush teeth carefully every day."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "牙医",
+      "pinyin": "yá yī",
+      "meaning": "dentist"
+    },
+    {
+      "word": "疼",
+      "pinyin": "téng",
+      "meaning": "painful"
+    },
+    {
+      "word": "蛀牙",
+      "pinyin": "zhù yá",
+      "meaning": "cavity, tooth decay"
+    },
+    {
+      "word": "张",
+      "pinyin": "zhāng",
+      "meaning": "to open (mouth)"
+    },
+    {
+      "word": "洞",
+      "pinyin": "dòng",
+      "meaning": "hole"
+    },
+    {
+      "word": "补牙",
+      "pinyin": "bǔ yá",
+      "meaning": "dental filling"
+    },
+    {
+      "word": "糖",
+      "pinyin": "táng",
+      "meaning": "candy, sugar"
+    }
+  ]
+}

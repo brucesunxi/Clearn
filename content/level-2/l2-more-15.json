@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-15",
+  "title": "放风筝",
+  "titleEn": "Flying a Kite",
+  "emoji": "🪁",
+  "paragraphs": [
+    {
+      "text": "春天的风暖暖的，最适合放风筝了。爸爸给我买了一个蝴蝶形状的风筝。",
+      "translation": "The spring wind is warm and perfect for flying kites. Dad bought me a butterfly-shaped kite."
+    },
+    {
+      "text": "我举着风筝跑啊跑，风筝慢慢升起来了。风筝越飞越高，在天空中自由飞翔。",
+      "translation": "I held the kite and ran and ran. The kite slowly rose up. Higher and higher, flying freely in the sky."
+    },
+    {
+      "text": "风筝线差点断了，我赶紧收线。放风筝真开心，下次我还要来！",
+      "translation": "The kite string almost broke; I quickly reeled it in. Flying kites is so fun, I want to come again next time!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "风筝",
+      "pinyin": "fēng zhēng",
+      "meaning": "kite"
+    },
+    {
+      "word": "春天",
+      "pinyin": "chūn tiān",
+      "meaning": "spring"
+    },
+    {
+      "word": "暖",
+      "pinyin": "nuǎn",
+      "meaning": "warm"
+    },
+    {
+      "word": "举",
+      "pinyin": "jǔ",
+      "meaning": "to hold up"
+    },
+    {
+      "word": "自由",
+      "pinyin": "zì yóu",
+      "meaning": "free, freedom"
+    },
+    {
+      "word": "断",
+      "pinyin": "duàn",
+      "meaning": "to break"
+    },
+    {
+      "word": "收",
+      "pinyin": "shōu",
+      "meaning": "to reel in, collect"
+    }
+  ]
+}

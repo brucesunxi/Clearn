@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-8",
+  "title": "第一次坐飞机",
+  "titleEn": "First Time on a Plane",
+  "emoji": "✈️",
+  "paragraphs": [
+    {
+      "text": "放暑假了，爸爸妈妈带我去坐飞机旅行。这是我第一次坐飞机，好兴奋！",
+      "translation": "Summer vacation started. Mom and Dad took me on a plane trip. This was my first time on a plane, I was so excited!"
+    },
+    {
+      "text": "飞机在跑道上滑行，然后越跑越快。突然，飞机起飞了，冲向蓝天！我的心砰砰跳。",
+      "translation": "The plane taxied on the runway, going faster and faster. Suddenly, the plane took off, soaring into the blue sky! My heart was pounding."
+    },
+    {
+      "text": "从窗户往外看，地上的房子变得像积木一样小，白云就在身边飘过。坐飞机真奇妙！",
+      "translation": "Looking out the window, the houses on the ground became as small as building blocks, white clouds drifted past. Flying on a plane is amazing!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "飞机",
+      "pinyin": "fēi jī",
+      "meaning": "airplane"
+    },
+    {
+      "word": "第一次",
+      "pinyin": "dì yī cì",
+      "meaning": "first time"
+    },
+    {
+      "word": "兴奋",
+      "pinyin": "xīng fèn",
+      "meaning": "excited"
+    },
+    {
+      "word": "跑道",
+      "pinyin": "pǎo dào",
+      "meaning": "runway"
+    },
+    {
+      "word": "起飞",
+      "pinyin": "qǐ fēi",
+      "meaning": "to take off"
+    },
+    {
+      "word": "窗户",
+      "pinyin": "chuāng hù",
+      "meaning": "window"
+    },
+    {
+      "word": "积木",
+      "pinyin": "jī mù",
+      "meaning": "building blocks"
+    }
+  ]
+}

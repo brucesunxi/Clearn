@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-9",
+  "title": "第一次做饭",
+  "titleEn": "First Time Cooking",
+  "emoji": "🍳",
+  "paragraphs": [
+    {
+      "text": "今天是母亲节，我想给妈妈做一顿早餐。我决定做简单的煎蛋和烤面包。",
+      "translation": "Today is Mother's Day, I want to make breakfast for Mom. I decide to make simple fried eggs and toast."
+    },
+    {
+      "text": "我打开煤气，往锅里倒了一点油。把鸡蛋打进去，滋啦滋啦响。第一次煎蛋有点紧张。",
+      "translation": "I turn on the gas and pour a little oil into the pan. I crack the egg in, sizzle sizzle. I'm a bit nervous frying an egg for the first time."
+    },
+    {
+      "text": "妈妈起床看到早餐，又惊又喜。她吃了一口说：真好吃！我心里美滋滋的。",
+      "translation": "Mom woke up and saw the breakfast, surprised and delighted. She took a bite and said: Delicious! I felt so proud inside."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "母亲节",
+      "pinyin": "mǔ qīn jié",
+      "meaning": "Mother's Day"
+    },
+    {
+      "word": "早餐",
+      "pinyin": "zǎo cān",
+      "meaning": "breakfast"
+    },
+    {
+      "word": "煎蛋",
+      "pinyin": "jiān dàn",
+      "meaning": "fried egg"
+    },
+    {
+      "word": "煤气",
+      "pinyin": "méi qì",
+      "meaning": "gas"
+    },
+    {
+      "word": "倒",
+      "pinyin": "dào",
+      "meaning": "to pour"
+    },
+    {
+      "word": "紧张",
+      "pinyin": "jǐn zhāng",
+      "meaning": "nervous"
+    },
+    {
+      "word": "惊喜",
+      "pinyin": "jīng xǐ",
+      "meaning": "pleasant surprise"
+    }
+  ]
+}

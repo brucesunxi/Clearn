@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-7",
+  "title": "去医院探望",
+  "titleEn": "Hospital Visit",
+  "emoji": "🏥",
+  "paragraphs": [
+    {
+      "text": "奶奶生病住院了，我和妈妈去医院看她。奶奶躺在病床上，脸色不太好。",
+      "translation": "Grandma is sick in the hospital. Mom and I went to visit her. Grandma was lying in the hospital bed, looking a bit pale."
+    },
+    {
+      "text": "我给奶奶带了一束鲜花和一篮水果。奶奶看到我来很開心，拉着我的手说个不停。",
+      "translation": "I brought Grandma a bouquet of flowers and a basket of fruit. Grandma was very happy to see me, holding my hand and talking nonstop."
+    },
+    {
+      "text": "医生说我奶奶很快就可以出院了。希望奶奶早日康复，回家和我们一起吃晚饭。",
+      "translation": "The doctor said Grandma can leave the hospital soon. I hope she recovers quickly and comes home to have dinner with us."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "住院",
+      "pinyin": "zhù yuàn",
+      "meaning": "to be hospitalized"
+    },
+    {
+      "word": "探望",
+      "pinyin": "tàn wàng",
+      "meaning": "to visit"
+    },
+    {
+      "word": "躺",
+      "pinyin": "tǎng",
+      "meaning": "to lie down"
+    },
+    {
+      "word": "鲜花",
+      "pinyin": "xiān huā",
+      "meaning": "fresh flowers"
+    },
+    {
+      "word": "拉",
+      "pinyin": "lā",
+      "meaning": "to pull, hold"
+    },
+    {
+      "word": "康复",
+      "pinyin": "kāng fù",
+      "meaning": "to recover"
+    },
+    {
+      "word": "早日",
+      "pinyin": "zǎo rì",
+      "meaning": "soon, early"
+    }
+  ]
+}

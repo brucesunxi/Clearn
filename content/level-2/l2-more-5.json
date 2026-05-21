@@ -1,0 +1,52 @@
+{
+  "id": "l2-more-5",
+  "title": "我的日记本",
+  "titleEn": "My Diary",
+  "emoji": "📔",
+  "paragraphs": [
+    {
+      "text": "我有一个漂亮的日记本，是妈妈送给我的生日礼物。日记本的封面有一只可爱的小熊。",
+      "translation": "I have a beautiful diary, a birthday gift from Mom. The cover has a cute little bear on it."
+    },
+    {
+      "text": "每天晚上，我都会在日记本上写下今天发生的事情。开心的事、难过的事、有趣的事，我都记下来。",
+      "translation": "Every evening, I write down what happened today in my diary. Happy things, sad things, interesting things, I write them all down."
+    },
+    {
+      "text": "写日记让我觉得很开心。以后长大了再看，一定很有意思。你们也写日记吗？",
+      "translation": "Keeping a diary makes me happy. It will be so interesting to read them when I grow up. Do you keep a diary too?"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "日记本",
+      "pinyin": "rì jì běn",
+      "meaning": "diary, journal"
+    },
+    {
+      "word": "礼物",
+      "pinyin": "lǐ wù",
+      "meaning": "gift"
+    },
+    {
+      "word": "封面",
+      "pinyin": "fēng miàn",
+      "meaning": "cover"
+    },
+    {
+      "word": "发生",
+      "pinyin": "fā shēng",
+      "meaning": "to happen, occur"
+    },
+    {
+      "word": "难过",
+      "pinyin": "nán guò",
+      "meaning": "sad"
+    },
+    {
+      "word": "记",
+      "pinyin": "jì",
+      "meaning": "to record, write down"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-3",
+  "title": "学做家务",
+  "titleEn": "Learning to Do Chores",
+  "emoji": "🧹",
+  "paragraphs": [
+    {
+      "text": "今天妈妈教我做家务。我先学扫地，把地上的灰尘和纸屑扫干净。",
+      "translation": "Today Mom taught me to do housework. First I learned to sweep the floor, cleaning up the dust and scraps of paper."
+    },
+    {
+      "text": "然后我学擦桌子。我用一块湿抹布把桌子擦得亮亮的。妈妈夸我真能干。",
+      "translation": "Then I learned to wipe the table. I used a wet cloth to make the table shiny. Mom praised me for being so capable."
+    },
+    {
+      "text": "做家务虽然有点累，但是看到家里变得整洁，我很开心。以后我要多帮妈妈做家务。",
+      "translation": "Although doing housework is a bit tiring, I'm happy to see the house become tidy. From now on I'll help Mom more with the chores."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "家务",
+      "pinyin": "jiā wù",
+      "meaning": "housework"
+    },
+    {
+      "word": "扫地",
+      "pinyin": "sǎo dì",
+      "meaning": "to sweep the floor"
+    },
+    {
+      "word": "擦",
+      "pinyin": "cā",
+      "meaning": "to wipe"
+    },
+    {
+      "word": "能干",
+      "pinyin": "néng gàn",
+      "meaning": "capable"
+    },
+    {
+      "word": "脏",
+      "pinyin": "zāng",
+      "meaning": "dirty"
+    },
+    {
+      "word": "整洁",
+      "pinyin": "zhěng jié",
+      "meaning": "tidy, neat"
+    },
+    {
+      "word": "帮",
+      "pinyin": "bāng",
+      "meaning": "to help"
+    }
+  ]
+}

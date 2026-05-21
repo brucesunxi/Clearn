@@ -1,0 +1,62 @@
+{
+  "id": "l2-more-4",
+  "title": "秋天来了",
+  "titleEn": "Autumn Has Come",
+  "emoji": "🍂",
+  "paragraphs": [
+    {
+      "text": "秋天来了，天气变凉了。树上的叶子变成了黄色和红色，一片一片落下来。",
+      "translation": "Autumn has come, the weather has turned cool. The leaves on the trees have turned yellow and red, falling one by one."
+    },
+    {
+      "text": "秋风吹过，树叶在空中跳舞。我和妹妹在落叶堆里跳来跳去，嘎吱嘎吱响。",
+      "translation": "The autumn wind blows, leaves dance in the air. My sister and I jump around in the leaf piles, crunch crunch."
+    },
+    {
+      "text": "秋天是丰收的季节。果园里的苹果红了，橘子黄了。农民伯伯们忙着摘水果。",
+      "translation": "Autumn is the harvest season. The apples in the orchard are red, the oranges are yellow. Farmer uncles are busy picking fruit."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "秋天",
+      "pinyin": "qiū tiān",
+      "meaning": "autumn"
+    },
+    {
+      "word": "树叶",
+      "pinyin": "shù yè",
+      "meaning": "leaves"
+    },
+    {
+      "word": "变成",
+      "pinyin": "biàn chéng",
+      "meaning": "to turn into"
+    },
+    {
+      "word": "吹",
+      "pinyin": "chuī",
+      "meaning": "to blow"
+    },
+    {
+      "word": "跳舞",
+      "pinyin": "tiào wǔ",
+      "meaning": "to dance"
+    },
+    {
+      "word": "丰收",
+      "pinyin": "fēng shōu",
+      "meaning": "bountiful harvest"
+    },
+    {
+      "word": "果园",
+      "pinyin": "guǒ yuán",
+      "meaning": "orchard"
+    },
+    {
+      "word": "农民",
+      "pinyin": "nóng mín",
+      "meaning": "farmer"
+    }
+  ]
+}

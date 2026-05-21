@@ -1,0 +1,62 @@
+{
+  "id": "l2-more-2",
+  "title": "学游泳",
+  "titleEn": "Learning to Swim",
+  "emoji": "🏊",
+  "paragraphs": [
+    {
+      "text": "暑假到了，妈妈给我报了游泳班。第一天去游泳池，我很紧张。",
+      "translation": "Summer vacation arrived, Mom signed me up for swim class. On the first day at the pool, I was very nervous."
+    },
+    {
+      "text": "教练教我们先在水里憋气，然后学漂浮。我试了好几次，终于成功了！",
+      "translation": "The coach taught us to hold our breath underwater first, then learn to float. I tried many times and finally succeeded!"
+    },
+    {
+      "text": "学了一周，我已经能游五米了。教练说我进步很快。我要继续努力！",
+      "translation": "After a week of learning, I can already swim five meters. The coach said I'm improving fast. I will keep working hard!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "暑假",
+      "pinyin": "shǔ jià",
+      "meaning": "summer vacation"
+    },
+    {
+      "word": "游泳",
+      "pinyin": "yóu yǒng",
+      "meaning": "to swim"
+    },
+    {
+      "word": "紧张",
+      "pinyin": "jǐn zhāng",
+      "meaning": "nervous"
+    },
+    {
+      "word": "教练",
+      "pinyin": "jiào liàn",
+      "meaning": "coach, trainer"
+    },
+    {
+      "word": "憋气",
+      "pinyin": "biē qì",
+      "meaning": "hold breath"
+    },
+    {
+      "word": "漂浮",
+      "pinyin": "piāo fú",
+      "meaning": "to float"
+    },
+    {
+      "word": "成功",
+      "pinyin": "chéng gōng",
+      "meaning": "to succeed"
+    },
+    {
+      "word": "努力",
+      "pinyin": "nǔ lì",
+      "meaning": "to work hard"
+    }
+  ]
+}

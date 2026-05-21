@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-1",
+  "title": "去图书馆",
+  "titleEn": "Going to the Library",
+  "emoji": "📚",
+  "paragraphs": [
+    {
+      "text": "今天放学后，我和小明一起去图书馆。图书馆里很安静，大家都在认真看书。",
+      "translation": "After school today, Xiaoming and I went to the library together. The library was very quiet, everyone was reading seriously."
+    },
+    {
+      "text": "我借了一本关于恐龙的书，小明借了一本关于宇宙的书。图书馆的阿姨说下周要还回来。",
+      "translation": "I borrowed a book about dinosaurs, Xiaoming borrowed a book about the universe. The librarian said to return them next week."
+    },
+    {
+      "text": "回到家我就迫不及待地翻开书看了起来。书里的知识真有趣！",
+      "translation": "When I got home I couldn't wait to open the book and start reading. The knowledge in the book was so interesting!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "图书馆",
+      "pinyin": "tú shū guǎn",
+      "meaning": "library"
+    },
+    {
+      "word": "安静",
+      "pinyin": "ān jìng",
+      "meaning": "quiet"
+    },
+    {
+      "word": "认真",
+      "pinyin": "rèn zhēn",
+      "meaning": "serious, earnest"
+    },
+    {
+      "word": "借",
+      "pinyin": "jiè",
+      "meaning": "to borrow"
+    },
+    {
+      "word": "恐龙",
+      "pinyin": "kǒng lóng",
+      "meaning": "dinosaur"
+    },
+    {
+      "word": "还",
+      "pinyin": "huán",
+      "meaning": "to return"
+    },
+    {
+      "word": "迫不及待",
+      "pinyin": "pò bù jí dài",
+      "meaning": "can't wait"
+    }
+  ]
+}

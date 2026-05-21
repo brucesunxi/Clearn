@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-17",
+  "title": "去爷爷奶奶家",
+  "titleEn": "Visiting Grandparents",
+  "emoji": "👴",
+  "paragraphs": [
+    {
+      "text": "每个周末我们都会去爷爷奶奶家。爷爷奶奶住在乡下，那里空气很好。",
+      "translation": "Every weekend we visit Grandpa and Grandma. They live in the countryside where the air is fresh."
+    },
+    {
+      "text": "爷爷种了很多蔬菜，有西红柿、黄瓜、豆角。每次去我都会帮爷爷浇菜。",
+      "translation": "Grandpa grows lots of vegetables: tomatoes, cucumbers, green beans. Every time I visit I help Grandpa water the vegetables."
+    },
+    {
+      "text": "奶奶会做很多好吃的。她包的水饺最好吃了。我喜欢去爷爷奶奶家！",
+      "translation": "Grandma makes lots of delicious food. The dumplings she makes are the best. I love visiting Grandpa and Grandma!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "爷爷奶奶",
+      "pinyin": "yé ye nǎi nai",
+      "meaning": "grandpa and grandma"
+    },
+    {
+      "word": "乡下",
+      "pinyin": "xiāng xià",
+      "meaning": "countryside"
+    },
+    {
+      "word": "空气",
+      "pinyin": "kōng qì",
+      "meaning": "air"
+    },
+    {
+      "word": "蔬菜",
+      "pinyin": "shū cài",
+      "meaning": "vegetables"
+    },
+    {
+      "word": "西红柿",
+      "pinyin": "xī hóng shì",
+      "meaning": "tomato"
+    },
+    {
+      "word": "黄瓜",
+      "pinyin": "huáng guā",
+      "meaning": "cucumber"
+    },
+    {
+      "word": "水饺",
+      "pinyin": "shuǐ jiǎo",
+      "meaning": "boiled dumplings"
+    }
+  ]
+}

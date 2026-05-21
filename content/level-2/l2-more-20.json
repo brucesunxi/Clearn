@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-20",
+  "title": "父亲节礼物",
+  "titleEn": "Father's Day Gift",
+  "emoji": "🎁",
+  "paragraphs": [
+    {
+      "text": "父亲节快到了，我想给爸爸准备一份特别的礼物。我决定亲手做一张贺卡。",
+      "translation": "Father's Day is coming, I want to prepare a special gift for Dad. I decided to make a greeting card by hand."
+    },
+    {
+      "text": "我用彩纸折了一件衬衫，贴在卡片上。然后在卡片里写下：爸爸，您辛苦了，祝您父亲节快乐！",
+      "translation": "I folded a shirt out of colored paper and pasted it on the card. Then I wrote inside: Dad, thank you for your hard work, Happy Father's Day!"
+    },
+    {
+      "text": "父亲节那天早上，我把卡片送给爸爸。爸爸看了很感动，把我抱起来亲了一口。我爱爸爸！",
+      "translation": "On Father's Day morning, I gave the card to Dad. Dad was very touched, hugged me and gave me a kiss. I love Dad!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "父亲节",
+      "pinyin": "fù qīn jié",
+      "meaning": "Father's Day"
+    },
+    {
+      "word": "礼物",
+      "pinyin": "lǐ wù",
+      "meaning": "gift"
+    },
+    {
+      "word": "贺卡",
+      "pinyin": "hè kǎ",
+      "meaning": "greeting card"
+    },
+    {
+      "word": "折",
+      "pinyin": "zhé",
+      "meaning": "to fold"
+    },
+    {
+      "word": "衬衫",
+      "pinyin": "chèn shān",
+      "meaning": "shirt"
+    },
+    {
+      "word": "辛苦",
+      "pinyin": "xīn kǔ",
+      "meaning": "hardworking, laborious"
+    },
+    {
+      "word": "感动",
+      "pinyin": "gǎn dòng",
+      "meaning": "touched, moved"
+    }
+  ]
+}

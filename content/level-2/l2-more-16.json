@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-16",
+  "title": "下棋",
+  "titleEn": "Playing Chess",
+  "emoji": "♟️",
+  "paragraphs": [
+    {
+      "text": "爷爷喜欢下象棋。今天他教我怎么下。象棋有车马炮，每个棋子走法不一样。",
+      "translation": "Grandpa likes to play Chinese chess. Today he taught me how to play. Chess has chariots, horses and cannons, each piece moves differently."
+    },
+    {
+      "text": "我先学怎么摆棋，然后学每个棋子的走法。车走直线，马走日字，炮要隔一个打。",
+      "translation": "I first learned how to set up the board, then the moves of each piece. Chariots go straight, horses move in an L-shape, cannons jump over one piece to capture."
+    },
+    {
+      "text": "我和爷爷下了一盘。虽然输了，但是爷爷夸我学得很快。下次我一定会赢！",
+      "translation": "I played a game with Grandpa. Even though I lost, Grandpa praised me for learning quickly. Next time I will definitely win!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "象棋",
+      "pinyin": "xiàng qí",
+      "meaning": "Chinese chess"
+    },
+    {
+      "word": "棋子",
+      "pinyin": "qí zi",
+      "meaning": "chess piece"
+    },
+    {
+      "word": "走法",
+      "pinyin": "zǒu fǎ",
+      "meaning": "move (in chess)"
+    },
+    {
+      "word": "直线",
+      "pinyin": "zhí xiàn",
+      "meaning": "straight line"
+    },
+    {
+      "word": "棋盘",
+      "pinyin": "qí pán",
+      "meaning": "chessboard"
+    },
+    {
+      "word": "输",
+      "pinyin": "shū",
+      "meaning": "to lose"
+    },
+    {
+      "word": "赢",
+      "pinyin": "yíng",
+      "meaning": "to win"
+    }
+  ]
+}

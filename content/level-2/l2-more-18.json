@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-18",
+  "title": "雪人不见了",
+  "titleEn": "The Snowman Disappeared",
+  "emoji": "⛄",
+  "paragraphs": [
+    {
+      "text": "昨天下了大雪，我和弟弟在院子里堆了一个雪人。雪人有圆圆的肚子和圆圆的头。",
+      "translation": "Yesterday it snowed heavily. My brother and I built a snowman in the yard. The snowman had a round belly and a round head."
+    },
+    {
+      "text": "我们用胡萝卜做鼻子，用两颗黑豆做眼睛，还用红色的围巾给它围上。雪人真好看！",
+      "translation": "We used a carrot for the nose, two black beans for the eyes, and put a red scarf around it. The snowman looked great!"
+    },
+    {
+      "text": "今天早上我跑出去看雪人，发现它变小了，围巾掉在地上。原来太阳出来了，雪人开始融化了。再见小雪人，明年冬天我们再见面！",
+      "translation": "This morning I ran out to see the snowman, but it had shrunk and the scarf had fallen off. The sun had come out and the snowman was melting. Goodbye little snowman, see you next winter!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "雪人",
+      "pinyin": "xuě rén",
+      "meaning": "snowman"
+    },
+    {
+      "word": "堆",
+      "pinyin": "duī",
+      "meaning": "to pile up"
+    },
+    {
+      "word": "胡萝卜",
+      "pinyin": "hú luó bo",
+      "meaning": "carrot"
+    },
+    {
+      "word": "围巾",
+      "pinyin": "wéi jīn",
+      "meaning": "scarf"
+    },
+    {
+      "word": "融化",
+      "pinyin": "róng huà",
+      "meaning": "to melt"
+    },
+    {
+      "word": "冬天",
+      "pinyin": "dōng tiān",
+      "meaning": "winter"
+    },
+    {
+      "word": "发现",
+      "pinyin": "fā xiàn",
+      "meaning": "to discover"
+    }
+  ]
+}

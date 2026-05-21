@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-13",
+  "title": "小鸭子学游泳",
+  "titleEn": "Little Duck Learns to Swim",
+  "emoji": "🐤",
+  "paragraphs": [
+    {
+      "text": "鸭妈妈带着一群小鸭子去河边学游泳。小鸭子们看到水，有点害怕。",
+      "translation": "Mother Duck takes a group of ducklings to the river to learn swimming. The ducklings see the water and feel a bit scared."
+    },
+    {
+      "text": "鸭妈妈先跳进水里，嘎嘎嘎地叫着，好像在说：快下来吧，水里很好玩！",
+      "translation": "Mother Duck jumps into the water first, quacking as if to say: Come on down, the water is fun!"
+    },
+    {
+      "text": "小鸭子们鼓起勇气，一只一只跳进水里。它们跟着妈妈游来游去，很快就学会了。",
+      "translation": "The ducklings gathered their courage and jumped into the water one by one. They swam around following their mom and learned quickly."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "鸭子",
+      "pinyin": "yā zi",
+      "meaning": "duck"
+    },
+    {
+      "word": "河",
+      "pinyin": "hé",
+      "meaning": "river"
+    },
+    {
+      "word": "害怕",
+      "pinyin": "hài pà",
+      "meaning": "afraid, scared"
+    },
+    {
+      "word": "跳",
+      "pinyin": "tiào",
+      "meaning": "to jump"
+    },
+    {
+      "word": "嘎嘎",
+      "pinyin": "gā gā",
+      "meaning": "quack quack"
+    },
+    {
+      "word": "勇气",
+      "pinyin": "yǒng qì",
+      "meaning": "courage"
+    },
+    {
+      "word": "学会",
+      "pinyin": "xué huì",
+      "meaning": "to learn (how to)"
+    }
+  ]
+}

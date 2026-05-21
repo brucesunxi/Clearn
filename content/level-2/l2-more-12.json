@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-12",
+  "title": "爬山去",
+  "titleEn": "Going Hiking",
+  "emoji": "⛰️",
+  "paragraphs": [
+    {
+      "text": "星期天，爸爸带我去爬山。山很高，山上有很多大树和野花。",
+      "translation": "On Sunday, Dad took me hiking. The mountain was tall with many big trees and wildflowers."
+    },
+    {
+      "text": "我们沿着山路往上走。走到一半我就累了，想坐下来休息。爸爸说：加油，快到山顶了！",
+      "translation": "We walked up the mountain path. Halfway up I was tired and wanted to sit down. Dad said: Keep going, almost at the top!"
+    },
+    {
+      "text": "终于到了山顶。从山顶往下看，房子像火柴盒，汽车像小甲虫。山顶的风景真美！",
+      "translation": "Finally we reached the top. Looking down from the summit, houses looked like matchboxes, cars like little beetles. The view from the top was beautiful!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "爬山",
+      "pinyin": "pá shān",
+      "meaning": "to hike, climb mountain"
+    },
+    {
+      "word": "山路",
+      "pinyin": "shān lù",
+      "meaning": "mountain path"
+    },
+    {
+      "word": "累",
+      "pinyin": "lèi",
+      "meaning": "tired"
+    },
+    {
+      "word": "山顶",
+      "pinyin": "shān dǐng",
+      "meaning": "mountain top"
+    },
+    {
+      "word": "风景",
+      "pinyin": "fēng jǐng",
+      "meaning": "scenery, view"
+    },
+    {
+      "word": "甲虫",
+      "pinyin": "jiǎ chóng",
+      "meaning": "beetle"
+    },
+    {
+      "word": "终于",
+      "pinyin": "zhōng yú",
+      "meaning": "finally, at last"
+    }
+  ]
+}

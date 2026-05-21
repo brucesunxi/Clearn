@@ -1,0 +1,57 @@
+{
+  "id": "l2-more-6",
+  "title": "中秋节赏月",
+  "titleEn": "Mid-Autumn Moon Viewing",
+  "emoji": "🥮",
+  "paragraphs": [
+    {
+      "text": "今天是中秋节。晚上，我和爸爸妈妈在阳台上赏月。月亮又圆又亮，像一个白玉盘。",
+      "translation": "Today is Mid-Autumn Festival. In the evening, Mom, Dad and I admire the moon on the balcony. The moon is round and bright like a white jade plate."
+    },
+    {
+      "text": "妈妈端来了月饼和水果。月饼有莲蓉味的、豆沙味的，还有蛋黄味的。我最喜欢吃蛋黄月饼。",
+      "translation": "Mom brought mooncakes and fruit. The mooncakes have lotus paste, red bean paste, and egg yolk flavors. I like egg yolk mooncakes best."
+    },
+    {
+      "text": "爸爸给我讲了嫦娥奔月的故事。我一边吃月饼一边听故事，这个中秋节真美好。",
+      "translation": "Dad told me the story of Chang'e flying to the moon. I listened while eating mooncakes. This Mid-Autumn Festival was so wonderful."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "中秋节",
+      "pinyin": "zhōng qiū jié",
+      "meaning": "Mid-Autumn Festival"
+    },
+    {
+      "word": "阳台",
+      "pinyin": "yáng tái",
+      "meaning": "balcony"
+    },
+    {
+      "word": "圆",
+      "pinyin": "yuán",
+      "meaning": "round"
+    },
+    {
+      "word": "盘",
+      "pinyin": "pán",
+      "meaning": "plate"
+    },
+    {
+      "word": "莲蓉",
+      "pinyin": "lián róng",
+      "meaning": "lotus seed paste"
+    },
+    {
+      "word": "豆沙",
+      "pinyin": "dòu shā",
+      "meaning": "red bean paste"
+    },
+    {
+      "word": "味道",
+      "pinyin": "wèi dào",
+      "meaning": "flavor, taste"
+    }
+  ]
+}

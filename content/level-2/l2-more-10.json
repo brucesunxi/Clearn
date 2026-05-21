@@ -1,0 +1,62 @@
+{
+  "id": "l2-more-10",
+  "title": "美丽的蝴蝶",
+  "titleEn": "Beautiful Butterflies",
+  "emoji": "🦋",
+  "paragraphs": [
+    {
+      "text": "春天到了，花园里开满了花。五颜六色的蝴蝶在花丛中飞来飞去。",
+      "translation": "Spring has arrived, the garden is full of blooming flowers. Colorful butterflies fly among the flowers."
+    },
+    {
+      "text": "一只蝴蝶停在一朵红花上。它有一对漂亮的翅膀，上面有蓝色的花纹。",
+      "translation": "A butterfly lands on a red flower. It has a pair of beautiful wings with blue patterns on them."
+    },
+    {
+      "text": "蝴蝶一开始是毛毛虫，后来变成蛹，最后才变成美丽的蝴蝶。大自然真神奇！",
+      "translation": "Butterflies start as caterpillars, then become pupae, and finally transform into beautiful butterflies. Nature is truly magical!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "蝴蝶",
+      "pinyin": "hú dié",
+      "meaning": "butterfly"
+    },
+    {
+      "word": "花园",
+      "pinyin": "huā yuán",
+      "meaning": "garden"
+    },
+    {
+      "word": "五颜六色",
+      "pinyin": "wǔ yán liù sè",
+      "meaning": "colorful"
+    },
+    {
+      "word": "翅膀",
+      "pinyin": "chì bǎng",
+      "meaning": "wing"
+    },
+    {
+      "word": "花纹",
+      "pinyin": "huā wén",
+      "meaning": "pattern"
+    },
+    {
+      "word": "毛毛虫",
+      "pinyin": "máo máo chóng",
+      "meaning": "caterpillar"
+    },
+    {
+      "word": "蛹",
+      "pinyin": "yǒng",
+      "meaning": "pupa, chrysalis"
+    },
+    {
+      "word": "神奇",
+      "pinyin": "shén qí",
+      "meaning": "magical"
+    }
+  ]
+}
