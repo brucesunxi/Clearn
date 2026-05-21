@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-5",
+  "title": "长江与黄河",
+  "titleEn": "The Yangtze and Yellow Rivers",
+  "emoji": "🌊",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "长江和黄河是中国的两条母亲河。长江全长约六千三百公里，是中国最长的河流。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "黄河的水是黄色的，因为河水携带了大量的泥沙。黄河是中华文明的发源地之一。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "我们要保护好这两条母亲河，让它们继续滋养中华大地。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "长江",
+      "pinyin": "chang2 jiang1",
+      "meaning": "Yangtze River"
+    },
+    {
+      "word": "黄河",
+      "pinyin": "huang2 he2",
+      "meaning": "Yellow River"
+    },
+    {
+      "word": "母亲河",
+      "pinyin": "mu3 qin1 he2",
+      "meaning": "mother river"
+    },
+    {
+      "word": "泥沙",
+      "pinyin": "ni2 sha1",
+      "meaning": "silt"
+    },
+    {
+      "word": "流域",
+      "pinyin": "liu2 yu4",
+      "meaning": "river basin"
+    },
+    {
+      "word": "滋养",
+      "pinyin": "zi1 yang3",
+      "meaning": "to nourish"
+    }
+  ]
+}

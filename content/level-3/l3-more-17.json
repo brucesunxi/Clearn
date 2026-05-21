@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-17",
+  "title": "中国象棋",
+  "titleEn": "Chinese Chess",
+  "emoji": "♟️",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国象棋是一种两人对弈的棋类游戏，在中国非常流行。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "棋盘有九条竖线和十条横线，双方各有十六个棋子。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "下象棋能锻炼思维，培养耐心和决策能力。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "象棋",
+      "pinyin": "xiang4 qi2",
+      "meaning": "Chinese chess"
+    },
+    {
+      "word": "对弈",
+      "pinyin": "dui4 yi4",
+      "meaning": "to play chess"
+    },
+    {
+      "word": "棋盘",
+      "pinyin": "qi2 pan2",
+      "meaning": "chessboard"
+    },
+    {
+      "word": "棋子",
+      "pinyin": "qi2 zi3",
+      "meaning": "chess piece"
+    },
+    {
+      "word": "思维",
+      "pinyin": "si1 wei2",
+      "meaning": "thinking"
+    },
+    {
+      "word": "决策",
+      "pinyin": "jue2 ce4",
+      "meaning": "decision-making"
+    }
+  ]
+}

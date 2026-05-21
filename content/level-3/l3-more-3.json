@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-3",
+  "title": "故宫博物院",
+  "titleEn": "The Palace Museum",
+  "emoji": "🏛️",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "故宫位于北京的中心，是明清两代的皇宫，已经有六百多年的历史了。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "故宫有大小宫殿七十多座，房屋九千多间，建筑非常精美。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "现在故宫已经成为一座博物院，每年接待数百万来自世界各地的游客。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "故宫",
+      "pinyin": "gu4 gong1",
+      "meaning": "Forbidden City"
+    },
+    {
+      "word": "宫殿",
+      "pinyin": "gong1 dian4",
+      "meaning": "palace"
+    },
+    {
+      "word": "建筑",
+      "pinyin": "jian4 zhu4",
+      "meaning": "architecture"
+    },
+    {
+      "word": "文物",
+      "pinyin": "wen2 wu4",
+      "meaning": "cultural relic"
+    },
+    {
+      "word": "博物馆",
+      "pinyin": "bo2 wu4 guan3",
+      "meaning": "museum"
+    },
+    {
+      "word": "骄傲",
+      "pinyin": "jiao1 ao4",
+      "meaning": "pride"
+    }
+  ]
+}

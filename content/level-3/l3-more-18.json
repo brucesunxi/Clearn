@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-18",
+  "title": "中医文化",
+  "titleEn": "Chinese Medicine Culture",
+  "emoji": "💊",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中医是中国传统医学，有着几千年的历史，讲究阴阳平衡。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "中医的治疗方法包括中药针灸推拿拔罐等。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "中医治未病的理念强调在生病之前做好预防。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "中医",
+      "pinyin": "zhong1 yi1",
+      "meaning": "Traditional Chinese Medicine"
+    },
+    {
+      "word": "阴阳",
+      "pinyin": "yin1 yang2",
+      "meaning": "yin and yang"
+    },
+    {
+      "word": "针灸",
+      "pinyin": "zhen1 jiu3",
+      "meaning": "acupuncture"
+    },
+    {
+      "word": "推拿",
+      "pinyin": "tui1 na2",
+      "meaning": "massage"
+    },
+    {
+      "word": "穴位",
+      "pinyin": "xue2 wei4",
+      "meaning": "acupuncture point"
+    },
+    {
+      "word": "养生",
+      "pinyin": "yang3 sheng1",
+      "meaning": "health cultivation"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-14",
+  "title": "中国杂技",
+  "titleEn": "Chinese Acrobatics",
+  "emoji": "🤹",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国杂技是一门古老的表演艺术，有三千多年历史。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "杂技节目有柔术顶碗转碟走钢丝空中飞人等。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "中国杂技团到世界各地演出，每次都座无虚席。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "杂技",
+      "pinyin": "za2 ji4",
+      "meaning": "acrobatics"
+    },
+    {
+      "word": "演员",
+      "pinyin": "yan3 yuan2",
+      "meaning": "performer"
+    },
+    {
+      "word": "训练",
+      "pinyin": "xun4 lian4",
+      "meaning": "training"
+    },
+    {
+      "word": "柔术",
+      "pinyin": "rou2 shu4",
+      "meaning": "contortion"
+    },
+    {
+      "word": "平衡",
+      "pinyin": "ping2 heng2",
+      "meaning": "balance"
+    },
+    {
+      "word": "惊叹",
+      "pinyin": "jing1 tan4",
+      "meaning": "to exclaim in wonder"
+    }
+  ]
+}

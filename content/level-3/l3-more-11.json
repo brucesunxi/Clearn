@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-11",
+  "title": "中国民歌",
+  "titleEn": "Chinese Folk Songs",
+  "emoji": "🎵",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国民歌是劳动人民在生活中创作的歌曲，反映不同地区的风土人情。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "茉莉花是中国最著名的民歌之一，在世界各地广为传唱。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "民歌是一个民族的文化记忆，很多已被列入非物质文化遗产。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "民歌",
+      "pinyin": "min2 ge1",
+      "meaning": "folk song"
+    },
+    {
+      "word": "反映",
+      "pinyin": "fan3 ying4",
+      "meaning": "to reflect"
+    },
+    {
+      "word": "茉莉花",
+      "pinyin": "mo4 li4 hua1",
+      "meaning": "jasmine flower"
+    },
+    {
+      "word": "旋律",
+      "pinyin": "xuan2 lv4",
+      "meaning": "melody"
+    },
+    {
+      "word": "多样性",
+      "pinyin": "duo1 yang4 xing4",
+      "meaning": "diversity"
+    },
+    {
+      "word": "非物质文化遗产",
+      "pinyin": "fei1 wu4 zhi4 wen2 hua4 yi2 chan3",
+      "meaning": "intangible cultural heritage"
+    }
+  ]
+}

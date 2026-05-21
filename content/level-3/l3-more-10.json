@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-10",
+  "title": "中国传统服饰",
+  "titleEn": "Traditional Chinese Clothing",
+  "emoji": "👘",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "汉服是中国汉族的传统服饰，特点是交领右衽宽袍大袖。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "旗袍是满族的传统服饰，后来成为中国的国服。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "如今越来越多年轻人穿上汉服拍照游玩，传承中华文化。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "汉服",
+      "pinyin": "han4 fu2",
+      "meaning": "Hanfu"
+    },
+    {
+      "word": "传统",
+      "pinyin": "chuan2 tong3",
+      "meaning": "tradition"
+    },
+    {
+      "word": "旗袍",
+      "pinyin": "qi2 pao2",
+      "meaning": "cheongsam"
+    },
+    {
+      "word": "优雅",
+      "pinyin": "you1 ya3",
+      "meaning": "elegant"
+    },
+    {
+      "word": "展现",
+      "pinyin": "zhan3 xian4",
+      "meaning": "to display"
+    },
+    {
+      "word": "传承",
+      "pinyin": "chuan2 cheng2",
+      "meaning": "to inherit"
+    }
+  ]
+}

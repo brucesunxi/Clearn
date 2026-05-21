@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-6",
+  "title": "中国功夫",
+  "titleEn": "Chinese Kung Fu",
+  "emoji": "🥋",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国功夫是中华民族的瑰宝，有着几千年的历史。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "功夫不仅是一种武术，更是一种修身养性的方式。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "功夫电影让中国功夫闻名世界，李小龙让全世界爱上了中国功夫。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "功夫",
+      "pinyin": "gong1 fu",
+      "meaning": "Kung Fu"
+    },
+    {
+      "word": "武术",
+      "pinyin": "wu3 shu4",
+      "meaning": "martial arts"
+    },
+    {
+      "word": "少林",
+      "pinyin": "shao3 lin2",
+      "meaning": "Shaolin"
+    },
+    {
+      "word": "门派",
+      "pinyin": "men2 pai4",
+      "meaning": "school"
+    },
+    {
+      "word": "以柔克刚",
+      "pinyin": "yi3 rou2 ke4 gang1",
+      "meaning": "overcome strength with softness"
+    },
+    {
+      "word": "坚韧不拔",
+      "pinyin": "jian1 ren4 bu4 ba2",
+      "meaning": "indomitable"
+    }
+  ]
+}

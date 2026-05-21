@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-1",
+  "title": "中国四大发明",
+  "titleEn": "China's Four Great Inventions",
+  "emoji": "🧭",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国古代有四大发明，分别是造纸术、印刷术、火药和指南针。这些发明对世界文明产生了深远的影响。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "造纸术是蔡伦在东汉时期改进的。在造纸术发明之前，人们用竹简和丝绸来写字，非常昂贵。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "指南针让航海家们在茫茫大海上不会迷失方向。火药改变了战争的方式。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "发明",
+      "pinyin": "fa1 ming2",
+      "meaning": "invention"
+    },
+    {
+      "word": "造纸术",
+      "pinyin": "zao4 zhi3 shu4",
+      "meaning": "papermaking"
+    },
+    {
+      "word": "印刷术",
+      "pinyin": "yin4 shua1 shu4",
+      "meaning": "printing"
+    },
+    {
+      "word": "火药",
+      "pinyin": "huo3 yao4",
+      "meaning": "gunpowder"
+    },
+    {
+      "word": "指南针",
+      "pinyin": "zhi3 nan2 zhen1",
+      "meaning": "compass"
+    },
+    {
+      "word": "贡献",
+      "pinyin": "gong4 xian4",
+      "meaning": "contribution"
+    }
+  ]
+}

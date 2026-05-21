@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-12",
+  "title": "中国茶道",
+  "titleEn": "Chinese Tea Ceremony",
+  "emoji": "🫖",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国茶道是一种以茶为媒介的生活礼仪和精神修养方式。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "泡茶首先要选好茶叶和茶具，然后控制水温和泡茶时间。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "朋友们聚在一起泡一壶好茶，边品茶边聊天，是非常惬意的事情。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "茶道",
+      "pinyin": "cha2 dao4",
+      "meaning": "tea ceremony"
+    },
+    {
+      "word": "礼仪",
+      "pinyin": "li3 yi2",
+      "meaning": "etiquette"
+    },
+    {
+      "word": "和谐",
+      "pinyin": "he2 xie2",
+      "meaning": "harmony"
+    },
+    {
+      "word": "茶叶",
+      "pinyin": "cha2 ye4",
+      "meaning": "tea leaves"
+    },
+    {
+      "word": "茶具",
+      "pinyin": "cha2 ju4",
+      "meaning": "teaware"
+    },
+    {
+      "word": "品茶",
+      "pinyin": "pin3 cha2",
+      "meaning": "to taste tea"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-7",
+  "title": "熊猫的生活",
+  "titleEn": "Life of Pandas",
+  "emoji": "🌿",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "大熊猫喜欢生活在四川的高山竹林里，一天要吃很多竹子。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "为了获取足够的营养，熊猫每天要花十多个小时吃东西。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "由于人类活动，野生熊猫数量曾经减少，如今已回升到一千八百多只。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "营养",
+      "pinyin": "ying2 yang3",
+      "meaning": "nutrition"
+    },
+    {
+      "word": "领地",
+      "pinyin": "ling3 di4",
+      "meaning": "territory"
+    },
+    {
+      "word": "保护",
+      "pinyin": "bao3 hu4",
+      "meaning": "to protect"
+    },
+    {
+      "word": "濒危",
+      "pinyin": "bin1 wei1",
+      "meaning": "endangered"
+    },
+    {
+      "word": "物种",
+      "pinyin": "wu4 zhong3",
+      "meaning": "species"
+    },
+    {
+      "word": "急剧",
+      "pinyin": "ji2 ju4",
+      "meaning": "sharply"
+    }
+  ]
+}

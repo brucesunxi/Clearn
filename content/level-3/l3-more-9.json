@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-9",
+  "title": "中国瓷器",
+  "titleEn": "Chinese Porcelain",
+  "emoji": "🏺",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国是瓷器的故乡，英文中的china既指中国，也指瓷器。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "景德镇被称为瓷都，制作瓷器需要经过很多工序。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "中国瓷器在世界各地博物馆都能看到，是中华文化的瑰宝。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "瓷器",
+      "pinyin": "ci2 qi4",
+      "meaning": "porcelain"
+    },
+    {
+      "word": "景德镇",
+      "pinyin": "jing3 de2 zhen4",
+      "meaning": "Jingdezhen"
+    },
+    {
+      "word": "工序",
+      "pinyin": "gong1 xu4",
+      "meaning": "process"
+    },
+    {
+      "word": "釉",
+      "pinyin": "you4",
+      "meaning": "glaze"
+    },
+    {
+      "word": "青花瓷",
+      "pinyin": "qing1 hua1 ci2",
+      "meaning": "blue-and-white porcelain"
+    },
+    {
+      "word": "瑰宝",
+      "pinyin": "gui1 bao3",
+      "meaning": "treasure"
+    }
+  ]
+}

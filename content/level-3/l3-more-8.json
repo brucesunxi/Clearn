@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-8",
+  "title": "汉字的故事",
+  "titleEn": "The Story of Chinese Characters",
+  "emoji": "🉐",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "汉字是世界上最古老的文字之一，最早的汉字是刻在龟甲上的甲骨文。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "象形字是根据事物的形状画出来的，比如日、月、山、水。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "汉字从甲骨文演变成我们今天使用的楷书，不仅是一种工具，也是一门艺术。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "汉字",
+      "pinyin": "han4 zi4",
+      "meaning": "Chinese character"
+    },
+    {
+      "word": "甲骨文",
+      "pinyin": "jia3 gu3 wen2",
+      "meaning": "oracle bone script"
+    },
+    {
+      "word": "象形字",
+      "pinyin": "xiang4 xing2 zi4",
+      "meaning": "pictograph"
+    },
+    {
+      "word": "会意字",
+      "pinyin": "hui4 yi4 zi4",
+      "meaning": "ideogram"
+    },
+    {
+      "word": "演变",
+      "pinyin": "yan3 bian4",
+      "meaning": "to evolve"
+    },
+    {
+      "word": "楷书",
+      "pinyin": "kai3 shu1",
+      "meaning": "regular script"
+    }
+  ]
+}

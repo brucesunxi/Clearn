@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-4",
+  "title": "中国的节日",
+  "titleEn": "Chinese Festivals",
+  "emoji": "🎊",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国有很多传统节日，每个节日都有独特的习俗和故事。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "元宵节在农历正月十五，人们吃元宵、赏花灯。清明节在春天扫墓祭祖。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "这些传统节日承载着中华民族的文化记忆，让家人团聚。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "传统",
+      "pinyin": "chuan2 tong3",
+      "meaning": "tradition"
+    },
+    {
+      "word": "元宵节",
+      "pinyin": "yuan2 xiao1 jie2",
+      "meaning": "Lantern Festival"
+    },
+    {
+      "word": "清明节",
+      "pinyin": "qing1 ming2 jie2",
+      "meaning": "Qingming Festival"
+    },
+    {
+      "word": "团聚",
+      "pinyin": "tuan2 ju4",
+      "meaning": "to reunite"
+    },
+    {
+      "word": "习俗",
+      "pinyin": "xi2 su2",
+      "meaning": "custom"
+    },
+    {
+      "word": "独特",
+      "pinyin": "du2 te4",
+      "meaning": "unique"
+    }
+  ]
+}

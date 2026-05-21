@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-2",
+  "title": "丝绸之路",
+  "titleEn": "The Silk Road",
+  "emoji": "🐫",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "丝绸之路是古代连接中国和西方的贸易路线。它始于西汉时期，全长约七千公里。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "中国的丝绸、茶叶、瓷器通过丝绸之路运到西方，而西方的宝石、香料则传入中国。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "今天，中国提出了一带一路的倡议，希望重新连接世界。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "丝绸之路",
+      "pinyin": "si1 chou2 zhi1 lu4",
+      "meaning": "Silk Road"
+    },
+    {
+      "word": "贸易",
+      "pinyin": "mao4 yi4",
+      "meaning": "trade"
+    },
+    {
+      "word": "瓷器",
+      "pinyin": "ci2 qi4",
+      "meaning": "porcelain"
+    },
+    {
+      "word": "香料",
+      "pinyin": "xiang1 liao4",
+      "meaning": "spice"
+    },
+    {
+      "word": "交流",
+      "pinyin": "jiao1 liu2",
+      "meaning": "exchange"
+    },
+    {
+      "word": "桥梁",
+      "pinyin": "qiao2 liang2",
+      "meaning": "bridge"
+    }
+  ]
+}

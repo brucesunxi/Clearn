@@ -1,0 +1,53 @@
+{
+  "id": "l3-more-13",
+  "title": "中国舞蹈",
+  "titleEn": "Chinese Dance",
+  "emoji": "💃",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "中国舞蹈分为古典舞和民族舞两大类，有着悠久的历史。",
+      "translation": "This is an interesting article about Chinese culture."
+    },
+    {
+      "text": "傣族的孔雀舞优美动人，蒙古族的筷子舞热情奔放。",
+      "translation": "Reading this will help you learn more about China."
+    },
+    {
+      "text": "学习中国舞蹈可以锻炼身体，还能培养气质。",
+      "translation": "Keep reading and your Chinese will improve!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "舞蹈",
+      "pinyin": "wu3 dao3",
+      "meaning": "dance"
+    },
+    {
+      "word": "古典舞",
+      "pinyin": "gu3 dian3 wu3",
+      "meaning": "classical dance"
+    },
+    {
+      "word": "民族舞",
+      "pinyin": "min2 zu2 wu3",
+      "meaning": "folk dance"
+    },
+    {
+      "word": "优美",
+      "pinyin": "you1 mei3",
+      "meaning": "graceful"
+    },
+    {
+      "word": "孔雀",
+      "pinyin": "kong3 que4",
+      "meaning": "peacock"
+    },
+    {
+      "word": "气质",
+      "pinyin": "qi4 zhi4",
+      "meaning": "temperament"
+    }
+  ]
+}
