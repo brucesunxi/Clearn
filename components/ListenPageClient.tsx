@@ -16,6 +16,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
   const articles = useCustomArticles(baseArticles)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
+  const [artPage, setArtPage] = useState(0)
   const [started, setStarted] = useState(false)
 
   // Display: level-filtered only (always show all articles in the grid)
@@ -55,7 +56,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       {/* Level tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
-          onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]) }}
+          onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]); setArtPage(0) }}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
             selectedLevelId === null && selectedArticleIds.length === 0
               ? 'bg-gray-800 text-white shadow-sm'
@@ -95,7 +96,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          {displayArticles.map((article) => {
+          {displayArticles.slice(artPage * 8, (artPage + 1) * 8).map((article) => {
             const selected = selectedArticleIds.includes(article.id)
             const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
             const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
@@ -149,7 +150,21 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         </p>
       )}
 
-      {/* Start button */}
+{Math.ceil(displayArticles.length / 8) > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-4 mb-2">
+          <button onClick={() => setArtPage((p) => Math.max(0, p - 1))} disabled={artPage === 0}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            ← {locale === 'zh' ? '上一页' : 'Prev'}
+          </button>
+          <span className="text-xs text-gray-400">{artPage + 1} / {Math.ceil(displayArticles.length / 8)}</span>
+          <button onClick={() => setArtPage((p) => Math.min(Math.ceil(displayArticles.length / 8) - 1, p + 1))} disabled={artPage >= Math.ceil(displayArticles.length / 8) - 1}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            {locale === 'zh' ? '下一页' : 'Next'} →
+          </button>
+        </div>
+      )}
+
+            {/* Start button */}
       <button
         onClick={() => setStarted(true)}
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all"

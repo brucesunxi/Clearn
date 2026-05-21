@@ -21,6 +21,7 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
   const [tab, setTab] = useState<Tab>('listen')
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
+  const [artPage, setArtPage] = useState(0)
 
   // Display: level-filtered only (always show all articles in the grid)
   const displayArticles = selectedLevelId !== null
@@ -47,7 +48,7 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
 
       {/* Level tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
-        <button onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]) }}
+        <button onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]); setArtPage(0) }}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
             selectedLevelId === null && selectedArticleIds.length === 0
               ? 'bg-gray-800 text-white shadow-sm' : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
@@ -68,7 +69,7 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
       {/* Article cards grid (collapsible) */}
       <div className="mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto">
-          {displayArticles.map((article) => {
+          {displayArticles.slice(artPage * 8, (artPage + 1) * 8).map((article) => {
             const selected = selectedArticleIds.includes(article.id)
             return (
               <button key={article.id} onClick={() => {
@@ -101,7 +102,21 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
         )}
       </div>
 
-      {/* Tab switcher */}
+{Math.ceil(displayArticles.length / 8) > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-4 mb-2">
+          <button onClick={() => setArtPage((p) => Math.max(0, p - 1))} disabled={artPage === 0}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            ← {locale === 'zh' ? '上一页' : 'Prev'}
+          </button>
+          <span className="text-xs text-gray-400">{artPage + 1} / {Math.ceil(displayArticles.length / 8)}</span>
+          <button onClick={() => setArtPage((p) => Math.min(Math.ceil(displayArticles.length / 8) - 1, p + 1))} disabled={artPage >= Math.ceil(displayArticles.length / 8) - 1}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            {locale === 'zh' ? '下一页' : 'Next'} →
+          </button>
+        </div>
+      )}
+
+            {/* Tab switcher */}
       <div className="flex gap-2 mb-6">
         <button onClick={() => setTab('listen')}
           className={`flex-1 py-3 rounded-xl text-base font-medium transition-all ${
