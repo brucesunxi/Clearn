@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { AdBanner } from '@/lib/adsense'
-import { getAllArticles } from '@/lib/content'
-import SpeakSession from '@/components/ClientSpeakSession'
+import { getLevels, getAllArticles } from '@/lib/content'
+import SpeakPageClient from '@/components/SpeakPageClient'
 
 export const metadata: Metadata = {
   title: '口语 Speaking',
@@ -13,11 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default function SpeakPage() {
+  const levels = getLevels()
   const articles = getAllArticles()
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <SpeakSession articles={articles} />
-    <AdBanner />
-    </div>
-  )
+  return <><SpeakPageClient levels={levels} articles={articles} /><AdBanner /></>
 }

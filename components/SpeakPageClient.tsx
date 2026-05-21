@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article } from '@/lib/types'
 import { useCustomArticles } from '@/lib/use-custom-articles'
-import ListenSession from './ListenSession'
+import SpeakSession from './SpeakSession'
 
-interface ListenPageClientProps {
+interface SpeakPageClientProps {
   levels: Level[]
   articles: Article[]
 }
 
-export default function ListenPageClient({ levels, articles: baseArticles }: ListenPageClientProps) {
+export default function SpeakPageClient({ levels, articles: baseArticles }: SpeakPageClientProps) {
   const { t, locale } = useTranslation()
   const articles = useCustomArticles(baseArticles)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
@@ -24,94 +24,75 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       ? articles.filter((a) => a.level === selectedLevelId)
       : articles
 
-  // Reset started when selection changes
   useEffect(() => { setStarted(false) }, [selectedLevelId, selectedArticleIds])
 
   if (started) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <button
-          onClick={() => setStarted(false)}
-          className="mb-4 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-        >
+        <button onClick={() => setStarted(false)}
+          className="mb-4 text-sm text-gray-500 hover:text-gray-700 transition-colors">
           ← {locale === 'zh' ? '返回选文' : 'Back to articles'}
         </button>
-        <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={filteredArticles} />
+        <SpeakSession key={selectedArticleIds.join(',') || 'all'} articles={filteredArticles} />
       </div>
     )
   }
 
+  const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-1">🎧 {locale === 'zh' ? '听力练习' : 'Listening Practice'}</h1>
-        <p className="text-gray-400 text-sm">{locale === 'zh' ? '选择文章范围，听中文选英文' : 'Select articles, listen and choose the meaning'}</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-1">🗣️ {locale === 'zh' ? '口语练习' : 'Speaking Practice'}</h1>
+        <p className="text-gray-400 text-sm">{locale === 'zh' ? '选择文章范围，看中文开口说' : 'Select articles, read and speak aloud'}</p>
       </div>
 
       {/* Level tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]) }}
+        <button onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]) }}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
             selectedLevelId === null && selectedArticleIds.length === 0
-              ? 'bg-gray-800 text-white shadow-sm'
-              : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
-          }`}
-        >
+              ? 'bg-gray-800 text-white shadow-sm' : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
+          }`}>
           🌐 {locale === 'zh' ? '全部文章' : 'All Articles'}
         </button>
         {levels.map((l) => (
-          <button
-            key={l.id}
-            onClick={() => setSelectedLevelId(selectedLevelId === l.id ? null : l.id)}
+          <button key={l.id} onClick={() => setSelectedLevelId(selectedLevelId === l.id ? null : l.id)}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-              selectedLevelId === l.id
-                ? 'text-white shadow-sm'
-                : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
+              selectedLevelId === l.id ? 'text-white shadow-sm' : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
             }`}
-            style={selectedLevelId === l.id ? { backgroundColor: l.color } : undefined}
-          >
+            style={selectedLevelId === l.id ? { backgroundColor: l.color } : undefined}>
             {l.emoji} {t(`level.${l.id}.name`)}
           </button>
         ))}
       </div>
 
-      {/* Level description */}
       {selectedLevelId !== null && (
         <div className="mb-6 bg-gray-50 rounded-xl px-5 py-3">
           <p className="text-sm text-gray-500">{t(`level.${selectedLevelId}.desc`)}</p>
         </div>
       )}
 
-      {/* Article grid */}
+      {/* Article cards */}
       {filteredArticles.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
-          <p className="text-5xl mb-4">🎧</p>
-          <p className="text-lg">{locale === 'zh' ? '该范围暂无文章' : 'No articles found'}</p>
+          <p className="text-5xl mb-4">🗣️</p>
+          <p className="text-lg">{locale === 'zh' ? '暂无文章' : 'No articles'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {filteredArticles.map((article) => {
             const selected = selectedArticleIds.includes(article.id)
             const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
-            const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
             return (
-              <button
-                key={article.id}
-                onClick={() => {
-                  setSelectedArticleIds((prev) =>
-                    prev.includes(article.id)
-                      ? prev.filter((id) => id !== article.id)
-                      : prev.length >= 3 ? prev : [...prev, article.id]
-                  )
-                }}
+              <button key={article.id} onClick={() => {
+                setSelectedArticleIds((prev) =>
+                  prev.includes(article.id) ? prev.filter((id) => id !== article.id) : prev.length >= 3 ? prev : [...prev, article.id]
+                )
+              }}
                 className={`group block text-left bg-white rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden ${
-                  selected
-                    ? 'border-blue-400 ring-2 ring-blue-200'
-                    : 'border-gray-100 hover:border-blue-200'
-                }`}
-              >
+                  selected ? 'border-red-400 ring-2 ring-red-200' : 'border-gray-100 hover:border-red-200'
+                }`}>
                 <div className="h-1.5" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }} />
                 <div className="p-4">
                   <div className="flex items-start gap-3 mb-2">
@@ -122,14 +103,10 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
                     </div>
                   </div>
                   {preview && (
-                    <p className="text-xs text-gray-400 line-clamp-2 mb-2 leading-relaxed">
-                      {preview}{preview.length >= 60 && '...'}
-                    </p>
+                    <p className="text-xs text-gray-400 line-clamp-2 mb-2 leading-relaxed">{preview}{preview.length >= 60 && '...'}</p>
                   )}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }}>
-                      L{article.level}
-                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }}>L{article.level}</span>
                     <span className="text-xs text-gray-400">📝 {article.vocabulary.length}</span>
                     <span className="text-xs ml-auto">{selected ? '✅' : '☐'}</span>
                   </div>
@@ -141,19 +118,16 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       )}
 
       {selectedArticleIds.length > 0 && (
-        <p className="mb-3 text-xs text-blue-600 font-medium text-center">
+        <p className="mb-3 text-xs text-red-600 font-medium text-center">
           {locale === 'zh' ? `已选 ${selectedArticleIds.length}/3 篇` : `${selectedArticleIds.length}/3 selected`}
         </p>
       )}
 
-      {/* Start button */}
-      <button
-        onClick={() => setStarted(true)}
-        className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all"
-      >
+      <button onClick={() => setStarted(true)}
+        className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 shadow-sm transition-all">
         {selectedArticleIds.length > 0
-          ? (locale === 'zh' ? `🎧 开始听力 (${filteredArticles.length}篇)` : `🎧 Start Listening (${filteredArticles.length} articles)`)
-          : (locale === 'zh' ? '🎧 开始听力' : '🎧 Start Listening')}
+          ? (locale === 'zh' ? `🗣️ 开始口语 (${filteredArticles.length}篇)` : `🗣️ Start Speaking (${filteredArticles.length} articles)`)
+          : (locale === 'zh' ? '🗣️ 开始口语' : '🗣️ Start Speaking')}
       </button>
     </div>
   )

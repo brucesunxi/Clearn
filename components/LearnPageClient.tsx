@@ -259,11 +259,11 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
             {t(`level.${selectedLevelId}.desc`)}
           </div>
         )}
-        {selectedLevelId !== null && levelFiltered.length === 0 ? (
+        {levelFiltered.length === 0 ? (
           <p className="text-xs text-gray-400 text-center py-4">
-            {locale === 'zh' ? '该级别暂无文章' : 'No articles in this level'}
+            {locale === 'zh' ? '暂无文章' : 'No articles'}
           </p>
-        ) : selectedLevelId !== null && (
+        ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {levelFiltered.map((article) => {
               const selected = selectedArticleIds.includes(article.id)
@@ -276,7 +276,7 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
                     setSelectedArticleIds((prev) =>
                       prev.includes(article.id)
                         ? prev.filter((id) => id !== article.id)
-                        : [...prev, article.id]
+                        : prev.length >= 3 ? prev : [...prev, article.id]
                     )
                   }}
                   className={`group block text-left bg-white rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden ${
@@ -314,7 +314,7 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
         )}
         {selectedArticleIds.length > 0 && (
           <div className="mt-3 text-xs text-emerald-600 font-medium">
-            {locale === 'zh' ? `已选 ${selectedArticleIds.length} 篇` : `${selectedArticleIds.length} articles selected`}
+            {locale === 'zh' ? `已选 ${selectedArticleIds.length}/3 篇` : `${selectedArticleIds.length}/3 selected`}
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { AdBanner } from '@/lib/adsense'
-import { getAllArticles } from '@/lib/content'
+import { getLevels, getAllArticles } from '@/lib/content'
 import ListenSpeakPageClient from '@/components/ListenSpeakPageClient'
 
 export const metadata: Metadata = {
@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default function PracticePage() {
+  const levels = getLevels()
   const articles = getAllArticles()
-  return <><ListenSpeakPageClient articles={articles} /><AdBanner /></>
+  return <><ListenSpeakPageClient levels={levels} articles={articles} /><AdBanner /></>
 }
