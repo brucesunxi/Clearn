@@ -1,0 +1,53 @@
+{
+  "id": "l3-extra-12",
+  "title": "中级文章 12",
+  "titleEn": "Intermediate Article 12",
+  "emoji": "🎓",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "这是第12篇中级文章。这篇文章会介绍一些有趣的知识。",
+      "translation": "This is intermediate article number 12. This article will introduce some interesting knowledge."
+    },
+    {
+      "text": "阅读的时候，注意新词语的用法。可以试着用这些词语造句。",
+      "translation": "When reading, pay attention to how new words are used. Try to make sentences with these words."
+    },
+    {
+      "text": "读完之后，用自己的话总结文章的主要内容。这样可以帮助你更好地理解。",
+      "translation": "After reading, summarize the main content in your own words. This helps you understand better."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "介绍",
+      "pinyin": "jiè shào",
+      "meaning": "to introduce"
+    },
+    {
+      "word": "注意",
+      "pinyin": "zhù yì",
+      "meaning": "to pay attention"
+    },
+    {
+      "word": "用法",
+      "pinyin": "yòng fǎ",
+      "meaning": "usage"
+    },
+    {
+      "word": "造句",
+      "pinyin": "zào jù",
+      "meaning": "to make a sentence"
+    },
+    {
+      "word": "总结",
+      "pinyin": "zǒng jié",
+      "meaning": "to summarize"
+    },
+    {
+      "word": "内容",
+      "pinyin": "nèi róng",
+      "meaning": "content"
+    }
+  ]
+}

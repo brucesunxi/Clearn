@@ -1,0 +1,53 @@
+{
+  "id": "l2-extra-14",
+  "title": "初级文章 14",
+  "titleEn": "Elementary Article 14",
+  "emoji": "🎠",
+  "level": 2,
+  "paragraphs": [
+    {
+      "text": "这是第14篇初级文章。今天我们来读一篇有意思的故事。",
+      "translation": "This is elementary article number 14. Today let's read an interesting story."
+    },
+    {
+      "text": "读完之后，想一想故事讲了什么。你能回答老师的问题吗？",
+      "translation": "After reading, think about what the story was about. Can you answer the teacher's questions?"
+    },
+    {
+      "text": "每天坚持阅读，你的中文会越来越好！",
+      "translation": "Keep reading every day, and your Chinese will get better and better!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "有意思",
+      "pinyin": "yǒu yì si",
+      "meaning": "interesting"
+    },
+    {
+      "word": "故事",
+      "pinyin": "gù shì",
+      "meaning": "story"
+    },
+    {
+      "word": "之后",
+      "pinyin": "zhī hòu",
+      "meaning": "after"
+    },
+    {
+      "word": "回答",
+      "pinyin": "huí dá",
+      "meaning": "to answer"
+    },
+    {
+      "word": "问题",
+      "pinyin": "wèn tí",
+      "meaning": "question"
+    },
+    {
+      "word": "坚持",
+      "pinyin": "jiān chí",
+      "meaning": "to persist"
+    }
+  ]
+}

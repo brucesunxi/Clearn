@@ -1,0 +1,39 @@
+{
+  "id": "l1-extra-16",
+  "title": "启蒙课 16",
+  "titleEn": "Beginner Lesson 16",
+  "emoji": "🚲",
+  "level": 1,
+  "paragraphs": [
+    {
+      "text": "这是启蒙课16。我们一起来学习新的词语。",
+      "translation": "This is Beginner Lesson 16. Let's learn new words together."
+    },
+    {
+      "text": "多听多读，你的中文会越来越好。加油！",
+      "translation": "Listen and read more, your Chinese will keep improving. Keep it up!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "学习",
+      "pinyin": "xué xí",
+      "meaning": "to learn"
+    },
+    {
+      "word": "词语",
+      "pinyin": "cí yǔ",
+      "meaning": "words"
+    },
+    {
+      "word": "听",
+      "pinyin": "tīng",
+      "meaning": "to listen"
+    },
+    {
+      "word": "越来越",
+      "pinyin": "yuè lái yuè",
+      "meaning": "more and more"
+    }
+  ]
+}
