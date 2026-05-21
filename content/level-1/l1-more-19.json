@@ -1,0 +1,58 @@
+{
+  "id": "l1-more-19",
+  "title": "大和小",
+  "titleEn": "Big and Small Animals",
+  "emoji": "🦒",
+  "paragraphs": [
+    {
+      "text": "长颈鹿有长长的脖子，是高的动物。小猪胖胖的，是矮的动物。",
+      "translation": "The giraffe has a long neck, it's a tall animal. The pig is chubby, it's a short animal."
+    },
+    {
+      "text": "大鲨鱼在海里游，小海星在沙滩上爬。大自然真奇妙！",
+      "translation": "Big sharks swim in the sea, little starfish crawl on the beach. Nature is so amazing!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "长颈鹿",
+      "pinyin": "cháng jǐng lù",
+      "meaning": "giraffe"
+    },
+    {
+      "word": "脖子",
+      "pinyin": "bó zi",
+      "meaning": "neck"
+    },
+    {
+      "word": "高",
+      "pinyin": "gāo",
+      "meaning": "tall"
+    },
+    {
+      "word": "矮",
+      "pinyin": "ǎi",
+      "meaning": "short"
+    },
+    {
+      "word": "鲨鱼",
+      "pinyin": "shā yú",
+      "meaning": "shark"
+    },
+    {
+      "word": "海星",
+      "pinyin": "hǎi xīng",
+      "meaning": "starfish"
+    },
+    {
+      "word": "大自然",
+      "pinyin": "dà zì rán",
+      "meaning": "nature"
+    },
+    {
+      "word": "奇妙",
+      "pinyin": "qí miào",
+      "meaning": "wonderful, amazing"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "l1-more-17",
+  "title": "小猫咪",
+  "titleEn": "Little Kitten",
+  "emoji": "🐱",
+  "paragraphs": [
+    {
+      "text": "我家有一只小猫咪。它全身白白的，只有耳朵是黑色的。",
+      "translation": "My family has a little kitten. Its whole body is white, only its ears are black."
+    },
+    {
+      "text": "小猫咪喜欢玩毛线球。它追着球跑来跑去，真可爱。",
+      "translation": "The kitten likes to play with yarn balls. It chases the ball around, so cute."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "猫咪",
+      "pinyin": "māo mī",
+      "meaning": "kitten"
+    },
+    {
+      "word": "耳朵",
+      "pinyin": "ěr duo",
+      "meaning": "ear"
+    },
+    {
+      "word": "黑色",
+      "pinyin": "hēi sè",
+      "meaning": "black"
+    },
+    {
+      "word": "玩",
+      "pinyin": "wán",
+      "meaning": "to play"
+    },
+    {
+      "word": "毛线",
+      "pinyin": "máo xiàn",
+      "meaning": "yarn"
+    },
+    {
+      "word": "追",
+      "pinyin": "zhuī",
+      "meaning": "to chase"
+    }
+  ]
+}

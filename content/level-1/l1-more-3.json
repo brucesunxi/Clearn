@@ -1,0 +1,48 @@
+{
+  "id": "l1-more-3",
+  "title": "我的妈妈",
+  "titleEn": "My Mom",
+  "emoji": "👩",
+  "paragraphs": [
+    {
+      "text": "我的妈妈很温柔。她有一头长长的头发，笑起来很好看。",
+      "translation": "My mom is very gentle. She has long hair, and her smile is very beautiful."
+    },
+    {
+      "text": "妈妈每天给我做好吃的。我爱妈妈。",
+      "translation": "Mom cooks delicious food for me every day. I love Mom."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "妈妈",
+      "pinyin": "mā ma",
+      "meaning": "mom"
+    },
+    {
+      "word": "温柔",
+      "pinyin": "wēn róu",
+      "meaning": "gentle"
+    },
+    {
+      "word": "头发",
+      "pinyin": "tóu fa",
+      "meaning": "hair"
+    },
+    {
+      "word": "笑",
+      "pinyin": "xiào",
+      "meaning": "to smile"
+    },
+    {
+      "word": "好吃",
+      "pinyin": "hǎo chī",
+      "meaning": "delicious"
+    },
+    {
+      "word": "爱",
+      "pinyin": "ài",
+      "meaning": "to love"
+    }
+  ]
+}

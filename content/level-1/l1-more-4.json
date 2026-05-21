@@ -1,0 +1,62 @@
+{
+  "id": "l1-more-4",
+  "title": "快快和慢慢",
+  "titleEn": "Fast and Slow",
+  "emoji": "🐢",
+  "paragraphs": [
+    {
+      "text": "兔子跑得快，乌龟爬得慢。谁先到终点呢？",
+      "translation": "The rabbit runs fast, the turtle crawls slowly. Who reaches the finish line first?"
+    },
+    {
+      "text": "兔子跑啊跑，看到大树就睡觉了。乌龟慢慢爬，一直不休息。",
+      "translation": "The rabbit runs and runs, sees a big tree and falls asleep. The turtle crawls slowly, never resting."
+    },
+    {
+      "text": "乌龟先到了终点。慢不怕，坚持最重要。",
+      "translation": "The turtle reaches the finish line first. Slow isn't scary, persistence matters most."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "快",
+      "pinyin": "kuài",
+      "meaning": "fast"
+    },
+    {
+      "word": "慢",
+      "pinyin": "màn",
+      "meaning": "slow"
+    },
+    {
+      "word": "兔子",
+      "pinyin": "tù zi",
+      "meaning": "rabbit"
+    },
+    {
+      "word": "乌龟",
+      "pinyin": "wū guī",
+      "meaning": "turtle"
+    },
+    {
+      "word": "爬",
+      "pinyin": "pá",
+      "meaning": "to crawl"
+    },
+    {
+      "word": "跑",
+      "pinyin": "pǎo",
+      "meaning": "to run"
+    },
+    {
+      "word": "睡觉",
+      "pinyin": "shuì jiào",
+      "meaning": "to sleep"
+    },
+    {
+      "word": "终点",
+      "pinyin": "zhōng diǎn",
+      "meaning": "finish line"
+    }
+  ]
+}

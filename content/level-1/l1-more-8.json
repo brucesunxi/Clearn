@@ -1,0 +1,48 @@
+{
+  "id": "l1-more-8",
+  "title": "我的玩具熊",
+  "titleEn": "My Teddy Bear",
+  "emoji": "🧸",
+  "paragraphs": [
+    {
+      "text": "我有一个玩具熊。它是棕色的，毛茸茸的。",
+      "translation": "I have a teddy bear. It's brown and fluffy."
+    },
+    {
+      "text": "每天晚上我都抱着它睡觉。它是我的好朋友。",
+      "translation": "Every night I hug it and go to sleep. It's my good friend."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "玩具熊",
+      "pinyin": "wán jù xióng",
+      "meaning": "teddy bear"
+    },
+    {
+      "word": "棕色",
+      "pinyin": "zōng sè",
+      "meaning": "brown"
+    },
+    {
+      "word": "抱着",
+      "pinyin": "bào zhe",
+      "meaning": "to hug"
+    },
+    {
+      "word": "晚上",
+      "pinyin": "wǎn shang",
+      "meaning": "evening, night"
+    },
+    {
+      "word": "好",
+      "pinyin": "hǎo",
+      "meaning": "good"
+    },
+    {
+      "word": "朋友",
+      "pinyin": "péng yǒu",
+      "meaning": "friend"
+    }
+  ]
+}

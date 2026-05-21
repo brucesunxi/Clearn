@@ -1,0 +1,53 @@
+{
+  "id": "l1-more-6",
+  "title": "一个是我的",
+  "titleEn": "This One is Mine",
+  "emoji": "✋",
+  "paragraphs": [
+    {
+      "text": "这是我的书包。那是你的铅笔。不要拿错哦！",
+      "translation": "This is my schoolbag. That is your pencil. Don't take the wrong one!"
+    },
+    {
+      "text": "我的书是红色的。你的书是蓝色的。我们交换看看吧。",
+      "translation": "My book is red. Your book is blue. Let's trade and take a look."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "这个",
+      "pinyin": "zhè ge",
+      "meaning": "this"
+    },
+    {
+      "word": "那个",
+      "pinyin": "nà ge",
+      "meaning": "that"
+    },
+    {
+      "word": "我的",
+      "pinyin": "wǒ de",
+      "meaning": "my, mine"
+    },
+    {
+      "word": "你的",
+      "pinyin": "nǐ de",
+      "meaning": "your, yours"
+    },
+    {
+      "word": "书包",
+      "pinyin": "shū bāo",
+      "meaning": "schoolbag"
+    },
+    {
+      "word": "铅笔",
+      "pinyin": "qiān bǐ",
+      "meaning": "pencil"
+    },
+    {
+      "word": "交换",
+      "pinyin": "jiāo huàn",
+      "meaning": "to exchange"
+    }
+  ]
+}

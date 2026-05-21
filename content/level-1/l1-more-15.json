@@ -1,0 +1,57 @@
+{
+  "id": "l1-more-15",
+  "title": "气球飞走了",
+  "titleEn": "The Balloon Flew Away",
+  "emoji": "🎈",
+  "paragraphs": [
+    {
+      "text": "我有一个红气球。我拿着绳子，气球飘啊飘。",
+      "translation": "I have a red balloon. I hold the string, the balloon floats and floats."
+    },
+    {
+      "text": "哎呀，手一松，气球飞走了。气球越飞越高，飞到蓝天里去了。",
+      "translation": "Oops, I let go and the balloon flew away. Higher and higher, into the blue sky."
+    },
+    {
+      "text": "再见，我的小气球！希望你去到好玩的地方。",
+      "translation": "Goodbye, my little balloon! Hope you go to a fun place."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "气球",
+      "pinyin": "qì qiú",
+      "meaning": "balloon"
+    },
+    {
+      "word": "绳子",
+      "pinyin": "shéng zi",
+      "meaning": "string"
+    },
+    {
+      "word": "飘",
+      "pinyin": "piāo",
+      "meaning": "to float"
+    },
+    {
+      "word": "哎呀",
+      "pinyin": "āi yā",
+      "meaning": "oops"
+    },
+    {
+      "word": "松",
+      "pinyin": "sōng",
+      "meaning": "to loosen, let go"
+    },
+    {
+      "word": "飞走",
+      "pinyin": "fēi zǒu",
+      "meaning": "fly away"
+    },
+    {
+      "word": "再见",
+      "pinyin": "zài jiàn",
+      "meaning": "goodbye"
+    }
+  ]
+}

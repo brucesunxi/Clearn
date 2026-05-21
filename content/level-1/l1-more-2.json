@@ -1,0 +1,48 @@
+{
+  "id": "l1-more-2",
+  "title": "大大的和小小的",
+  "titleEn": "Big and Small",
+  "emoji": "🐘",
+  "paragraphs": [
+    {
+      "text": "大象很大，老鼠很小。西瓜很大，葡萄很小。",
+      "translation": "Elephants are very big, mice are very small. Watermelons are big, grapes are small."
+    },
+    {
+      "text": "什么是大的？什么是小的？你能说一说吗？",
+      "translation": "What is big? What is small? Can you tell me?"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "大",
+      "pinyin": "dà",
+      "meaning": "big"
+    },
+    {
+      "word": "小",
+      "pinyin": "xiǎo",
+      "meaning": "small"
+    },
+    {
+      "word": "大象",
+      "pinyin": "dà xiàng",
+      "meaning": "elephant"
+    },
+    {
+      "word": "老鼠",
+      "pinyin": "lǎo shǔ",
+      "meaning": "mouse"
+    },
+    {
+      "word": "什么",
+      "pinyin": "shén me",
+      "meaning": "what"
+    },
+    {
+      "word": "说",
+      "pinyin": "shuō",
+      "meaning": "to say"
+    }
+  ]
+}

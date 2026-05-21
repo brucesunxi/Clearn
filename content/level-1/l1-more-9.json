@@ -1,0 +1,48 @@
+{
+  "id": "l1-more-9",
+  "title": "小雨滴",
+  "titleEn": "Little Raindrops",
+  "emoji": "🌧️",
+  "paragraphs": [
+    {
+      "text": "下雨了，小雨滴滴哒哒。雨滴落在叶子上，落在水洼里。",
+      "translation": "It's raining, little raindrops go drip drop. Raindrops fall on leaves, fall in puddles."
+    },
+    {
+      "text": "雨停了，天上出现了彩虹。好美的彩虹啊！",
+      "translation": "The rain stops, a rainbow appears in the sky. What a beautiful rainbow!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "雨",
+      "pinyin": "yǔ",
+      "meaning": "rain"
+    },
+    {
+      "word": "滴答",
+      "pinyin": "dī dā",
+      "meaning": "drip drop"
+    },
+    {
+      "word": "落",
+      "pinyin": "luò",
+      "meaning": "to fall"
+    },
+    {
+      "word": "叶子",
+      "pinyin": "yè zi",
+      "meaning": "leaf"
+    },
+    {
+      "word": "停",
+      "pinyin": "tíng",
+      "meaning": "to stop"
+    },
+    {
+      "word": "彩虹",
+      "pinyin": "cǎi hóng",
+      "meaning": "rainbow"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "l1-more-16",
+  "title": "小蝌蚪找妈妈",
+  "titleEn": "Little Tadpole Looks for Mom",
+  "emoji": "🐸",
+  "paragraphs": [
+    {
+      "text": "小蝌蚪在水里游来游去，它在找妈妈。",
+      "translation": "Little tadpole swims around in the water, looking for its mom."
+    },
+    {
+      "text": "它看到金鱼，叫妈妈。金鱼说：我不是你的妈妈。",
+      "translation": "It sees a goldfish and calls it mom. The goldfish says: I'm not your mom."
+    },
+    {
+      "text": "它看到乌龟，叫妈妈。乌龟说：你的妈妈有四条腿，绿衣裳。最后小蝌蚪找到了妈妈。",
+      "translation": "It sees a turtle and calls it mom. The turtle says: Your mom has four legs and green clothes. Finally the tadpole finds its mom."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "蝌蚪",
+      "pinyin": "kē dǒu",
+      "meaning": "tadpole"
+    },
+    {
+      "word": "游",
+      "pinyin": "yóu",
+      "meaning": "to swim"
+    },
+    {
+      "word": "金鱼",
+      "pinyin": "jīn yú",
+      "meaning": "goldfish"
+    },
+    {
+      "word": "最后",
+      "pinyin": "zuì hòu",
+      "meaning": "finally, at last"
+    },
+    {
+      "word": "腿",
+      "pinyin": "tuǐ",
+      "meaning": "leg"
+    },
+    {
+      "word": "绿",
+      "pinyin": "lǜ",
+      "meaning": "green"
+    },
+    {
+      "word": "找到",
+      "pinyin": "zhǎo dào",
+      "meaning": "to find"
+    }
+  ]
+}

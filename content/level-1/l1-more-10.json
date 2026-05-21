@@ -1,0 +1,53 @@
+{
+  "id": "l1-more-10",
+  "title": "数星星",
+  "titleEn": "Counting Stars",
+  "emoji": "⭐",
+  "paragraphs": [
+    {
+      "text": "晚上，天上有很多星星。一颗星，两颗星，三颗星……数也数不完。",
+      "translation": "At night, there are many stars in the sky. One star, two stars, three stars... too many to count."
+    },
+    {
+      "text": "月亮弯弯的，像一条小船。星星一闪一闪的，好像在对我眨眼睛。",
+      "translation": "The moon is curved like a little boat. Stars twinkle, as if winking at me."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "星星",
+      "pinyin": "xīng xīng",
+      "meaning": "star"
+    },
+    {
+      "word": "颗",
+      "pinyin": "kē",
+      "meaning": "(measure word for small round objects)"
+    },
+    {
+      "word": "数",
+      "pinyin": "shǔ",
+      "meaning": "to count"
+    },
+    {
+      "word": "月亮",
+      "pinyin": "yuè liàng",
+      "meaning": "moon"
+    },
+    {
+      "word": "弯",
+      "pinyin": "wān",
+      "meaning": "curved"
+    },
+    {
+      "word": "船",
+      "pinyin": "chuán",
+      "meaning": "boat"
+    },
+    {
+      "word": "闪",
+      "pinyin": "shǎn",
+      "meaning": "to twinkle"
+    }
+  ]
+}

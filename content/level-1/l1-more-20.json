@@ -1,0 +1,62 @@
+{
+  "id": "l1-more-20",
+  "title": "小种子长大了",
+  "titleEn": "Little Seed Grows Up",
+  "emoji": "🌱",
+  "paragraphs": [
+    {
+      "text": "我种了一颗小种子。每天给它浇水、晒太阳。",
+      "translation": "I planted a little seed. Every day I water it and give it sunshine."
+    },
+    {
+      "text": "过了几天，小种子发芽了，长出两片小叶子。",
+      "translation": "After a few days, the seed sprouted and grew two small leaves."
+    },
+    {
+      "text": "小苗越长越高，开出了一朵美丽的花！种花真开心。",
+      "translation": "The seedling grows taller and taller, and blooms into a beautiful flower! Growing flowers is so joyful."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "种子",
+      "pinyin": "zhǒng zi",
+      "meaning": "seed"
+    },
+    {
+      "word": "种",
+      "pinyin": "zhòng",
+      "meaning": "to plant"
+    },
+    {
+      "word": "浇水",
+      "pinyin": "jiāo shuǐ",
+      "meaning": "to water"
+    },
+    {
+      "word": "晒太阳",
+      "pinyin": "shài tài yáng",
+      "meaning": "to bask in the sun"
+    },
+    {
+      "word": "发芽",
+      "pinyin": "fā yá",
+      "meaning": "to sprout"
+    },
+    {
+      "word": "片",
+      "pinyin": "piàn",
+      "meaning": "(measure word for leaves, slices)"
+    },
+    {
+      "word": "苗",
+      "pinyin": "miáo",
+      "meaning": "seedling"
+    },
+    {
+      "word": "开花",
+      "pinyin": "kāi huā",
+      "meaning": "to bloom"
+    }
+  ]
+}

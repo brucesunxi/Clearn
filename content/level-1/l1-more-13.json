@@ -1,0 +1,48 @@
+{
+  "id": "l1-more-13",
+  "title": "小兔子乖乖",
+  "titleEn": "Good Little Rabbit",
+  "emoji": "🐰",
+  "paragraphs": [
+    {
+      "text": "小兔子乖乖，把门开开。妈妈回来了，快点开门！",
+      "translation": "Good little rabbit, open the door. Mom is back, open up quickly!"
+    },
+    {
+      "text": "不开不开，我不开。妈妈没回来，谁来都不开。",
+      "translation": "Won't open, won't open, I won't open. Mom hasn't come back, no matter who comes I won't open."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "乖乖",
+      "pinyin": "guāi guāi",
+      "meaning": "well-behaved, good"
+    },
+    {
+      "word": "门",
+      "pinyin": "mén",
+      "meaning": "door"
+    },
+    {
+      "word": "开",
+      "pinyin": "kāi",
+      "meaning": "to open"
+    },
+    {
+      "word": "回来",
+      "pinyin": "huí lái",
+      "meaning": "to come back"
+    },
+    {
+      "word": "快点",
+      "pinyin": "kuài diǎn",
+      "meaning": "quickly"
+    },
+    {
+      "word": "谁",
+      "pinyin": "shuí",
+      "meaning": "who"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "l1-more-18",
+  "title": "过马路",
+  "titleEn": "Crossing the Road",
+  "emoji": "🚦",
+  "paragraphs": [
+    {
+      "text": "红灯停，绿灯行。过马路要走斑马线。",
+      "translation": "Red light stop, green light go. To cross the road, use the crosswalk."
+    },
+    {
+      "text": "先看左，再看右。没有车了才安全过马路。小朋友要注意安全哦！",
+      "translation": "Look left first, then look right. Cross safely only when there are no cars. Kids must be careful!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "红灯",
+      "pinyin": "hóng dēng",
+      "meaning": "red light"
+    },
+    {
+      "word": "绿灯",
+      "pinyin": "lǜ dēng",
+      "meaning": "green light"
+    },
+    {
+      "word": "停",
+      "pinyin": "tíng",
+      "meaning": "to stop"
+    },
+    {
+      "word": "行",
+      "pinyin": "xíng",
+      "meaning": "to go"
+    },
+    {
+      "word": "马路",
+      "pinyin": "mǎ lù",
+      "meaning": "road, street"
+    },
+    {
+      "word": "斑马线",
+      "pinyin": "bān mǎ xiàn",
+      "meaning": "crosswalk"
+    },
+    {
+      "word": "安全",
+      "pinyin": "ān quán",
+      "meaning": "safe"
+    }
+  ]
+}

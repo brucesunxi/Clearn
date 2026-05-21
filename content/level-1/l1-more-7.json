@@ -1,0 +1,53 @@
+{
+  "id": "l1-more-7",
+  "title": "去海边",
+  "titleEn": "Going to the Beach",
+  "emoji": "🏖️",
+  "paragraphs": [
+    {
+      "text": "夏天去海边玩真开心。沙滩软软的，海水凉凉的。",
+      "translation": "Going to the beach in summer is so fun. The sand is soft, the sea water is cool."
+    },
+    {
+      "text": "我在沙滩上捡贝壳。有白色的、有粉色的，真漂亮。",
+      "translation": "I pick up shells on the beach. There are white ones and pink ones, so pretty."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "海边",
+      "pinyin": "hǎi biān",
+      "meaning": "beach, seaside"
+    },
+    {
+      "word": "沙滩",
+      "pinyin": "shā tān",
+      "meaning": "sand beach"
+    },
+    {
+      "word": "海水",
+      "pinyin": "hǎi shuǐ",
+      "meaning": "sea water"
+    },
+    {
+      "word": "凉",
+      "pinyin": "liáng",
+      "meaning": "cool"
+    },
+    {
+      "word": "捡",
+      "pinyin": "jiǎn",
+      "meaning": "to pick up"
+    },
+    {
+      "word": "贝壳",
+      "pinyin": "bèi ké",
+      "meaning": "shell"
+    },
+    {
+      "word": "漂亮",
+      "pinyin": "piào liang",
+      "meaning": "pretty"
+    }
+  ]
+}

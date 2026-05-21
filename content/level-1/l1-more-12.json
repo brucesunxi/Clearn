@@ -1,0 +1,58 @@
+{
+  "id": "l1-more-12",
+  "title": "刷牙歌",
+  "titleEn": "Brushing Teeth Song",
+  "emoji": "🪥",
+  "paragraphs": [
+    {
+      "text": "早上要刷牙，晚上也要刷牙。上刷刷，下刷刷，左刷刷，右刷刷。",
+      "translation": "Brush teeth in the morning, brush teeth at night. Brush up, brush down, brush left, brush right."
+    },
+    {
+      "text": "刷完牙齿白白的，嘴巴香香的。没有蛀牙，身体棒棒的！",
+      "translation": "After brushing, teeth are white and mouth is fresh. No cavities, healthy body!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "刷牙",
+      "pinyin": "shuā yá",
+      "meaning": "brush teeth"
+    },
+    {
+      "word": "上",
+      "pinyin": "shàng",
+      "meaning": "up"
+    },
+    {
+      "word": "下",
+      "pinyin": "xià",
+      "meaning": "down"
+    },
+    {
+      "word": "左",
+      "pinyin": "zuǒ",
+      "meaning": "left"
+    },
+    {
+      "word": "右",
+      "pinyin": "yòu",
+      "meaning": "right"
+    },
+    {
+      "word": "牙齿",
+      "pinyin": "yá chǐ",
+      "meaning": "teeth"
+    },
+    {
+      "word": "蛀牙",
+      "pinyin": "zhù yá",
+      "meaning": "cavity"
+    },
+    {
+      "word": "身体",
+      "pinyin": "shēn tǐ",
+      "meaning": "body"
+    }
+  ]
+}

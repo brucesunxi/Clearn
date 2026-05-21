@@ -1,0 +1,53 @@
+{
+  "id": "l1-more-5",
+  "title": "小鸟飞飞",
+  "titleEn": "Little Bird Flies",
+  "emoji": "🐦",
+  "paragraphs": [
+    {
+      "text": "小鸟在天空飞。它飞到东，飞到西。",
+      "translation": "The little bird flies in the sky. It flies east, it flies west."
+    },
+    {
+      "text": "小鸟飞到树上唱歌。它的歌声真好听。",
+      "translation": "The little bird flies to the tree and sings. Its song is so beautiful."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "小鸟",
+      "pinyin": "xiǎo niǎo",
+      "meaning": "little bird"
+    },
+    {
+      "word": "飞",
+      "pinyin": "fēi",
+      "meaning": "to fly"
+    },
+    {
+      "word": "东",
+      "pinyin": "dōng",
+      "meaning": "east"
+    },
+    {
+      "word": "西",
+      "pinyin": "xī",
+      "meaning": "west"
+    },
+    {
+      "word": "树",
+      "pinyin": "shù",
+      "meaning": "tree"
+    },
+    {
+      "word": "唱歌",
+      "pinyin": "chàng gē",
+      "meaning": "to sing"
+    },
+    {
+      "word": "好听",
+      "pinyin": "hǎo tīng",
+      "meaning": "pleasant to hear"
+    }
+  ]
+}

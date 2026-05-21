@@ -1,0 +1,48 @@
+{
+  "id": "l1-more-1",
+  "title": "早上好",
+  "titleEn": "Good Morning",
+  "emoji": "🌅",
+  "paragraphs": [
+    {
+      "text": "早上好！太阳升起来了。新的一天开始了。",
+      "translation": "Good morning! The sun has risen. A new day begins."
+    },
+    {
+      "text": "我起床穿衣服，然后吃早餐。今天是很棒的一天。",
+      "translation": "I get up and get dressed, then eat breakfast. Today is a great day."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "早上",
+      "pinyin": "zǎo shang",
+      "meaning": "morning"
+    },
+    {
+      "word": "太阳",
+      "pinyin": "tài yáng",
+      "meaning": "sun"
+    },
+    {
+      "word": "升起来",
+      "pinyin": "shēng qǐ lái",
+      "meaning": "to rise up"
+    },
+    {
+      "word": "新",
+      "pinyin": "xīn",
+      "meaning": "new"
+    },
+    {
+      "word": "一天",
+      "pinyin": "yī tiān",
+      "meaning": "one day"
+    },
+    {
+      "word": "穿衣服",
+      "pinyin": "chuān yī fu",
+      "meaning": "get dressed"
+    }
+  ]
+}

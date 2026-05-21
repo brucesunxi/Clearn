@@ -1,0 +1,53 @@
+{
+  "id": "l1-more-11",
+  "title": "小画家",
+  "titleEn": "Little Artist",
+  "emoji": "🎨",
+  "paragraphs": [
+    {
+      "text": "我有一盒彩笔。我用红色画太阳，用蓝色画天空。",
+      "translation": "I have a box of colored pens. I draw the sun with red, draw the sky with blue."
+    },
+    {
+      "text": "我用绿色画大树，用黄色画小花。画画真有趣！",
+      "translation": "I draw a big tree with green, draw little flowers with yellow. Drawing is so fun!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "彩笔",
+      "pinyin": "cǎi bǐ",
+      "meaning": "colored pen"
+    },
+    {
+      "word": "画",
+      "pinyin": "huà",
+      "meaning": "to draw"
+    },
+    {
+      "word": "用",
+      "pinyin": "yòng",
+      "meaning": "to use"
+    },
+    {
+      "word": "红色",
+      "pinyin": "hóng sè",
+      "meaning": "red"
+    },
+    {
+      "word": "蓝色",
+      "pinyin": "lán sè",
+      "meaning": "blue"
+    },
+    {
+      "word": "绿色",
+      "pinyin": "lǜ sè",
+      "meaning": "green"
+    },
+    {
+      "word": "黄色",
+      "pinyin": "huáng sè",
+      "meaning": "yellow"
+    }
+  ]
+}
