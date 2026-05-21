@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-3",
+  "title": "全球气候变化",
+  "titleEn": "Global Climate Change",
+  "emoji": "🌍",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "全球变暖导致冰川融化海平面上升和极端天气频发。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "造成气候变暖的主要原因是温室气体的排放。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "各国正在努力减少碳排放，中国承诺在2060年前实现碳中和。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "气候",
+      "pinyin": "qi4 hou4",
+      "meaning": "climate"
+    },
+    {
+      "word": "全球变暖",
+      "pinyin": "quan2 qiu2 bian4 nuan3",
+      "meaning": "global warming"
+    },
+    {
+      "word": "冰川",
+      "pinyin": "bing1 chuan1",
+      "meaning": "glacier"
+    },
+    {
+      "word": "温室气体",
+      "pinyin": "wen1 shi4 qi4 ti3",
+      "meaning": "greenhouse gas"
+    },
+    {
+      "word": "碳达峰",
+      "pinyin": "tan4 da2 feng1",
+      "meaning": "peak carbon"
+    },
+    {
+      "word": "碳中和",
+      "pinyin": "tan4 zhong1 he2",
+      "meaning": "carbon neutrality"
+    }
+  ]
+}

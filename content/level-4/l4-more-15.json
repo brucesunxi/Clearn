@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-15",
+  "title": "5G通信技术",
+  "titleEn": "5G Communication Technology",
+  "emoji": "📡",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "5G是第五代移动通信技术，速度比4G快很多倍。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "5G的低延迟特性使其非常适合自动驾驶远程医疗等应用。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "中国在5G技术领域处于全球领先地位。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "通信",
+      "pinyin": "tong1 xin4",
+      "meaning": "communication"
+    },
+    {
+      "word": "网络",
+      "pinyin": "wang3 luo4",
+      "meaning": "network"
+    },
+    {
+      "word": "速度",
+      "pinyin": "su4 du4",
+      "meaning": "speed"
+    },
+    {
+      "word": "延迟",
+      "pinyin": "yan2 chi2",
+      "meaning": "latency"
+    },
+    {
+      "word": "应用",
+      "pinyin": "ying4 yong4",
+      "meaning": "application"
+    },
+    {
+      "word": "领先",
+      "pinyin": "ling3 xian1",
+      "meaning": "leading"
+    }
+  ]
+}

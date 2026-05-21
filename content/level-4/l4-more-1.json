@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-1",
+  "title": "量子物理入门",
+  "titleEn": "Introduction to Quantum Physics",
+  "emoji": "⚛️",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "量子物理是研究微观世界的科学，它揭示了原子和亚原子粒子的奇特行为。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "在量子世界中，粒子可以同时处于多个状态，这被称为叠加态。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "量子物理虽然很难理解，但它已经应用在我们日常生活的许多技术中。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "量子",
+      "pinyin": "liang4 zi3",
+      "meaning": "quantum"
+    },
+    {
+      "word": "物理",
+      "pinyin": "wu4 li3",
+      "meaning": "physics"
+    },
+    {
+      "word": "微观",
+      "pinyin": "wei1 guan1",
+      "meaning": "microscopic"
+    },
+    {
+      "word": "原子",
+      "pinyin": "yuan2 zi3",
+      "meaning": "atom"
+    },
+    {
+      "word": "粒子",
+      "pinyin": "li4 zi3",
+      "meaning": "particle"
+    },
+    {
+      "word": "叠加",
+      "pinyin": "die2 jia1",
+      "meaning": "superposition"
+    }
+  ]
+}

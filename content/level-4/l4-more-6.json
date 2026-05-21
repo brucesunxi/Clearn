@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-6",
+  "title": "数字货币与区块链",
+  "titleEn": "Digital Currency and Blockchain",
+  "emoji": "💰",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "比特币是第一种成功的加密货币，它基于区块链技术。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "区块链是一种去中心化的分布式账本技术，具有安全透明的特点。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "数字货币正在改变我们的支付方式，各国央行也在研究自己的数字货币。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "数字货币",
+      "pinyin": "shu4 zi4 huo4 bi4",
+      "meaning": "digital currency"
+    },
+    {
+      "word": "区块链",
+      "pinyin": "qu4 kuai4 lian4",
+      "meaning": "blockchain"
+    },
+    {
+      "word": "比特币",
+      "pinyin": "bi3 te4 bi4",
+      "meaning": "Bitcoin"
+    },
+    {
+      "word": "加密",
+      "pinyin": "jia1 mi4",
+      "meaning": "encryption"
+    },
+    {
+      "word": "账本",
+      "pinyin": "zhang4 ben3",
+      "meaning": "ledger"
+    },
+    {
+      "word": "支付",
+      "pinyin": "zhi1 fu4",
+      "meaning": "payment"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-5",
+  "title": "基因编辑技术",
+  "titleEn": "Gene Editing Technology",
+  "emoji": "🧬",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "基因编辑技术让科学家能够精确修改生物体的DNA。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "CRISPR是最新的基因编辑工具，它像一把分子剪刀。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "基因技术在医疗农业等领域有广阔前景，但也需要谨慎使用。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "基因",
+      "pinyin": "ji1 yin1",
+      "meaning": "gene"
+    },
+    {
+      "word": "编辑",
+      "pinyin": "bian1 ji2",
+      "meaning": "editing"
+    },
+    {
+      "word": "DNA",
+      "pinyin": "DNA",
+      "meaning": "DNA"
+    },
+    {
+      "word": "CRISPR",
+      "pinyin": "CRISPR",
+      "meaning": "CRISPR"
+    },
+    {
+      "word": "分子",
+      "pinyin": "fen1 zi3",
+      "meaning": "molecule"
+    },
+    {
+      "word": "医疗",
+      "pinyin": "yi1 liao2",
+      "meaning": "medical"
+    }
+  ]
+}

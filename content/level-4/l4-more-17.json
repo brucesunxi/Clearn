@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-17",
+  "title": "电动汽车",
+  "titleEn": "Electric Vehicles",
+  "emoji": "🚗",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "电动汽车使用电池驱动，不排放尾气，对环境更加友好。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "随着电池技术的发展，电动汽车的续航里程越来越长。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "越来越多的国家和汽车公司正在转向电动化。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "电动",
+      "pinyin": "dian4 dong4",
+      "meaning": "electric"
+    },
+    {
+      "word": "电池",
+      "pinyin": "dian4 chi2",
+      "meaning": "battery"
+    },
+    {
+      "word": "充电",
+      "pinyin": "chong1 dian4",
+      "meaning": "charging"
+    },
+    {
+      "word": "续航",
+      "pinyin": "xu4 hang2",
+      "meaning": "range"
+    },
+    {
+      "word": "排放",
+      "pinyin": "pai2 fang4",
+      "meaning": "emission"
+    },
+    {
+      "word": "环保",
+      "pinyin": "huan2 bao3",
+      "meaning": "environmental protection"
+    }
+  ]
+}

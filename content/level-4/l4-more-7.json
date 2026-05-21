@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-7",
+  "title": "海洋探索",
+  "titleEn": "Ocean Exploration",
+  "emoji": "🌊",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "海洋覆盖了地球表面的百分之七十，但人类只探索了其中的一小部分。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "深海中有许多未知的生物和资源等待我们发现。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "保护海洋生态环境对于地球的健康至关重要。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "海洋",
+      "pinyin": "hai3 yang2",
+      "meaning": "ocean"
+    },
+    {
+      "word": "探索",
+      "pinyin": "tan4 suo3",
+      "meaning": "exploration"
+    },
+    {
+      "word": "覆盖",
+      "pinyin": "fu4 gai4",
+      "meaning": "to cover"
+    },
+    {
+      "word": "深海",
+      "pinyin": "shen1 hai3",
+      "meaning": "deep sea"
+    },
+    {
+      "word": "资源",
+      "pinyin": "zi1 yuan2",
+      "meaning": "resources"
+    },
+    {
+      "word": "生态",
+      "pinyin": "sheng1 tai4",
+      "meaning": "ecology"
+    }
+  ]
+}

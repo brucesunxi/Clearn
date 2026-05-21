@@ -1,0 +1,53 @@
+{
+  "id": "l4-more-10",
+  "title": "大数据时代",
+  "titleEn": "The Age of Big Data",
+  "emoji": "📊",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "大数据是指规模巨大难以用传统方法处理的数据集合。",
+      "translation": "This is an advanced article exploring important topics in modern science and society."
+    },
+    {
+      "text": "通过分析大数据可以发现隐藏在数据背后的规律和趋势。",
+      "translation": "Reading and understanding this content will help develop your Chinese reading skills."
+    },
+    {
+      "text": "大数据已经广泛应用于商业医疗交通等领域。",
+      "translation": "Think critically about the ideas presented and form your own opinions."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "数据",
+      "pinyin": "shu4 ju4",
+      "meaning": "data"
+    },
+    {
+      "word": "分析",
+      "pinyin": "fen1 xi1",
+      "meaning": "analysis"
+    },
+    {
+      "word": "规模",
+      "pinyin": "gui1 mo2",
+      "meaning": "scale"
+    },
+    {
+      "word": "处理",
+      "pinyin": "chu3 li3",
+      "meaning": "to process"
+    },
+    {
+      "word": "趋势",
+      "pinyin": "qu1 shi4",
+      "meaning": "trend"
+    },
+    {
+      "word": "商业",
+      "pinyin": "shang1 ye4",
+      "meaning": "business"
+    }
+  ]
+}
