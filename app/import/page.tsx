@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AdBanner } from '@/lib/adsense'
 import { getLevels, getAllArticles } from '@/lib/content'
 import ImportPageClient from '@/components/ImportPageClient'
 
@@ -14,5 +15,5 @@ export const metadata: Metadata = {
 export default function ImportPage() {
   const levels = getLevels()
   const articles = getAllArticles()
-  return <ImportPageClient levels={levels} articles={articles} />
+  return <><ImportPageClient levels={levels} articles={articles} /><AdBanner /></>
 }

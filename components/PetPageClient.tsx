@@ -25,6 +25,7 @@ export default function PetPageClient() {
   const [inv, setInv] = useState<Inventory>(() => getInventory())
   const [feedMsg, setFeedMsg] = useState('')
   const [shopMsg, setShopMsg] = useState('')
+  const [petHearts, setPetHearts] = useState<{ id: number; x: number }[]>([])
 
   // Periodically recalculate decay for display (without saving, so accumulated decay isn't lost)
   useEffect(() => {
@@ -61,6 +62,26 @@ export default function PetPageClient() {
       .catch(() => {})
   }, [])
 
+  const handlePet = () => {
+    setPet((prev) => {
+      const now = Date.now()
+      const last = new Date(prev.lastUpdated).getTime()
+      const hours = (now - last) / (1000 * 60 * 60)
+      // Cap happiness at 100 after petting
+      const newHappiness = Math.min(100, prev.happiness + 3)
+      const updated = { ...prev, happiness: newHappiness, lastUpdated: prev.lastUpdated }
+      localStorage.setItem('panda-pet', JSON.stringify(updated))
+      return updated
+    })
+    // Show floating heart
+    const id = Date.now()
+    const x = -20 + Math.random() * 40
+    setPetHearts((prev) => [...prev, { id, x }])
+    setTimeout(() => setPetHearts((prev) => prev.filter((h) => h.id !== id)), 1000)
+    setFeedMsg('❤️ +3')
+    setTimeout(() => setFeedMsg(''), 1500)
+  }
+
   const handleFeed = (foodId: string) => {
     const result = feedPet(foodId)
     setPet(result.pet)
@@ -76,7 +97,7 @@ export default function PetPageClient() {
       setInv(getInventory())
       setShopMsg('+1 🎉')
       const item = FOOD_ITEMS.find((f) => f.id === foodId)
-      if (item) syncSpendToApi(item.price, 'shop_purchase')
+      if (item) syncSpendToApi(item.price, 'shop_purchase', foodId)
       trackActivity('shop_purchase', { itemId: foodId, type: 'food' })
     } else {
       setShopMsg('Not enough coins!')
@@ -90,7 +111,7 @@ export default function PetPageClient() {
       setInv(getInventory())
       setShopMsg('Purchased! 🎉')
       const item = ACCESSORY_ITEMS.find((a) => a.id === accId)
-      if (item) syncSpendToApi(item.price, 'shop_purchase')
+      if (item) syncSpendToApi(item.price, 'shop_purchase', accId)
       trackActivity('shop_purchase', { itemId: accId, type: 'accessory', price: item?.price || 0 })
     } else {
       setShopMsg('Not enough coins!')
@@ -141,23 +162,61 @@ export default function PetPageClient() {
         <>
           {/* Panda Display */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-6 text-center relative">
-            <div className="relative inline-block" style={{ width: 128, height: 128 }}>
-              {/* Base panda */}
-              <svg width="128" height="128" viewBox="0 0 64 64" className="absolute inset-0">
-                <circle cx="16" cy="18" r="10" fill="#2D2D2D" />
-                <circle cx="48" cy="18" r="10" fill="#2D2D2D" />
-                <circle cx="32" cy="32" r="24" fill="white" stroke="#2D2D2D" strokeWidth="1.5" />
-                <ellipse cx="21" cy="28" rx="8" ry="7" fill="#2D2D2D" />
-                <ellipse cx="43" cy="28" rx="8" ry="7" fill="#2D2D2D" />
-                <circle cx="21" cy="27" r="3.5" fill="white" />
-                <circle cx="43" cy="27" r="3.5" fill="white" />
-                <circle cx="21" cy="27" r="2" fill="#2D2D2D" />
-                <circle cx="43" cy="27" r="2" fill="#2D2D2D" />
-                <ellipse cx="32" cy="36" rx="3" ry="2" fill="#2D2D2D" />
-                <path d="M29 39 C29 43,35 43,35 39" stroke="#2D2D2D" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            <div className="relative inline-block" style={{ width: 160, height: 160 }}>
+              {/* Floating hearts */}
+              {petHearts.map((h) => (
+                <span
+                  key={h.id}
+                  className="absolute text-xl pointer-events-none animate-ping"
+                  style={{ left: 80 + h.x, top: 40, animation: 'heartFloat 1s ease-out forwards' }}
+                >❤️</span>
+              ))}
+              {/* Cute panda (click to pet) */}
+              <svg
+                width="160" height="160" viewBox="0 0 80 80"
+                className="absolute inset-0 cursor-pointer hover:scale-105 transition-transform"
+                onClick={handlePet}
+              >
+                {/* Ears */}
+                <circle cx="18" cy="20" r="12" fill="#2D2D2D" />
+                <circle cx="18" cy="20" r="6" fill="#4a4a4a" />
+                <circle cx="62" cy="20" r="12" fill="#2D2D2D" />
+                <circle cx="62" cy="20" r="6" fill="#4a4a4a" />
+
+                {/* Head */}
+                <circle cx="40" cy="42" r="28" fill="white" stroke="#2D2D2D" strokeWidth="1.5" />
+
+                {/* Eye patches */}
+                <ellipse cx="27" cy="37" rx="12" ry="10" fill="#2D2D2D" transform="rotate(-10,27,37)" />
+                <ellipse cx="53" cy="37" rx="12" ry="10" fill="#2D2D2D" transform="rotate(10,53,37)" />
+
+                {/* Eyes */}
+                <ellipse cx="27" cy="37" rx="7" ry="8" fill="white" />
+                <ellipse cx="53" cy="37" rx="7" ry="8" fill="white" />
+
+                {/* Pupils */}
+                <ellipse cx="28" cy="38" rx="4.5" ry="5.5" fill="#2D2D2D" />
+                <ellipse cx="54" cy="38" rx="4.5" ry="5.5" fill="#2D2D2D" />
+
+                {/* Eye highlights */}
+                <circle cx="26" cy="35" r="2.5" fill="white" />
+                <circle cx="30" cy="40" r="1.2" fill="white" />
+                <circle cx="52" cy="35" r="2.5" fill="white" />
+                <circle cx="56" cy="40" r="1.2" fill="white" />
+
+                {/* Blush */}
+                <ellipse cx="15" cy="45" rx="6" ry="3.5" fill="#FFB5C2" opacity="0.6" />
+                <ellipse cx="65" cy="45" rx="6" ry="3.5" fill="#FFB5C2" opacity="0.6" />
+
+                {/* Nose */}
+                <ellipse cx="40" cy="46" rx="3.5" ry="2.5" fill="#2D2D2D" />
+
+                {/* Mouth / smile */}
+                <path d="M33 49 C35 53, 45 53, 47 49" stroke="#2D2D2D" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+
                 {pet.hunger <= 30 && (
                   <>
-                    <text x="17" y="25" fontSize="5" fill="white" fontWeight="bold" transform="rotate(-15,17,25)">×</text>
+                    <text x="20" y="30" fontSize="5" fill="white" fontWeight="bold" transform="rotate(-15,20,30)">×</text>
                     <text x="41" y="25" fontSize="5" fill="white" fontWeight="bold" transform="rotate(15,41,25)">×</text>
                   </>
                 )}
@@ -179,6 +238,9 @@ export default function PetPageClient() {
               })}
             </div>
             <p className="mt-4 text-lg font-medium text-gray-700">{statusText}</p>
+            <p className="text-xs text-gray-400 mt-1 cursor-pointer hover:text-pink-500 transition-colors" onClick={handlePet}>
+              👋 {locale === 'zh' ? '摸摸头 +3 😊' : 'Pet me +3 😊'}
+            </p>
 
             {/* Hunger bar */}
             <div className="mt-4 text-left">

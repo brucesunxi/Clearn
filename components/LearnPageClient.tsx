@@ -75,6 +75,8 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
   const [sessionKey, setSessionKey] = useState(0)
   const [wordBook, setWordBook] = useState<number | null>(null)
   const [showCalendar, setShowCalendar] = useState(false)
+  const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
+  const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
 
   const refreshStats = useCallback(() => {
     setGoalState(getDailyGoal())
@@ -91,15 +93,24 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
     setWordBook(getSavedBook())
   }, [refreshStats])
 
+  // Filter articles by level and/or selected articles
+  const articleFiltered = selectedArticleIds.length > 0
+    ? articles.filter((a) => selectedArticleIds.includes(a.id))
+    : articles
+
+  const levelFiltered = selectedLevelId === null
+    ? articleFiltered
+    : articleFiltered.filter((a) => a.level === selectedLevelId)
+
   // When a specific word book is selected, use its virtual articles.
   // For "All Words", use the article-derived vocabulary.
   const filteredArticles = wordBook === null
-    ? articles
+    ? levelFiltered
     : wordBookToArticles(wordBook)
 
   // Count total vocab in the selected source
   const sourceWordCount = wordBook === null
-    ? articles.reduce((sum, a) => sum + a.vocabulary.length, 0)
+    ? levelFiltered.reduce((sum, a) => sum + a.vocabulary.length, 0)
     : (getWordBook(wordBook)?.words.length ?? 0)
 
   const handleSetGoal = (n: number) => {
@@ -212,52 +223,107 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
         </div>
       </div>
 
-      {/* Word book selector */}
+      {/* Article level selector (like Reading) */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-600">
-            📚 {locale === 'zh' ? '选择词书' : 'Word Book'}
-          </h3>
-          {wordBook !== null && (
-            <span className="text-xs text-gray-400">
-              {locale === 'zh' ? `${sourceWordCount} 个词` : `${sourceWordCount} words`}
-            </span>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
+        <h3 className="text-sm font-semibold text-gray-600 mb-3">
+          📖 {locale === 'zh' ? '选择文章范围' : 'Select Articles'}
+        </h3>
+        <div className="flex flex-wrap gap-2 mb-4">
           <button
-            onClick={() => handleWordBookChange(null)}
+            onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]) }}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              wordBook === null
-                ? 'bg-emerald-500 text-white shadow-sm'
+              selectedLevelId === null
+                ? 'bg-gray-800 text-white shadow-sm'
                 : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
             }`}
           >
-            {locale === 'zh' ? '全部单词' : 'All Words'}
+            🌐 {locale === 'zh' ? '全部文章' : 'All Articles'}
           </button>
-          {WORD_BOOKS.map((wb) => (
+          {levels.map((l) => (
             <button
-              key={wb.id}
-              onClick={() => handleWordBookChange(wb.id)}
+              key={l.id}
+              onClick={() => setSelectedLevelId(selectedLevelId === l.id ? null : l.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                wordBook === wb.id
+                selectedLevelId === l.id
                   ? 'text-white shadow-sm'
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
               }`}
-              style={wordBook === wb.id ? { backgroundColor: wb.color } : undefined}
+              style={selectedLevelId === l.id ? { backgroundColor: l.color } : undefined}
             >
-              {wb.emoji} {locale === 'zh' ? levels.find((l) => l.id === wb.id)?.name || wb.name : wb.name}
+              {l.emoji} {t(`level.${l.id}.name`)}
             </button>
           ))}
         </div>
-        <p className="text-xs text-gray-400 mt-2">
-          {wordBook === null
-            ? (locale === 'zh' ? `全部文章 · ${sourceWordCount} 个单词` : `All articles · ${sourceWordCount} words`)
-            : (locale === 'zh'
-                ? `${levels.find((l) => l.id === wordBook)?.name || ''}词书 · ${sourceWordCount} 个单词`
-                : `${getWordBook(wordBook)?.name || ''} word book · ${sourceWordCount} words`)
-          }
-        </p>
+        {selectedLevelId !== null && (
+          <div className="text-xs text-gray-400 mb-3">
+            {t(`level.${selectedLevelId}.desc`)}
+          </div>
+        )}
+        {selectedLevelId !== null && levelFiltered.length === 0 ? (
+          <p className="text-xs text-gray-400 text-center py-4">
+            {locale === 'zh' ? '该级别暂无文章' : 'No articles in this level'}
+          </p>
+        ) : selectedLevelId !== null && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {levelFiltered.map((article) => {
+              const selected = selectedArticleIds.includes(article.id)
+              const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
+              const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
+              return (
+                <button
+                  key={article.id}
+                  onClick={() => {
+                    setSelectedArticleIds((prev) =>
+                      prev.includes(article.id)
+                        ? prev.filter((id) => id !== article.id)
+                        : [...prev, article.id]
+                    )
+                  }}
+                  className={`group block text-left bg-white rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden ${
+                    selected
+                      ? 'border-emerald-400 ring-2 ring-emerald-200'
+                      : 'border-gray-100 hover:border-emerald-200'
+                  }`}
+                >
+                  <div className="h-1.5" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }} />
+                  <div className="p-4">
+                    <div className="flex items-start gap-3 mb-2">
+                      <span className="text-2xl shrink-0">{article.emoji}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-base font-bold text-gray-800 leading-tight">{article.title}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{article.titleEn}</p>
+                      </div>
+                    </div>
+                    {preview && (
+                      <p className="text-xs text-gray-400 line-clamp-2 mb-2 leading-relaxed">
+                        {preview}{preview.length >= 60 && '...'}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }}>
+                        L{article.level}
+                      </span>
+                      <span className="text-xs text-gray-400">📝 {article.vocabulary.length}</span>
+                      <span className="text-xs ml-auto">{selected ? '✅' : '☐'}</span>
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        )}
+        {selectedArticleIds.length > 0 && (
+          <div className="mt-3 text-xs text-emerald-600 font-medium">
+            {locale === 'zh' ? `已选 ${selectedArticleIds.length} 篇` : `${selectedArticleIds.length} articles selected`}
+          </div>
+        )}
+      </div>
+
+      {/* Article word count */}
+      <div className="mb-4 text-xs text-gray-400">
+        {locale === 'zh'
+          ? `共 ${filteredArticles.reduce((s, a) => s + a.vocabulary.length, 0)} 个单词`
+          : `${filteredArticles.reduce((s, a) => s + a.vocabulary.length, 0)} words total`}
       </div>
 
       {/* Collapsible Check-in Calendar */}

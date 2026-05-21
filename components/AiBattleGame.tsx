@@ -5,6 +5,7 @@ import { WORD_BOOKS } from '@/lib/wordbooks'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Article } from '@/lib/types'
 import { trackActivity } from '@/lib/activity'
+import { addCoins, syncCoinsToApi } from '@/lib/pet'
 
 type AiLevel = 'easy' | 'medium' | 'hard'
 
@@ -225,6 +226,22 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
     const next = round + 1
     if (next >= totalRounds) {
       cleanup()
+      // Calculate coin reward
+      const difficultyMul = { easy: 1, medium: 1.5, hard: 2 }[aiLevel]
+      const won = userScore > aiScore
+      const draw = userScore === aiScore
+      let reward: number
+      if (won) {
+        reward = Math.round(userCorrect * 20 * difficultyMul)
+      } else if (draw) {
+        reward = Math.round(userCorrect * 15)
+      } else {
+        reward = Math.round(userCorrect * 10)
+      }
+      if (reward > 0) {
+        addCoins(reward)
+        syncCoinsToApi(reward, 'battle_complete', aiLevel + ', ' + userCorrect + '/' + totalRounds + ' correct, ' + (won ? 'won' : draw ? 'tie' : 'lost'))
+      }
       trackActivity('battle_complete', { userScore, aiScore, userCorrect, aiCorrect, aiLevel, totalRounds })
       setPhase('result')
       return
@@ -477,6 +494,19 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
               ✅ {aiCorrect}/{totalRounds} {locale === 'zh' ? '正确' : 'correct'}
             </p>
           </div>
+        </div>
+
+        {/* Coin reward */}
+        <div className="text-center mb-6">
+          {(() => {
+            const mul = { easy: 1, medium: 1.5, hard: 2 }[aiLevel]
+            let r
+            if (userWon) r = Math.round(userCorrect * 20 * mul)
+            else if (tie) r = Math.round(userCorrect * 15)
+            else r = Math.round(userCorrect * 10)
+            if (r <= 0) return null
+            return <p className="text-sm font-medium text-yellow-600">🪙 +{r} coins</p>
+          })()}
         </div>
 
         <div className="flex justify-center gap-3">

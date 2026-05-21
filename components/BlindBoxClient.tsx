@@ -102,7 +102,7 @@ export default function BlindBoxClient() {
     updateCoins(coins - BOX_COST)
     // Record box purchase in coin history
     const { syncSpendToApi } = await import('@/lib/pet')
-    syncSpendToApi(BOX_COST, 'box_open')
+    syncSpendToApi(BOX_COST, 'box_open', 'box')
     setBoxes(generateBoxes())
     setSelectedIndex(null)
     setMessage('')
@@ -124,7 +124,7 @@ export default function BlindBoxClient() {
     if (prize.type === 'coins' && prize.coinAmount) {
       const { addCoins, syncCoinsToApi } = await import('@/lib/pet')
       addCoins(prize.coinAmount)
-      syncCoinsToApi(prize.coinAmount, 'box_prize')
+      syncCoinsToApi(prize.coinAmount, 'box_prize', '' + prize.coinAmount + ' coins')
       setCoins((prev: number) => prev + prize.coinAmount!)
       setMessage(locale === 'zh' ? `获得 ${prize.coinAmount} 金币！` : `Got ${prize.coinAmount} coins!`)
       return

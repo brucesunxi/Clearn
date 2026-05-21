@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/lib/i18n/context'
+import { useAuth } from '@/lib/auth-context'
 import { getDailyGoal, getTodayProgress, isCheckedInToday, getCheckInData } from '@/lib/checkin'
 import { getMasteredCount, getTotalWordsCount, getDueReviewCount } from '@/lib/words'
 
@@ -12,6 +13,7 @@ interface HomePageClientProps {
 
 export default function HomePageClient({ totalArticles }: HomePageClientProps) {
   const { t, locale } = useTranslation()
+  const { user } = useAuth()
   const [goal, setGoal] = useState(10)
   const [progress, setProgress] = useState({ done: 0, goal: 10 })
   const [checkedIn, setCheckedIn] = useState(false)
@@ -39,6 +41,31 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
         </h1>
         <p className="text-gray-500 text-base">
           {locale === 'zh' ? '让海外孩子爱上中文' : 'Helping kids around the world learn Chinese'}
+        {/* Email verification reminder */}
+        {user && !user.emailVerified && (
+          <div className="max-w-lg mx-auto mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-400">
+            <p className="font-medium">📧 {locale === 'zh' ? '请验证您的邮箱' : 'Verify your email'}</p>
+            <p className="text-xs mt-1">
+              {locale === 'zh'
+                ? '请检查收件箱（包括垃圾邮件），点击验证链接完成注册。如果没收到可点击重新发送。'
+                : 'Check your inbox (and spam) and click the verification link.'}
+            </p>
+            <button
+              onClick={async (e) => {
+                const btn = e.currentTarget
+                btn.disabled = true
+                btn.textContent = locale === 'zh' ? '发送中...' : 'Sending...'
+                await fetch('/api/auth/resend-verification', { method: 'POST' })
+                btn.textContent = locale === 'zh' ? '✅ 已发送' : '✅ Sent'
+                setTimeout(() => { btn.disabled = false; btn.textContent = locale === 'zh' ? '重新发送' : 'Resend' }, 30000)
+              }}
+              className="mt-2 px-3 py-1 text-xs rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-800 dark:text-amber-300 transition-colors"
+            >
+              {locale === 'zh' ? '重新发送' : 'Resend'}
+            </button>
+          </div>
+        )}
+
         </p>
       </div>
 

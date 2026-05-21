@@ -18,13 +18,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { amount, reason } = await request.json()
+    const { amount, reason, detail } = await request.json()
     if (typeof amount !== 'number' || amount <= 0) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
     const balance = await addCoins(userId, amount)
-    // Record history (fire-and-forget)
-    addCoinHistory(userId, amount, reason || 'earn', balance)
+    addCoinHistory(userId, amount, reason || 'earn', balance, detail)
     return NextResponse.json({ balance })
   } catch {
     return NextResponse.json({ error: 'Failed to add coins' }, { status: 500 })

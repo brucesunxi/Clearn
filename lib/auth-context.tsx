@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 interface AuthUser {
   email: string
   userId: string
+  emailVerified: boolean
 }
 
 interface AuthContextValue {
@@ -43,8 +44,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // Initial fetch
   useEffect(() => {
     fetchUser()
+  }, [fetchUser])
+
+  // Re-fetch when tab regains focus (e.g. user verified email in another tab)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchUser()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [fetchUser])
 
   const login = useCallback(async (email: string, password: string) => {
@@ -67,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (email: string, password: string) => {
     try {
-      // Pass existing anonymous userId so server binds data to this email
       const anonId = typeof window !== 'undefined' ? localStorage.getItem('chineselearn-user-id') || '' : ''
       const res = await fetch('/api/auth/register', {
         method: 'POST',

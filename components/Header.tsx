@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/context'
 import { useAuth } from '@/lib/auth-context'
 import { useTheme } from '@/lib/theme-context'
@@ -14,6 +15,7 @@ interface CoinHistoryEntry {
   reason: string
   balance: number
   createdAt: string
+  detail: string
 }
 
 function getUserId(): string {
@@ -30,6 +32,8 @@ export default function Header() {
   const { locale, setLocale, t } = useTranslation()
   const { user, loading, logout } = useAuth()
   const { theme, setTheme } = useTheme()
+  const pathname = usePathname()
+  const isAdminPage = pathname?.startsWith('/admin')
   const [coins, setCoins] = useState(500)
   const [showHistory, setShowHistory] = useState(false)
   const [history, setHistory] = useState<CoinHistoryEntry[]>([])
@@ -176,6 +180,7 @@ export default function Header() {
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-medium text-gray-700 dark:text-gray-200">{reasonLabel(entry.reason)}</p>
                           <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(entry.createdAt)}</p>
+                          {entry.detail && <p className="text-[10px] text-gray-400 mt-0.5 truncate">{entry.detail}</p>}
                         </div>
                         <div className={`text-sm font-bold ${entry.amount >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                           {entry.amount >= 0 ? '+' : ''}{entry.amount}
@@ -187,11 +192,14 @@ export default function Header() {
               </>
             )}
           </div>
-          {!loading && (
+          {!isAdminPage && !loading && (
             <>
               {user ? (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500 hidden sm:inline max-w-[100px] truncate dark:text-gray-400">{user.email}</span>
+                  {!user.emailVerified && (
+                    <span className="text-[11px] text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded dark:bg-amber-900/30 dark:text-amber-400" title="Email not verified">⚠️</span>
+                  )}
                   <button
                     onClick={logout}
                     className="px-2.5 py-1.5 rounded-full text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors border border-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 dark:border-gray-600"
@@ -200,12 +208,20 @@ export default function Header() {
                   </button>
                 </div>
               ) : (
-                <Link
-                  href="/login"
-                  className="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800"
-                >
-                  {locale === 'zh' ? '登录' : 'Login'}
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/register"
+                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors border border-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 dark:border-gray-600"
+                  >
+                    {locale === 'zh' ? '注册' : 'Register'}
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800"
+                  >
+                    {locale === 'zh' ? '登录' : 'Login'}
+                  </Link>
+                </div>
               )}
             </>
           )}

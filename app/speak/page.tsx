@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AdBanner } from '@/lib/adsense'
 import { getAllArticles } from '@/lib/content'
 import SpeakSession from '@/components/ClientSpeakSession'
 
@@ -16,6 +17,7 @@ export default function SpeakPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <SpeakSession articles={articles} />
+    <AdBanner />
     </div>
   )
 }

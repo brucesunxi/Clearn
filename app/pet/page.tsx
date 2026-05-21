@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AdBanner } from '@/lib/adsense'
 import PetPageClient from '@/components/PetPageClient'
 
 export const metadata: Metadata = {
@@ -11,5 +12,5 @@ export const metadata: Metadata = {
 }
 
 export default function PetPage() {
-  return <PetPageClient />
+  return <><PetPageClient /><AdBanner /></>
 }

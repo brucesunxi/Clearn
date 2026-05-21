@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
   // Reward 20 coins for check-in
   const coins = await addCoins(uid, 20)
-  addCoinHistory(uid, 20, 'checkin', coins)
+  addCoinHistory(uid, 20, 'checkin', coins, 'streak ' + data.currentStreak + ' days')
 
   return NextResponse.json({ checkin: data, checkedInToday: true, coins })
 }

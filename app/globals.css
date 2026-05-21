@@ -16,16 +16,6 @@ body {
   background-color: #FFFBF5;
 }
 
-.dark body,
-.dark {
-  background-color: #0f172a;
-  color: #e2e8f0;
-}
-
-.dark body {
-  background-color: #0f172a;
-}
-
 .word-highlight {
   cursor: pointer;
   border-bottom: 2px dashed #FFD93D;
@@ -34,4 +24,95 @@ body {
 
 .word-highlight:hover {
   background-color: #FFD93D44;
+}
+
+/* ---- Dark Mode Overrides ---- */
+
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* Card / container backgrounds */
+.dark .bg-white { background-color: #1e293b; }
+.dark .bg-gray-50 { background-color: #1e293b; }
+.dark .bg-gray-100 { background-color: #334155; }
+.dark .bg-yellow-50 { background-color: #422006; }
+.dark .bg-blue-50 { background-color: #1e3a5f; }
+.dark .bg-green-50 { background-color: #14532d; }
+.dark .bg-red-50 { background-color: #450a0a; }
+.dark .bg-orange-50 { background-color: #431407; }
+.dark .bg-purple-50 { background-color: #3b0764; }
+.dark .bg-indigo-50 { background-color: #1e1b4b; }
+.dark .bg-emerald-50 { background-color: #022c22; }
+.dark .bg-amber-50 { background-color: #451a03; }
+.dark .bg-sky-50 { background-color: #0c4a6e; }
+.dark .bg-violet-50 { background-color: #2e1065; }
+.dark .bg-rose-50 { background-color: #4c0519; }
+
+/* Make gradient sections flat in dark mode */
+.dark [class*="bg-gradient-to-br"] { background: #1e293b !important; }
+
+/* Pill tags */
+.dark .bg-indigo-100 { background-color: #312e81; }
+.dark .bg-orange-100 { background-color: #7c2d12; }
+.dark .bg-purple-100 { background-color: #4c1d95; }
+
+/* Text colors */
+.dark .text-gray-400,
+.dark .text-gray-500 { color: #94a3b8; }
+.dark .text-gray-600,
+.dark .text-gray-700,
+.dark .text-gray-800 { color: #e2e8f0; }
+.dark .text-gray-900 { color: #f1f5f9; }
+.dark .text-yellow-600,
+.dark .text-yellow-700 { color: #fbbf24; }
+.dark .text-indigo-600 { color: #a5b4fc; }
+.dark .text-purple-600 { color: #a5b4fc; }
+.dark .text-orange-600 { color: #fdba74; }
+.dark .text-emerald-600 { color: #6ee7b7; }
+.dark .text-sky-600 { color: #7dd3fc; }
+.dark .text-violet-600 { color: #c4b5fd; }
+.dark .text-amber-600 { color: #fcd34d; }
+.dark .text-rose-500 { color: #fda4af; }
+.dark .text-red-500 { color: #f87171; }
+.dark .text-amber-500 { color: #fbbf24; }
+.dark .text-rose-400 { color: #fda4af; }
+.dark .text-red-400 { color: #f87171; }
+.dark .text-sky-500 { color: #7dd3fc; }
+.dark .text-violet-500 { color: #c4b5fd; }
+.dark .text-emerald-500 { color: #6ee7b7; }
+
+/* Border colors */
+.dark .border-gray-100,
+.dark .border-gray-200 { border-color: #334155; }
+.dark .border-yellow-200 { border-color: #92400e; }
+.dark .border-blue-200 { border-color: #1e40af; }
+.dark .border-green-200 { border-color: #166534; }
+.dark .border-indigo-200 { border-color: #3730a3; }
+.dark .boder-orange-200 { border-color: #7c2d12; }
+.dark .border-purple-200 { border-color: #4c1d95; }
+
+/* Shadows */
+.dark .shadow-sm,
+.dark .shadow,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl,
+.dark .shadow-2xl {
+  box-shadow: 0 0 0 1px #334155;
+}
+
+/* Input / textarea */
+.dark input,
+.dark textarea {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+/* Pet panda heart float */
+@keyframes heartFloat {
+  0% { opacity: 1; transform: translateY(0) scale(0.5); }
+  50% { opacity: 0.8; transform: translateY(-20px) scale(1.2); }
+  100% { opacity: 0; transform: translateY(-40px) scale(0.8); }
 }

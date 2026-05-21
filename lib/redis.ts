@@ -78,6 +78,7 @@ export interface CoinHistoryEntry {
   reason: string
   balance: number
   createdAt: string
+  detail: string
 }
 
 function coinHistoryIndexKey(userId: string): string {
@@ -97,6 +98,7 @@ export async function addCoinHistory(
   amount: number,
   reason: string,
   balance: number,
+  detail?: string,
 ): Promise<void> {
   const redis = getRedis()
   if (!redis) return
@@ -106,6 +108,7 @@ export async function addCoinHistory(
     reason,
     balance,
     createdAt: new Date().toISOString(),
+    detail: detail || '',
   }
   try {
     await redis.set(coinHistoryEntryKey(entry.id), JSON.stringify(entry))
@@ -142,6 +145,8 @@ export interface UserRecord {
   email: string
   passwordHash: string
   createdAt: string
+  emailVerified: boolean
+  verificationToken: string | null
 }
 
 function userEmailKey(email: string): string {
@@ -174,6 +179,8 @@ export async function createUser(
       email: email.toLowerCase().trim(),
       passwordHash,
       createdAt: new Date().toISOString(),
+      emailVerified: false,
+      verificationToken: null,
     } satisfies UserRecord))
     return true
   } catch {
@@ -204,6 +211,55 @@ export async function getUser(userId: string): Promise<UserRecord | null> {
   } catch {
     return null
   }
+}
+
+export async function setVerificationToken(userId: string, token: string): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  const user = await getUser(userId)
+  if (!user) return
+  user.verificationToken = token
+  await redis.set(userKey(userId), JSON.stringify(user))
+  // Index for quick lookup during verification
+  await redis.set(`verification:token:${token}`, userId, { ex: 86400 }) // 24h TTL
+}
+
+export async function getAllUsers(): Promise<UserRecord[]> {
+  const redis = getRedis()
+  if (!redis) return []
+  const users: UserRecord[] = []
+  try {
+    let cursor = 0
+    do {
+      const result = await redis.scan(cursor, { match: 'user:*', count: 100 })
+      cursor = parseInt(result[0], 10)
+      const keys = result[1]
+      for (const key of keys) {
+        if (key.startsWith('user:email:')) continue
+        const raw = await redis.get<any>(key)
+        if (!raw) continue
+        const user = typeof raw === 'string' ? JSON.parse(raw) : raw as UserRecord
+        if (user.email) users.push(user)
+      }
+    } while (cursor !== 0)
+  } catch {}
+  return users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+}
+
+export async function markEmailVerified(token: string): Promise<boolean> {
+  const redis = getRedis()
+  if (!redis) return false
+  try {
+    const userId = await redis.get<string>(`verification:token:${token}`)
+    if (!userId) return false
+    const user = await getUser(userId)
+    if (!user) return false
+    user.emailVerified = true
+    user.verificationToken = null
+    await redis.set(userKey(userId), JSON.stringify(user))
+    await redis.del(`verification:token:${token}`)
+    return true
+  } catch { return false }
 }
 
 // ---- Inventory ----

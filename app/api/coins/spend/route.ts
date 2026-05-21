@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { amount, reason } = await request.json()
+    const { amount, reason, detail } = await request.json()
     if (typeof amount !== 'number' || amount <= 0) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
@@ -19,8 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient coins', balance: result.balance }, { status: 402 })
     }
 
-    // Record history (fire-and-forget)
-    addCoinHistory(userId, -amount, reason || 'spend', result.balance)
+    addCoinHistory(userId, -amount, reason || 'spend', result.balance, detail)
 
     return NextResponse.json({ balance: result.balance })
   } catch {

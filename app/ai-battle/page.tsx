@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AdBanner } from '@/lib/adsense'
 import { getAllArticles } from '@/lib/content'
 import AiBattleGame from '@/components/AiBattleGame'
 
@@ -16,6 +17,7 @@ export default function AiBattlePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <AiBattleGame articles={articles} />
+    <AdBanner />
     </div>
   )
 }

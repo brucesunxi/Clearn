@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createUser } from '@/lib/redis'
+import { createUser, setVerificationToken } from '@/lib/redis'
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth'
+import { sendVerificationEmail } from '@/lib/mail'
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,9 +30,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 })
     }
 
-    const token = await signToken(userId)
-    const response = NextResponse.json({ success: true, userId })
-    setAuthCookie(response, token)
+    // Generate verification token and send verification email
+    const buf = new Uint8Array(32)
+    crypto.getRandomValues(buf)
+    const verToken = Array.from(buf).map((b) => b.toString(16).padStart(2, '0')).join('')
+    await setVerificationToken(userId, verToken)
+    const emailSent = await sendVerificationEmail(normalizedEmail, verToken).catch((e) => {
+      console.error('Failed to send verification email:', e)
+      return false
+    })
+
+    const jwt = await signToken(userId)
+    const response = NextResponse.json({ success: true, userId, emailVerified: false, emailSent })
+    setAuthCookie(response, jwt)
 
     return response
   } catch (e) {

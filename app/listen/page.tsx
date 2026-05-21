@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
-import { getAllArticles } from '@/lib/content'
-import ListenSession from '@/components/ClientListenSession'
+import { AdBanner } from '@/lib/adsense'
+import { getLevels, getAllArticles } from '@/lib/content'
+import ListenPageClient from '@/components/ListenPageClient'
 
 export const metadata: Metadata = {
   title: '听力 Listening',
@@ -12,10 +13,7 @@ export const metadata: Metadata = {
 }
 
 export default function ListenPage() {
+  const levels = getLevels()
   const articles = getAllArticles()
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <ListenSession articles={articles} />
-    </div>
-  )
+  return <><ListenPageClient levels={levels} articles={articles} /><AdBanner /></>
 }

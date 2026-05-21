@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AdBanner } from '@/lib/adsense'
 import { getAllArticles } from '@/lib/content'
 import ListenSpeakPageClient from '@/components/ListenSpeakPageClient'
 
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 
 export default function PracticePage() {
   const articles = getAllArticles()
-  return <ListenSpeakPageClient articles={articles} />
+  return <><ListenSpeakPageClient articles={articles} /><AdBanner /></>
 }

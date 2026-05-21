@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { AdBanner } from '@/lib/adsense'
 import BlindBoxClient from '@/components/BlindBoxClient'
 
 export const metadata: Metadata = {
@@ -11,5 +12,5 @@ export const metadata: Metadata = {
 }
 
 export default function BlindBoxPage() {
-  return <BlindBoxClient />
+  return <><BlindBoxClient /><AdBanner /></>
 }
