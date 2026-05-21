@@ -36,6 +36,7 @@ export default function Header() {
   const isAdminPage = pathname?.startsWith('/admin')
   const [coins, setCoins] = useState(500)
   const [showHistory, setShowHistory] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [history, setHistory] = useState<CoinHistoryEntry[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
 
@@ -114,43 +115,25 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2">
           <SiteLogo />
         </Link>
-        <nav className="flex items-center gap-5">
-          <Link
-            href="/listen"
-            className="text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors text-sm"
-          >
-            🎧 {locale === 'zh' ? '听' : 'Listen'}
-          </Link>
-          <Link
-            href="/speak"
-            className="text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 font-medium transition-colors text-sm"
-          >
-            🗣️ {locale === 'zh' ? '说' : 'Speak'}
-          </Link>
-          <Link
-            href="/reading"
-            className="text-gray-600 hover:text-orange-500 dark:text-gray-300 dark:hover:text-orange-400 font-medium transition-colors text-sm"
-          >
-            📖 {locale === 'zh' ? '读' : 'Read'}
-          </Link>
-          <Link
-            href="/import"
-            className="text-gray-600 hover:text-indigo-500 dark:text-gray-300 dark:hover:text-indigo-400 font-medium transition-colors text-sm"
-          >
-            📥 {locale === 'zh' ? '导入' : 'Import'}
-          </Link>
-          <Link
-            href="/blindbox"
-            className="text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 font-medium transition-colors text-sm"
-          >
-            🎁 {locale === 'zh' ? '盲盒' : 'Box'}
-          </Link>
-          <Link
-            href="/pet"
-            className="text-gray-600 hover:text-green-500 dark:text-gray-300 dark:hover:text-green-400 font-medium transition-colors text-sm"
-          >
-            🐼
-          </Link>
+        {/* Hamburger */}
+          <button onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden p-2 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
+            aria-label="Menu">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={menuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
+
+        {/* Desktop links */}
+        <div className="hidden md:flex items-center gap-5">
+          <Link href="/listen" className="text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors text-sm">🎧 {locale === 'zh' ? '听' : 'Listen'}</Link>
+          <Link href="/speak" className="text-gray-600 hover:text-red-500 dark:text-gray-300 dark:hover:text-red-400 font-medium transition-colors text-sm">🗣️ {locale === 'zh' ? '说' : 'Speak'}</Link>
+          <Link href="/reading" className="text-gray-600 hover:text-orange-500 dark:text-gray-300 dark:hover:text-orange-400 font-medium transition-colors text-sm">📖 {locale === 'zh' ? '读' : 'Read'}</Link>
+          <Link href="/import" className="text-gray-600 hover:text-indigo-500 dark:text-gray-300 dark:hover:text-indigo-400 font-medium transition-colors text-sm">📥 {locale === 'zh' ? '导入' : 'Import'}</Link>
+          <Link href="/stats" className="text-gray-600 hover:text-cyan-500 dark:text-gray-300 dark:hover:text-cyan-400 font-medium transition-colors text-sm">📊 {locale === 'zh' ? '统计' : 'Stats'}</Link>
+          <Link href="/blindbox" className="text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 font-medium transition-colors text-sm">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
+          <Link href="/pet" className="text-gray-600 hover:text-green-500 dark:text-gray-300 dark:hover:text-green-400 font-medium transition-colors text-sm">🐼</Link>
+        </div>
           <div className="relative">
             <button
               onClick={handleToggleHistory}
@@ -238,8 +221,21 @@ export default function Header() {
           >
             {locale === 'zh' ? 'EN' : '中文'}
           </button>
-        </nav>
       </div>
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 px-4 py-3 space-y-2">
+          <Link href="/listen" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🎧 {locale === 'zh' ? '听力' : 'Listen'}</Link>
+          <Link href="/speak" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🗣️ {locale === 'zh' ? '口语' : 'Speak'}</Link>
+          <Link href="/reading" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">📖 {locale === 'zh' ? '阅读' : 'Read'}</Link>
+          <Link href="/practice" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🎯 {locale === 'zh' ? '练习' : 'Practice'}</Link>
+          <Link href="/learn" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">📝 {locale === 'zh' ? '单词' : 'Words'}</Link>
+          <Link href="/import" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">📥 {locale === 'zh' ? '导入' : 'Import'}</Link>
+          <Link href="/stats" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">📊 {locale === 'zh' ? '统计' : 'Stats'}</Link>
+          <Link href="/blindbox" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
+          <Link href="/pet" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🐼 {locale === 'zh' ? '宠物' : 'Pet'}</Link>
+        </div>
+      )}
     </header>
   )
 }
