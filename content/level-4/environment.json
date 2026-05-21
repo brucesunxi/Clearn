@@ -1,0 +1,53 @@
+{
+  "id": "environment",
+  "title": "保护环境",
+  "titleEn": "Protecting the Environment",
+  "emoji": "🌿",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "环境问题是当今世界面临的最大挑战之一。随着工业的发展和人口的增长，地球上的资源正在被过度消耗，空气和水污染越来越严重。",
+      "translation": "Environmental issues are among the biggest challenges facing the world today. With industrial development and population growth, resources are being over-consumed."
+    },
+    {
+      "text": "每个人都可以为保护环境贡献力量。我们可以从日常生活中的小事做起：减少使用一次性塑料制品，做好垃圾分类，节约用水用电。",
+      "translation": "Everyone can contribute to environmental protection. We can start with small things in daily life: reduce disposable plastics, sort garbage, save water and electricity."
+    },
+    {
+      "text": "中国在环保方面也做出了很多努力，大力发展清洁能源，推广电动汽车。绿水青山就是金山银山，我们每个人都应该珍惜地球家园。",
+      "translation": "China has also made great efforts in environmental protection, developing clean energy and promoting electric vehicles. Clear waters and green mountains are as valuable as gold and silver."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "环境",
+      "pinyin": "huán jìng",
+      "meaning": "environment"
+    },
+    {
+      "word": "污染",
+      "pinyin": "wū rǎn",
+      "meaning": "pollution"
+    },
+    {
+      "word": "塑料",
+      "pinyin": "sù liào",
+      "meaning": "plastic"
+    },
+    {
+      "word": "垃圾分类",
+      "pinyin": "lā jī fēn lèi",
+      "meaning": "garbage sorting"
+    },
+    {
+      "word": "太阳能",
+      "pinyin": "tài yáng néng",
+      "meaning": "solar energy"
+    },
+    {
+      "word": "清洁能源",
+      "pinyin": "qīng jié néng yuán",
+      "meaning": "clean energy"
+    }
+  ]
+}

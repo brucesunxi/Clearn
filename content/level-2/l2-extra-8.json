@@ -1,0 +1,53 @@
+{
+  "id": "l2-extra-8",
+  "title": "初级阅读 8",
+  "titleEn": "Elementary Reading 8",
+  "emoji": "🌳",
+  "level": 2,
+  "paragraphs": [
+    {
+      "text": "这是第8篇初级阅读文章。今天我们要学习一些新的词语和句子。",
+      "translation": "This is elementary reading article number 8. Today we'll learn some new words and sentences."
+    },
+    {
+      "text": "多读书可以让我们学到很多知识。你喜欢读书吗？",
+      "translation": "Reading more books helps us learn a lot of knowledge. Do you like reading?"
+    },
+    {
+      "text": "每天读一点，进步就会很大。加油！",
+      "translation": "Read a little every day, and you will make great progress. Keep it up!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "阅读",
+      "pinyin": "yuè dú",
+      "meaning": "reading"
+    },
+    {
+      "word": "词语",
+      "pinyin": "cí yǔ",
+      "meaning": "words, vocabulary"
+    },
+    {
+      "word": "句子",
+      "pinyin": "jù zi",
+      "meaning": "sentence"
+    },
+    {
+      "word": "知识",
+      "pinyin": "zhī shi",
+      "meaning": "knowledge"
+    },
+    {
+      "word": "进步",
+      "pinyin": "jìn bù",
+      "meaning": "progress"
+    },
+    {
+      "word": "加油",
+      "pinyin": "jiā yóu",
+      "meaning": "keep going"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "l3-extra-9",
+  "title": "中级阅读 9",
+  "titleEn": "Intermediate Reading 9",
+  "emoji": "🎋",
+  "level": 3,
+  "paragraphs": [
+    {
+      "text": "这是第9篇中级阅读文章。这篇文章将帮助你提高阅读理解能力。",
+      "translation": "This is intermediate reading article 9. This article will help improve your reading comprehension."
+    },
+    {
+      "text": "通过阅读不同主题的文章，你可以扩大词汇量，了解更多的文化知识。",
+      "translation": "By reading articles on different topics, you can expand your vocabulary and learn more about culture."
+    },
+    {
+      "text": "遇到不懂的词语，可以查字典或者根据上下文猜意思。坚持阅读，你的中文会越来越好！",
+      "translation": "When you encounter unfamiliar words, you can look them up in a dictionary or guess the meaning from context. Keep reading, and your Chinese will get better and better!"
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "提高",
+      "pinyin": "tí gāo",
+      "meaning": "to improve"
+    },
+    {
+      "word": "理解",
+      "pinyin": "lǐ jiě",
+      "meaning": "comprehension"
+    },
+    {
+      "word": "扩大",
+      "pinyin": "kuò dà",
+      "meaning": "to expand"
+    },
+    {
+      "word": "词汇量",
+      "pinyin": "cí huì liàng",
+      "meaning": "vocabulary size"
+    },
+    {
+      "word": "字典",
+      "pinyin": "zì diǎn",
+      "meaning": "dictionary"
+    },
+    {
+      "word": "上下文",
+      "pinyin": "shàng xià wén",
+      "meaning": "context"
+    }
+  ]
+}

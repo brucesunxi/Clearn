@@ -1,0 +1,53 @@
+{
+  "id": "l4-extra-8",
+  "title": "高级阅读 8",
+  "titleEn": "Advanced Reading 8",
+  "emoji": "🔮",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "这是第8篇高级阅读文章。高级阅读适合已经有一定中文基础的学习者。",
+      "translation": "This is advanced reading article number 8. Advanced reading is suitable for learners who already have a foundation in Chinese."
+    },
+    {
+      "text": "高级文章通常讨论更复杂的话题，使用的词汇也更加丰富和多样。",
+      "translation": "Advanced articles usually discuss more complex topics and use richer, more diverse vocabulary."
+    },
+    {
+      "text": "通过阅读这些文章，你可以进一步提高你的中文水平，更好地理解中国文化和社会。",
+      "translation": "By reading these articles, you can further improve your Chinese level and better understand Chinese culture and society."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "高级",
+      "pinyin": "gāo jí",
+      "meaning": "advanced"
+    },
+    {
+      "word": "基础",
+      "pinyin": "jī chǔ",
+      "meaning": "foundation"
+    },
+    {
+      "word": "复杂",
+      "pinyin": "fù zá",
+      "meaning": "complex"
+    },
+    {
+      "word": "丰富",
+      "pinyin": "fēng fù",
+      "meaning": "rich, abundant"
+    },
+    {
+      "word": "水平",
+      "pinyin": "shuǐ píng",
+      "meaning": "level, proficiency"
+    },
+    {
+      "word": "社会",
+      "pinyin": "shè huì",
+      "meaning": "society"
+    }
+  ]
+}

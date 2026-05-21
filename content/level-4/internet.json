@@ -1,0 +1,53 @@
+{
+  "id": "internet",
+  "title": "互联网和我们的生活",
+  "titleEn": "The Internet and Our Lives",
+  "emoji": "🌐",
+  "level": 4,
+  "paragraphs": [
+    {
+      "text": "互联网已经深深改变了我们的生活方式。从早上起床看手机新闻，到晚上睡觉前刷社交媒体，互联网无处不在。它让信息传播变得极快，让人们之间的联系更加紧密。",
+      "translation": "The internet has profoundly changed our way of life. From checking phone news in the morning to scrolling social media before bed, the internet is everywhere."
+    },
+    {
+      "text": "在线教育是互联网的一大贡献。现在，无论你住在城市还是偏远山区，只要有网络，就可以听到优秀老师的课。疫情期间，千千万万的学生通过互联网在家上课。",
+      "translation": "Online education is a major contribution of the internet. Now, whether you live in a city or a remote area, as long as you have internet, you can attend classes from excellent teachers."
+    },
+    {
+      "text": "当然，互联网也有一些问题，比如网络诈骗和信息泄露。我们要学会安全上网，不随便透露个人信息。互联网是一把双刃剑，正确使用才能发挥它的好处。",
+      "translation": "Of course, the internet also has problems like fraud and information leaks. We need to learn to use it safely. The internet is a double-edged sword; only by using it correctly can we benefit."
+    }
+  ],
+  "vocabulary": [
+    {
+      "word": "互联网",
+      "pinyin": "hù lián wǎng",
+      "meaning": "internet"
+    },
+    {
+      "word": "传播",
+      "pinyin": "chuán bō",
+      "meaning": "to spread"
+    },
+    {
+      "word": "在线教育",
+      "pinyin": "zài xiàn jiào yù",
+      "meaning": "online education"
+    },
+    {
+      "word": "诈骗",
+      "pinyin": "zhà piàn",
+      "meaning": "fraud"
+    },
+    {
+      "word": "泄露",
+      "pinyin": "xiè lòu",
+      "meaning": "to leak"
+    },
+    {
+      "word": "双刃剑",
+      "pinyin": "shuāng rèn jiàn",
+      "meaning": "double-edged sword"
+    }
+  ]
+}
