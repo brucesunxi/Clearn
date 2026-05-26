@@ -1,24 +1,24 @@
-const RESEND_API_KEY = process.env.RESEND_API_KEY
+const MAILTRAP_API_KEY = process.env.MAILTRAP_API_KEY
 const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@pandahan.xyz'
 
 export async function sendVerificationEmail(to: string, token: string): Promise<boolean> {
-  if (!RESEND_API_KEY) {
-    console.warn('RESEND_API_KEY not set, skipping email verification')
+  if (!MAILTRAP_API_KEY) {
+    console.warn('MAILTRAP_API_KEY not set, skipping email verification')
     return false
   }
 
   const link = `https://pandahan.xyz/verify-email?token=${encodeURIComponent(token)}`
 
   try {
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await fetch('https://send.api.mailtrap.io/api/send', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Authorization': `Bearer ${MAILTRAP_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `熊猫汉语 <${FROM_EMAIL}>`,
-        to,
+        from: { email: FROM_EMAIL, name: '熊猫汉语' },
+        to: [{ email: to }],
         subject: '验证您的邮箱 - 熊猫汉语',
         html: `
           <div style="max-width:480px;margin:40px auto;font-family:Arial,sans-serif;text-align:center">
@@ -36,9 +36,10 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
         `,
       }),
     })
+
     if (!res.ok) {
       const body = await res.text()
-      console.error('Resend API error:', res.status, body)
+      console.error('Mailtrap API error:', res.status, body)
     }
     return res.ok
   } catch (e) {
