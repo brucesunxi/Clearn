@@ -13,6 +13,7 @@ interface ArticlePageProps {
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const article = getArticle(params.id)
+  const canonicalUrl = `https://pandahan.xyz/reading/${params.id}`;
   if (!article) {
     return { title: '文章未找到 Article Not Found' }
   }

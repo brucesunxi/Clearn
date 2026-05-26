@@ -5,6 +5,9 @@ import { AdBanner } from '@/lib/adsense'
 
 export const metadata: Metadata = {
   title: '阅读 Reading',
+  alternates: {
+    canonical: 'https://pandahan.xyz/reading',
+  },
   description: '中文分级阅读文章，从启蒙到高级，适合不同年龄段的海外华裔儿童。Leveled Chinese reading articles for overseas children.',
   openGraph: {
     title: '阅读 - 熊猫汉语',

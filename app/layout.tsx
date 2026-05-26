@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   description:
     '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。A leveled Chinese reading platform for overseas children.',
   metadataBase: new URL('https://pandahan.xyz'),
+  alternates: {
+    canonical: '/',
+  },
   icons: {
     icon: [
       {
