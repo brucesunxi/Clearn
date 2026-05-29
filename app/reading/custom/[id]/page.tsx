@@ -13,6 +13,11 @@ export default function CustomArticlePage() {
   const id = params.id as string
   const [article, setArticle] = useState<Article | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [isZh, setIsZh] = useState(false)
+
+  useEffect(() => {
+    setIsZh(window.navigator.language.startsWith('zh'))
+  }, [])
 
   useEffect(() => {
     const a = getCustomArticle(id)
@@ -69,13 +74,13 @@ export default function CustomArticlePage() {
             href="/import"
             className="text-xs px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors font-medium"
           >
-            ✏️ {typeof window !== 'undefined' && window.navigator.language.startsWith('zh') ? '编辑' : 'Edit'}
+            ✏️ {isZh ? '编辑' : 'Edit'}
           </Link>
           <button
             onClick={handleDelete}
             className="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors font-medium"
           >
-            🗑️ {typeof window !== 'undefined' && window.navigator.language.startsWith('zh') ? '删除' : 'Delete'}
+            🗑️ {isZh ? '删除' : 'Delete'}
           </button>
         </div>
       </div>

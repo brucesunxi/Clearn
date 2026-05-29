@@ -10,9 +10,8 @@ const WEEKDAYS_ZH = ['日', '一', '二', '三', '四', '五', '六']
 export default function CheckInCalendar() {
   const { locale, t } = useTranslation()
   const [checkin] = useState(() => getCheckInData())
-  const now = new Date()
-  const [year, setYear] = useState(now.getFullYear())
-  const [month, setMonth] = useState(now.getMonth() + 1)
+  const [year, setYear] = useState(() => new Date().getFullYear())
+  const [month, setMonth] = useState(() => new Date().getMonth() + 1)
 
   const days = getMonthData(year, month)
   const firstDayOfMonth = new Date(year, month - 1, 1).getDay()
@@ -50,7 +49,7 @@ export default function CheckInCalendar() {
         >
           ◀
         </button>
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-gray-700" suppressHydrationWarning>
           {locale === 'zh' ? `${year}年${month}月` : `${month}/${year}`}
         </span>
         <button

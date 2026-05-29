@@ -35,8 +35,10 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getStoredTheme)
+  // Start with 'system' for SSR consistency, then hydrate on client
+  const [theme, setThemeState] = useState<Theme>('system')
   const [resolved, setResolved] = useState<'light' | 'dark'>('light')
+  const [mounted, setMounted] = useState(false)
 
   // Apply on mount and listen for system changes
   useEffect(() => {
@@ -45,6 +47,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const r = t === 'system' ? getSystemTheme() : t
     setResolved(r)
     applyTheme(t)
+    setMounted(true)
 
     // Listen for OS theme changes when in system mode
     const mq = window.matchMedia('(prefers-color-scheme: dark)')

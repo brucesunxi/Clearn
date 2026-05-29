@@ -30,13 +30,16 @@ function interpolate(text: string, params?: Record<string, string | number>): st
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
+  // Start with 'en' for SSR consistency, then hydrate from localStorage on client
   const [locale, setLocaleState] = useState<Locale>('en')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('chineselearn-locale') as Locale | null
     if (saved === 'en' || saved === 'zh') {
       setLocaleState(saved)
     }
+    setMounted(true)
   }, [])
 
   const setLocale = useCallback((newLocale: Locale) => {
