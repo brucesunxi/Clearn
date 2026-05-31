@@ -1,9 +1,16 @@
 // Import limit tracking - 自定义文章导入限制
 // 每天免费3篇，超出需30金币/篇
+import { getImportLimit as getRedisImportLimit, setImportLimit as setRedisImportLimit } from './redis'
 
 const IMPORT_COUNT_KEY = 'daily_import_count'
 const IMPORT_DATE_KEY = 'daily_import_date'
 const IMPORTED_ARTICLES_KEY = 'daily_imported_articles'
+
+// 获取当前用户ID
+function getCurrentUserId(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('chineselearn-user-id')
+}
 
 export const IMPORT_CONFIG = {
   FREE_LIMIT: 3,           // 每天免费导入数量
@@ -41,10 +48,40 @@ export function getImportCount(): { count: number; date: string } {
   }
 }
 
+// 异步获取（优先 Redis）
+export async function getImportCountAsync(): Promise<{ count: number; date: string; articles: string[] }> {
+  const userId = getCurrentUserId()
+  if (userId) {
+    try {
+      const redisData = await getRedisImportLimit(userId)
+      if (redisData) {
+        return {
+          count: redisData.count,
+          date: redisData.date,
+          articles: redisData.articles || []
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
+  const localData = getImportCount()
+  return {
+    count: localData.count,
+    date: localData.date,
+    articles: getImportedArticles()
+  }
+}
+
 export function incrementImportCount(): void {
   if (typeof window === 'undefined') return
   const { count } = getImportCount()
   localStorage.setItem(IMPORT_COUNT_KEY, String(count + 1))
+
+  // 异步同步到 Redis
+  const userId = getCurrentUserId()
+  if (userId) {
+    setRedisImportLimit(userId, { count: count + 1, date: new Date().toISOString().split('T')[0], articles: getImportedArticles() }).catch(() => {})
+  }
 }
 
 export function getImportLimitStatus(): ImportLimitStatus {
@@ -82,12 +119,21 @@ export function checkImportCost(): { allowed: boolean; cost: number; message: st
 }
 
 // 记录已导入的文章ID
-export function recordImportedArticle(articleId: string): void {
+export async function recordImportedArticle(articleId: string): Promise<void> {
   if (typeof window === 'undefined') return
   const imported = getImportedArticles()
   if (!imported.includes(articleId)) {
     imported.push(articleId)
     localStorage.setItem(IMPORTED_ARTICLES_KEY, JSON.stringify(imported))
+
+    // 同步到 Redis
+    const userId = getCurrentUserId()
+    if (userId) {
+      try {
+        const current = await getImportCountAsync()
+        await setRedisImportLimit(userId, { count: current.count, date: current.date, articles: imported })
+      } catch { /* ignore */ }
+    }
   }
 }
 

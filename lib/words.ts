@@ -1,8 +1,15 @@
 'use client'
 
 import type { Article, VocabularyItem } from './types'
+import { getWordsProgress, setWordsProgress } from './redis'
 
 const STORAGE_KEY = 'chineselearn-words'
+
+// 获取当前用户ID
+function getCurrentUserId(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('chineselearn-user-id')
+}
 
 export interface WordProgress {
   word: string
@@ -30,7 +37,8 @@ export function getWordId(word: string, level: number, articleId: string): strin
   return `${word}_level-${level}_${articleId}`
 }
 
-export function getAllProgress(): Record<string, WordProgress> {
+// 从 localStorage 读取
+function getLocalProgress(): Record<string, WordProgress> {
   if (typeof window === 'undefined') return {}
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -49,9 +57,51 @@ export function getAllProgress(): Record<string, WordProgress> {
   }
 }
 
-function saveAllProgress(data: Record<string, WordProgress>) {
+// 保存到 localStorage
+function saveLocalProgress(data: Record<string, WordProgress>) {
   if (typeof window === 'undefined') return
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+}
+
+// 获取进度（优先从 Redis，回退到 localStorage）
+export async function getAllProgressAsync(): Promise<Record<string, WordProgress>> {
+  const userId = getCurrentUserId()
+  if (userId) {
+    try {
+      const redisData = await getWordsProgress(userId)
+      if (redisData) return redisData
+    } catch { /* ignore */ }
+  }
+  return getLocalProgress()
+}
+
+// 兼容旧版同步函数
+export function getAllProgress(): Record<string, WordProgress> {
+  return getLocalProgress()
+}
+
+// 保存进度（双写：localStorage + Redis）
+export async function saveAllProgress(data: Record<string, WordProgress>) {
+  // 保存到 localStorage
+  saveLocalProgress(data)
+
+  // 同步到 Redis
+  const userId = getCurrentUserId()
+  if (userId) {
+    try {
+      await setWordsProgress(userId, data)
+    } catch { /* ignore */ }
+  }
+}
+
+// 迁移数据到 Redis
+export async function migrateWordsToRedis(userId: string): Promise<void> {
+  const data = getLocalProgress()
+  if (Object.keys(data).length > 0) {
+    try {
+      await setWordsProgress(userId, data)
+    } catch { /* ignore */ }
+  }
 }
 
 export function buildWordDatabase(
@@ -120,13 +170,13 @@ export function getReviewWords(
   }))
 }
 
-export function recordAnswer(
+export async function recordAnswerAsync(
   wordId: string,
   word: VocabularyItem,
   articleId: string,
   correct: boolean
-): WordProgress {
-  const progress = getAllProgress()
+): Promise<WordProgress> {
+  const progress = await getAllProgressAsync()
   const existing = progress[wordId]
 
   const today = new Date()
@@ -168,7 +218,50 @@ export function recordAnswer(
     }
   }
 
-  saveAllProgress(progress)
+  await saveAllProgress(progress)
+  return progress[wordId]
+}
+
+// 兼容旧版同步函数
+export function recordAnswer(
+  wordId: string,
+  word: VocabularyItem,
+  articleId: string,
+  correct: boolean
+): WordProgress {
+  const progress = getAllProgress()
+  const existing = progress[wordId]
+
+  const today = new Date()
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+
+  if (correct) {
+    const currentStage = existing?.stage || 0
+    const newStage = Math.min(currentStage + 1, 7)
+    const intervalDays = EBBINGHAUS_INTERVALS[newStage] || 90
+    const nextDate = new Date(today)
+    nextDate.setDate(nextDate.getDate() + intervalDays)
+    progress[wordId] = {
+      word: word.word, meaning: word.meaning, pinyin: word.pinyin, stage: newStage,
+      nextReview: `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`,
+      reviewCount: (existing?.reviewCount || 0) + 1, lastReviewDate: todayStr, articleId,
+    }
+  } else {
+    const nextDate = new Date(today)
+    nextDate.setDate(nextDate.getDate() + 1)
+    progress[wordId] = {
+      word: word.word, meaning: word.meaning, pinyin: word.pinyin, stage: 1,
+      nextReview: `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`,
+      reviewCount: (existing?.reviewCount || 0) + 1, lastReviewDate: todayStr, articleId,
+    }
+  }
+
+  saveLocalProgress(progress)
+  // 异步同步到 Redis
+  const userId = getCurrentUserId()
+  if (userId) {
+    setWordsProgress(userId, progress).catch(() => {})
+  }
   return progress[wordId]
 }
 

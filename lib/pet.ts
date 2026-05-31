@@ -1,7 +1,15 @@
 'use client'
 
+import { getPet as getRedisPet, setPet as setRedisPet, getInventory as getRedisInventory, setInventory as setRedisInventory } from './redis'
+
 const PET_KEY = 'panda-pet'
 const INVENTORY_KEY = 'panda-inventory'
+
+// 获取当前用户ID
+function getCurrentUserId(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('chineselearn-user-id')
+}
 
 export interface PetState {
   hunger: number
@@ -88,6 +96,42 @@ function saveInventory(inv: Inventory) {
   localStorage.setItem(INVENTORY_KEY, JSON.stringify(inv))
 }
 
+// 从 Redis 获取宠物状态
+async function getRedisPetState(): Promise<PetState | null> {
+  const userId = getCurrentUserId()
+  if (!userId) return null
+  try {
+    return await getRedisPet(userId)
+  } catch { return null }
+}
+
+// 保存宠物状态到 Redis
+async function saveRedisPet(state: PetState) {
+  const userId = getCurrentUserId()
+  if (!userId) return
+  try {
+    await setRedisPet(userId, state)
+  } catch { /* ignore */ }
+}
+
+// 从 Redis 获取库存
+async function getRedisInventoryState(): Promise<Inventory | null> {
+  const userId = getCurrentUserId()
+  if (!userId) return null
+  try {
+    return await getRedisInventory(userId)
+  } catch { return null }
+}
+
+// 保存库存到 Redis
+async function saveRedisInventory(inv: Inventory) {
+  const userId = getCurrentUserId()
+  if (!userId) return
+  try {
+    await setRedisInventory(userId, inv)
+  } catch { /* ignore */ }
+}
+
 /** Calculate decay since last login */
 function applyDecay(pet: PetState): PetState {
   const now = new Date()
@@ -106,8 +150,23 @@ function applyDecay(pet: PetState): PetState {
   }
 }
 
-/** Get current pet with decay applied */
-export function getPet(): PetState {
+/** Get current pet with decay applied (双写模式) */
+export async function getPet(): Promise<PetState> {
+  // 优先从 Redis 获取
+  const redisPet = await getRedisPetState()
+  const pet = redisPet || getPetRaw()
+  const updated = applyDecay(pet)
+
+  if (updated.hunger !== pet.hunger || updated.happiness !== pet.happiness) {
+    savePet(updated)
+    await saveRedisPet(updated)
+  }
+
+  return updated
+}
+
+// 兼容旧版同步函数
+export function getPetSync(): PetState {
   const pet = getPetRaw()
   const updated = applyDecay(pet)
   if (updated.hunger !== pet.hunger || updated.happiness !== pet.happiness) {
@@ -117,8 +176,8 @@ export function getPet(): PetState {
 }
 
 /** Feed the pet */
-export function feedPet(foodId: string): { pet: PetState; inventory: Inventory; message: string } {
-  const pet = getPet()
+export async function feedPet(foodId: string): Promise<{ pet: PetState; inventory: Inventory; message: string }> {
+  const pet = await getPet()
   const inv = getInventoryRaw()
   const qty = inv.food[foodId] || 0
 
@@ -142,17 +201,22 @@ export function feedPet(foodId: string): { pet: PetState; inventory: Inventory; 
   const newFood = { ...inv.food }
   newFood[foodId] = qty - 1
 
+  const updatedInv = { ...inv, food: newFood }
+
+  // 双写保存
   savePet(updatedPet)
-  saveInventory({ ...inv, food: newFood })
+  saveInventory(updatedInv)
+  await saveRedisPet(updatedPet)
+  await saveRedisInventory(updatedInv)
 
   return {
     pet: updatedPet,
-    inventory: { ...inv, food: newFood },
+    inventory: updatedInv,
     message: `${item.name} +${item.effect.hunger || 0} hunger, +${item.effect.happiness || 0} happiness!`,
   }
 }
 
-// ---- Inventory ----
+// ---- Inventory (双写模式) ----
 
 export function getInventory(): Inventory {
   return getInventoryRaw()
@@ -162,70 +226,73 @@ export function getCoins(): number {
   return getInventoryRaw().coins
 }
 
-export function addCoins(amount: number): number {
+export async function addCoins(amount: number): Promise<number> {
+  const inv = getInventoryRaw()
+  const newCoins = inv.coins + amount
+  const updatedInv = { ...inv, coins: newCoins }
+  saveInventory(updatedInv)
+  await saveRedisInventory(updatedInv)
+  return newCoins
+}
+
+// 兼容旧版
+export function addCoinsSync(amount: number): number {
   const inv = getInventoryRaw()
   const newCoins = inv.coins + amount
   saveInventory({ ...inv, coins: newCoins })
   return newCoins
 }
 
-/** Sync a coin reward to API/Redis (fire-and-forget, call after addCoins) */
-export function syncCoinsToApi(earnedAmount: number, reason: string = 'earn', detail?: string) {
-  if (typeof window === 'undefined') return
-  const userId = localStorage.getItem('chineselearn-user-id')
-  if (!userId) return
-  fetch('/api/coins', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
-    body: JSON.stringify({ amount: earnedAmount, reason, detail }),
-  }).catch(() => {})
+export async function spendCoins(amount: number): Promise<boolean> {
+  const inv = getInventoryRaw()
+  if (inv.coins < amount) return false
+  const updatedInv = { ...inv, coins: inv.coins - amount }
+  saveInventory(updatedInv)
+  await saveRedisInventory(updatedInv)
+  return true
 }
 
-/** Sync a coin spend to API/Redis (fire-and-forget, call after spendCoins) */
-export function syncSpendToApi(amount: number, reason: string = 'spend', detail?: string) {
-  if (typeof window === 'undefined') return
-  const userId = localStorage.getItem('chineselearn-user-id')
-  if (!userId) return
-  fetch('/api/coins/spend', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
-    body: JSON.stringify({ amount, reason, detail }),
-  }).catch(() => {})
-}
-
-export function spendCoins(amount: number): boolean {
+// 兼容旧版
+export function spendCoinsSync(amount: number): boolean {
   const inv = getInventoryRaw()
   if (inv.coins < amount) return false
   saveInventory({ ...inv, coins: inv.coins - amount })
   return true
 }
 
-export function buyFood(foodId: string, quantity: number = 1): boolean {
+export async function buyFood(foodId: string, quantity: number = 1): Promise<boolean> {
   const item = FOOD_ITEMS.find((f) => f.id === foodId)
   if (!item) return false
 
   const totalPrice = item.price * quantity
-  if (!spendCoins(totalPrice)) return false
-
   const inv = getInventoryRaw()
+  if (inv.coins < totalPrice) return false
+
   const newFood = { ...inv.food }
   newFood[foodId] = (newFood[foodId] || 0) + quantity
-  saveInventory({ ...inv, food: newFood })
+  const updatedInv = { ...inv, coins: inv.coins - totalPrice, food: newFood }
+
+  saveInventory(updatedInv)
+  await saveRedisInventory(updatedInv)
   return true
 }
 
-export function buyAccessory(accessoryId: string): boolean {
+export async function buyAccessory(accessoryId: string): Promise<boolean> {
   const item = ACCESSORY_ITEMS.find((a) => a.id === accessoryId)
   if (!item) return false
-  if (!spendCoins(item.price)) return false
 
   const inv = getInventoryRaw()
+  if (inv.coins < item.price) return false
+
   const newAcc = { ...inv.accessories, [accessoryId]: true }
-  saveInventory({ ...inv, accessories: newAcc })
+  const updatedInv = { ...inv, coins: inv.coins - item.price, accessories: newAcc }
+
+  saveInventory(updatedInv)
+  await saveRedisInventory(updatedInv)
   return true
 }
 
-export function toggleEquip(accessoryId: string): Inventory {
+export async function toggleEquip(accessoryId: string): Promise<Inventory> {
   const inv = getInventoryRaw()
   const owned = inv.accessories[accessoryId]
   if (!owned) return inv
@@ -239,7 +306,18 @@ export function toggleEquip(accessoryId: string): Inventory {
 
   const updatedInv = { ...inv, equipped: newEquipped }
   saveInventory(updatedInv)
+  await saveRedisInventory(updatedInv)
   return updatedInv
+}
+
+// 迁移函数
+export async function migratePetToRedis(userId: string): Promise<void> {
+  const pet = getPetRaw()
+  const inv = getInventoryRaw()
+  try {
+    await setRedisPet(userId, pet)
+    await setRedisInventory(userId, inv)
+  } catch { /* ignore */ }
 }
 
 // ---- Pet interaction ----
