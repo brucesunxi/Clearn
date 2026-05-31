@@ -165,9 +165,6 @@ export async function getPet(): Promise<PetState> {
   return updated
 }
 
-// 兼容旧版导出 - 使用 sync 版本
-export { addCoinsSync as addCoins, spendCoinsSync as spendCoins }
-
 /** Sync a coin reward to API/Redis (兼容旧版) */
 export function syncCoinsToApi(earnedAmount: number, reason: string = 'earn', detail?: string) {
   if (typeof window === 'undefined') return
@@ -253,42 +250,26 @@ export function getCoins(): number {
   return getInventoryRaw().coins
 }
 
-export async function addCoins(amount: number): Promise<number> {
+// 使用 sync 版本作为默认导出，内部会异步同步到 Redis
+export function addCoins(amount: number): number {
   const inv = getInventoryRaw()
   const newCoins = inv.coins + amount
   const updatedInv = { ...inv, coins: newCoins }
   saveInventory(updatedInv)
-  await saveRedisInventory(updatedInv)
+  // 异步同步到 Redis
+  saveRedisInventory(updatedInv).catch(() => {})
   return newCoins
 }
 
-// 兼容旧版
-export function addCoinsSync(amount: number): number {
-  const inv = getInventoryRaw()
-  const newCoins = inv.coins + amount
-  saveInventory({ ...inv, coins: newCoins })
-  return newCoins
-}
-
-export async function spendCoins(amount: number): Promise<boolean> {
+export function spendCoins(amount: number): boolean {
   const inv = getInventoryRaw()
   if (inv.coins < amount) return false
   const updatedInv = { ...inv, coins: inv.coins - amount }
   saveInventory(updatedInv)
-  await saveRedisInventory(updatedInv)
+  // 异步同步到 Redis
+  saveRedisInventory(updatedInv).catch(() => {})
   return true
 }
-
-// 兼容旧版
-export function spendCoinsSync(amount: number): boolean {
-  const inv = getInventoryRaw()
-  if (inv.coins < amount) return false
-  saveInventory({ ...inv, coins: inv.coins - amount })
-  return true
-}
-
-// 为了向后兼容，导出同名函数
-// 注意：addCoins 和 spendCoins 已在上面定义，不要重复导出
 
 export async function buyFood(foodId: string, quantity: number = 1): Promise<boolean> {
   const item = FOOD_ITEMS.find((f) => f.id === foodId)
