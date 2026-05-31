@@ -9,7 +9,15 @@
       "Bash(curl -sI https://pandahan.xyz)",
       "Bash(npx next *)",
       "WebFetch(domain:paddle.com)",
-      "Bash(vercel --prod)"
+      "Bash(vercel --prod)",
+      "Bash(curl *)",
+      "Bash(vercel --version)",
+      "Bash(vercel --scope brucesunxi --yes)",
+      "Bash(vercel --yes)",
+      "Bash(vercel deploy *)",
+      "Bash(vercel env *)",
+      "Bash(git checkout *)",
+      "Bash(vercel logs *)"
     ]
   }
 }

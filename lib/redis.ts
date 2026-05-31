@@ -562,3 +562,144 @@ export async function getActivityEntries(
     return { entries: [], total: 0 }
   }
 }
+
+// ---- Word Progress ----
+
+export interface WordProgressData {
+  word: string
+  meaning: string
+  pinyin: string
+  stage: number
+  nextReview: string
+  reviewCount: number
+  lastReviewDate: string
+  articleId: string
+}
+
+function wordsProgressKey(uid: string) { return `words:progress:${uid}` }
+
+export async function getWordsProgress(userId: string): Promise<Record<string, WordProgressData> | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const raw = await redis.get<any>(wordsProgressKey(userId))
+    if (!raw) return null
+    if (typeof raw === 'string') return JSON.parse(raw) as Record<string, WordProgressData>
+    return raw as Record<string, WordProgressData>
+  } catch { return null }
+}
+
+export async function setWordsProgress(userId: string, data: Record<string, WordProgressData>): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  await redis.set(wordsProgressKey(userId), JSON.stringify(data))
+}
+
+// ---- Reading Limit ----
+
+export interface ReadingLimitData {
+  count: number
+  date: string
+}
+
+function readingLimitKey(uid: string) { return `reading:limit:${uid}` }
+
+export async function getReadingLimit(userId: string): Promise<ReadingLimitData | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const raw = await redis.get<any>(readingLimitKey(userId))
+    if (!raw) return null
+    if (typeof raw === 'string') return JSON.parse(raw) as ReadingLimitData
+    return raw as ReadingLimitData
+  } catch { return null }
+}
+
+export async function setReadingLimit(userId: string, data: ReadingLimitData): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  await redis.set(readingLimitKey(userId), JSON.stringify(data))
+}
+
+// ---- Import Limit ----
+
+export interface ImportLimitData {
+  count: number
+  date: string
+  articles: string[]
+}
+
+function importLimitKey(uid: string) { return `import:limit:${uid}` }
+
+export async function getImportLimit(userId: string): Promise<ImportLimitData | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const raw = await redis.get<any>(importLimitKey(userId))
+    if (!raw) return null
+    if (typeof raw === 'string') return JSON.parse(raw) as ImportLimitData
+    return raw as ImportLimitData
+  } catch { return null }
+}
+
+export async function setImportLimit(userId: string, data: ImportLimitData): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  await redis.set(importLimitKey(userId), JSON.stringify(data))
+}
+
+// ---- Custom Articles ----
+
+export interface CustomArticle {
+  id: string
+  title: string
+  content: string
+  level: number
+  vocabulary: { word: string; pinyin: string; meaning: string }[]
+  createdAt: string
+}
+
+function customArticlesKey(uid: string) { return `articles:custom:${uid}` }
+
+export async function getCustomArticles(userId: string): Promise<CustomArticle[] | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const raw = await redis.get<any>(customArticlesKey(userId))
+    if (!raw) return null
+    if (typeof raw === 'string') return JSON.parse(raw) as CustomArticle[]
+    return raw as CustomArticle[]
+  } catch { return null }
+}
+
+export async function setCustomArticles(userId: string, articles: CustomArticle[]): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  await redis.set(customArticlesKey(userId), JSON.stringify(articles))
+}
+
+// ---- Daily Goal ----
+
+export interface DailyGoalData {
+  target: number
+  record: Record<string, number>
+}
+
+function dailyGoalKey(uid: string) { return `daily:goal:${uid}` }
+
+export async function getDailyGoalData(userId: string): Promise<DailyGoalData | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    const raw = await redis.get<any>(dailyGoalKey(userId))
+    if (!raw) return null
+    if (typeof raw === 'string') return JSON.parse(raw) as DailyGoalData
+    return raw as DailyGoalData
+  } catch { return null }
+}
+
+export async function setDailyGoalData(userId: string, data: DailyGoalData): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  await redis.set(dailyGoalKey(userId), JSON.stringify(data))
+}

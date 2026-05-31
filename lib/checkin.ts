@@ -1,7 +1,10 @@
 'use client'
 
+import { getCheckin, setCheckin, type CheckinData as RedisCheckinData } from './redis'
+
 const STORAGE_KEY = 'chineselearn-checkin'
 
+// 兼容旧的数据格式
 export interface CheckInData {
   history: string[]
   currentStreak: number
@@ -16,6 +19,15 @@ function today(): string {
   return `${year}-${month}-${day}`
 }
 
+// 获取当前用户的 userId（从 localStorage 或 auth）
+function getCurrentUserId(): string | null {
+  if (typeof window === 'undefined') return null
+  // 优先从 auth cookie 获取（需要配合 auth 系统）
+  // 这里先返回 localStorage 中的匿名 ID
+  return localStorage.getItem('chineselearn-user-id')
+}
+
+// 从 localStorage 读取（旧版本兼容）
 export function getCheckInData(): CheckInData {
   if (typeof window === 'undefined') {
     return { history: [], currentStreak: 0, longestStreak: 0 }
@@ -31,7 +43,14 @@ export function getCheckInData(): CheckInData {
   return { history: [], currentStreak: 0, longestStreak: 0 }
 }
 
-export function doCheckIn(): CheckInData {
+// 保存到 localStorage（旧版本兼容）
+function saveCheckInData(data: CheckInData) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+}
+
+// 执行签到（同时更新 localStorage 和 Redis）
+export async function doCheckIn(): Promise<CheckInData> {
   const data = getCheckInData()
   const t = today()
   if (data.history.includes(t)) return data
@@ -59,7 +78,21 @@ export function doCheckIn(): CheckInData {
     data.longestStreak = streak
   }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+  // 保存到 localStorage
+  saveCheckInData(data)
+
+  // 如果已登录，同步到 Redis
+  const userId = getCurrentUserId()
+  if (userId) {
+    try {
+      await setCheckin(userId, {
+        history: data.history,
+        currentStreak: data.currentStreak,
+        longestStreak: data.longestStreak,
+      })
+    } catch { /* ignore */ }
+  }
+
   return data
 }
 
@@ -129,15 +162,40 @@ export function getTodayProgress(): { done: number; goal: number } {
   return { done: data.record[t] || 0, goal: data.target }
 }
 
-export function incrementTodayProgress(n: number): { done: number; goal: number } {
+export async function incrementTodayProgress(n: number): Promise<{ done: number; goal: number }> {
   const data = getDailyGoalData()
   const t = today()
   data.record[t] = (data.record[t] || 0) + n
   saveDailyGoalData(data)
+
+  // 同步到 Redis
+  const userId = getCurrentUserId()
+  if (userId) {
+    try {
+      await import('./redis').then(m => m.setDailyGoalData(userId, data))
+    } catch { /* ignore */ }
+  }
+
   return { done: data.record[t], goal: data.target }
 }
 
 export function isGoalCompletedToday(): boolean {
   const { done, goal } = getTodayProgress()
   return done >= goal
+}
+
+// --- Migration helper ---
+// 登录后调用此函数，将 localStorage 数据迁移到 Redis
+export async function migrateCheckinToRedis(userId: string): Promise<void> {
+  const checkinData = getCheckInData()
+  const goalData = getDailyGoalData()
+
+  try {
+    await setCheckin(userId, {
+      history: checkinData.history,
+      currentStreak: checkinData.currentStreak,
+      longestStreak: checkinData.longestStreak,
+    })
+    await import('./redis').then(m => m.setDailyGoalData(userId, goalData))
+  } catch { /* ignore */ }
 }
