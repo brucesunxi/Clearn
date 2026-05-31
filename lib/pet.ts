@@ -165,14 +165,8 @@ export async function getPet(): Promise<PetState> {
   return updated
 }
 
-// 兼容旧版导出
-export function addCoins(amount: number): number {
-  return addCoinsSync(amount)
-}
-
-export function spendCoins(amount: number): boolean {
-  return spendCoinsSync(amount)
-}
+// 兼容旧版导出 - 使用 sync 版本
+export { addCoinsSync as addCoins, spendCoinsSync as spendCoins }
 
 /** Sync a coin reward to API/Redis (兼容旧版) */
 export function syncCoinsToApi(earnedAmount: number, reason: string = 'earn', detail?: string) {
@@ -292,6 +286,9 @@ export function spendCoinsSync(amount: number): boolean {
   saveInventory({ ...inv, coins: inv.coins - amount })
   return true
 }
+
+// 为了向后兼容，导出同名函数
+export { addCoinsSync as addCoins, spendCoinsSync as spendCoins }
 
 export async function buyFood(foodId: string, quantity: number = 1): Promise<boolean> {
   const item = FOOD_ITEMS.find((f) => f.id === foodId)
