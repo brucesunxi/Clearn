@@ -119,7 +119,15 @@ async function getRedisInventoryState(): Promise<Inventory | null> {
   const userId = getCurrentUserId()
   if (!userId) return null
   try {
-    return await getRedisInventory(userId)
+    const data = await getRedisInventory(userId)
+    if (!data) return null
+    // 转换 InventoryData 为 Inventory
+    return {
+      coins: 0, // InventoryData 中没有 coins，从本地获取
+      food: data.food,
+      accessories: data.accessories,
+      equipped: data.equipped,
+    }
   } catch { return null }
 }
 
@@ -128,7 +136,13 @@ async function saveRedisInventory(inv: Inventory) {
   const userId = getCurrentUserId()
   if (!userId) return
   try {
-    await setRedisInventory(userId, inv)
+    // 转换为 InventoryData
+    const data = {
+      food: inv.food,
+      accessories: inv.accessories,
+      equipped: inv.equipped,
+    }
+    await setRedisInventory(userId, data)
   } catch { /* ignore */ }
 }
 
