@@ -650,18 +650,11 @@ export async function setImportLimit(userId: string, data: ImportLimitData): Pro
 
 // ---- Custom Articles ----
 
-export interface CustomArticle {
-  id: string
-  title: string
-  content: string
-  level: number
-  vocabulary: { word: string; pinyin: string; meaning: string }[]
-  createdAt: string
-}
+import type { Article } from './types'
 
 function customArticlesKey(uid: string) { return `articles:custom:${uid}` }
 
-export async function getCustomArticles(userId: string): Promise<CustomArticle[] | null> {
+export async function getCustomArticles(userId: string): Promise<Article[] | null> {
   const redis = getRedis()
   if (!redis) return null
   try {
@@ -672,7 +665,7 @@ export async function getCustomArticles(userId: string): Promise<CustomArticle[]
   } catch { return null }
 }
 
-export async function setCustomArticles(userId: string, articles: CustomArticle[]): Promise<void> {
+export async function setCustomArticles(userId: string, articles: Article[]): Promise<void> {
   const redis = getRedis()
   if (!redis) return
   await redis.set(customArticlesKey(userId), JSON.stringify(articles))
