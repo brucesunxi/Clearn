@@ -283,7 +283,7 @@ export function spendCoins(amount: number): boolean {
   return true
 }
 
-export async function buyFood(foodId: string, quantity: number = 1): Promise<boolean> {
+export function buyFood(foodId: string, quantity: number = 1): boolean {
   const item = FOOD_ITEMS.find((f) => f.id === foodId)
   if (!item) return false
 
@@ -296,11 +296,11 @@ export async function buyFood(foodId: string, quantity: number = 1): Promise<boo
   const updatedInv = { ...inv, coins: inv.coins - totalPrice, food: newFood }
 
   saveInventory(updatedInv)
-  await saveRedisInventory(updatedInv)
+  saveRedisInventory(updatedInv).catch(() => {})
   return true
 }
 
-export async function buyAccessory(accessoryId: string): Promise<boolean> {
+export function buyAccessory(accessoryId: string): boolean {
   const item = ACCESSORY_ITEMS.find((a) => a.id === accessoryId)
   if (!item) return false
 
@@ -311,11 +311,11 @@ export async function buyAccessory(accessoryId: string): Promise<boolean> {
   const updatedInv = { ...inv, coins: inv.coins - item.price, accessories: newAcc }
 
   saveInventory(updatedInv)
-  await saveRedisInventory(updatedInv)
+  saveRedisInventory(updatedInv).catch(() => {})
   return true
 }
 
-export async function toggleEquip(accessoryId: string): Promise<Inventory> {
+export function toggleEquip(accessoryId: string): Inventory {
   const inv = getInventoryRaw()
   const owned = inv.accessories[accessoryId]
   if (!owned) return inv
@@ -329,7 +329,7 @@ export async function toggleEquip(accessoryId: string): Promise<Inventory> {
 
   const updatedInv = { ...inv, equipped: newEquipped }
   saveInventory(updatedInv)
-  await saveRedisInventory(updatedInv)
+  saveRedisInventory(updatedInv).catch(() => {})
   return updatedInv
 }
 
