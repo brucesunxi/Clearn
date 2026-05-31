@@ -165,6 +165,39 @@ export async function getPet(): Promise<PetState> {
   return updated
 }
 
+// 兼容旧版导出
+export function addCoins(amount: number): number {
+  return addCoinsSync(amount)
+}
+
+export function spendCoins(amount: number): boolean {
+  return spendCoinsSync(amount)
+}
+
+/** Sync a coin reward to API/Redis (兼容旧版) */
+export function syncCoinsToApi(earnedAmount: number, reason: string = 'earn', detail?: string) {
+  if (typeof window === 'undefined') return
+  const userId = localStorage.getItem('chineselearn-user-id')
+  if (!userId) return
+  fetch('/api/coins', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+    body: JSON.stringify({ amount: earnedAmount, reason, detail }),
+  }).catch(() => {})
+}
+
+/** Sync a coin spend to API/Redis (兼容旧版) */
+export function syncSpendToApi(amount: number, reason: string = 'spend', detail?: string) {
+  if (typeof window === 'undefined') return
+  const userId = localStorage.getItem('chineselearn-user-id')
+  if (!userId) return
+  fetch('/api/coins/spend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+    body: JSON.stringify({ amount, reason, detail }),
+  }).catch(() => {})
+}
+
 // 兼容旧版同步函数
 export function getPetSync(): PetState {
   const pet = getPetRaw()
