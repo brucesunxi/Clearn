@@ -288,7 +288,7 @@ export function spendCoinsSync(amount: number): boolean {
 }
 
 // 为了向后兼容，导出同名函数
-export { addCoinsSync as addCoins, spendCoinsSync as spendCoins }
+// 注意：addCoins 和 spendCoins 已在上面定义，不要重复导出
 
 export async function buyFood(foodId: string, quantity: number = 1): Promise<boolean> {
   const item = FOOD_ITEMS.find((f) => f.id === foodId)
