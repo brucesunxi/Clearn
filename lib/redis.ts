@@ -660,8 +660,8 @@ export async function getCustomArticles(userId: string): Promise<Article[] | nul
   try {
     const raw = await redis.get<any>(customArticlesKey(userId))
     if (!raw) return null
-    if (typeof raw === 'string') return JSON.parse(raw) as CustomArticle[]
-    return raw as CustomArticle[]
+    if (typeof raw === 'string') return JSON.parse(raw) as Article[]
+    return raw as Article[]
   } catch { return null }
 }
 
