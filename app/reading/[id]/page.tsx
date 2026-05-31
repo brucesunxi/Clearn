@@ -1,11 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getArticle, getLevel, getAllArticles } from '@/lib/content'
-import ArticleContent from '@/components/ArticleContent'
-import WordList from '@/components/WordList'
-import ArticleBreadcrumb from '@/components/ArticleBreadcrumb'
-import ArticleStudyButton from '@/components/ArticleStudyButton'
-import { AdBanner } from '@/lib/adsense'
+import ArticlePageClient from '@/components/ArticlePageClient'
 
 interface ArticlePageProps {
   params: { id: string }
@@ -19,6 +15,9 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   }
   return {
     title: `${article.title} ${article.titleEn}`,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     description: `阅读中文文章「${article.title}」(${article.titleEn})，学习${article.vocabulary.length}个生词。Read Chinese: ${article.titleEn}.`,
     openGraph: {
       title: `${article.title} - 熊猫汉语`,
@@ -39,21 +38,6 @@ export default function ArticlePage({ params }: ArticlePageProps) {
   const level = getLevel(article.level)
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <ArticleBreadcrumb level={level || undefined} articleLevel={article.level} />
-
-      {/* Main content */}
-      <ArticleContent article={article} />
-
-      <AdBanner />
-
-      {/* Vocabulary list */}
-      <WordList vocabulary={article.vocabulary} articleId={article.id} />
-
-      {/* Learn this lesson's words */}
-      <div className="mt-8 text-center">
-        <ArticleStudyButton />
-      </div>
-    </div>
+    <ArticlePageClient article={article} level={level} />
   )
 }

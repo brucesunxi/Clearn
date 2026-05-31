@@ -15,6 +15,7 @@ import type { WordBookEntry } from '@/lib/wordbooks'
 import CheckInCalendar from '@/components/CheckInCalendar'
 import FlashcardSession from '@/components/FlashcardSession'
 import QuizSession from '@/components/QuizSession'
+import { AdBanner } from '@/lib/adsense'
 
 interface LearnPageClientProps {
   levels: Level[]
@@ -223,6 +224,9 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
           </div>
         </div>
       </div>
+
+      {/* Ad in learning page */}
+      <AdBanner />
 
       {/* Article level selector (like Reading) */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">

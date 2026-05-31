@@ -6,7 +6,10 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push *)",
-      "Bash(curl -sI https://pandahan.xyz)"
+      "Bash(curl -sI https://pandahan.xyz)",
+      "Bash(npx next *)",
+      "WebFetch(domain:paddle.com)",
+      "Bash(vercel --prod)"
     ]
   }
 }

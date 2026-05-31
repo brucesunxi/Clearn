@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article } from '@/lib/types'
 import { getMasteredCount, getTotalWordsCount } from '@/lib/words'
 import { getCustomArticles } from '@/lib/custom-articles'
+import { AdBanner } from '@/lib/adsense'
 
 interface ReadingPageClientProps {
   levels: Level[]
@@ -107,8 +108,16 @@ export default function ReadingPageClient({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {articles.map((article) => (
-            <ArticleCardClient key={article.id} article={article} locale={locale} t={t} />
+          {articles.map((article, index) => (
+            <>
+              <ArticleCardClient key={article.id} article={article} locale={locale} t={t} />
+              {/* Insert ad every 4 articles */}
+              {(index + 1) % 4 === 0 && index !== articles.length - 1 && (
+                <div className="col-span-1 sm:col-span-2 my-4">
+                  <AdBanner />
+                </div>
+              )}
+            </>
           ))}
         </div>
       )}

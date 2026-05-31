@@ -2,6 +2,15 @@
 const nextConfig = {
   trailingSlash: false,
   skipTrailingSlashRedirect: true,
+  async redirects() {
+    return [
+      {
+        source: '/favicon.ico',
+        destination: '/favicon.svg',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

@@ -5,6 +5,12 @@ import levelsData from '@/content/levels.json'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content')
 
+// Extract numeric suffix from ID (e.g., "l1-extra-5" -> 5, "l1-more-12" -> 12)
+function extractNumberFromId(id: string): number | null {
+  const match = id.match(/-(\d+)$/)
+  return match ? parseInt(match[1], 10) : null
+}
+
 export type { Article, Level }
 
 export function getLevels(): Level[] {
@@ -31,7 +37,15 @@ export function getArticlesByLevel(levelId: number): Article[] {
     articles.push(JSON.parse(content) as Article)
   }
 
-  return articles.sort((a, b) => a.id.localeCompare(b.id))
+  return articles.sort((a, b) => {
+    // Extract numeric parts from IDs for proper numeric sorting
+    const numA = extractNumberFromId(a.id)
+    const numB = extractNumberFromId(b.id)
+    if (numA !== null && numB !== null) {
+      return numA - numB
+    }
+    return a.id.localeCompare(b.id)
+  })
 }
 
 export function getAllArticles(): Article[] {
