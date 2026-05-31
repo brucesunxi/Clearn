@@ -5,9 +5,10 @@ import { WORD_BOOKS } from '@/lib/wordbooks'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Article } from '@/lib/types'
 import { trackActivity } from '@/lib/activity'
-import { addCoins, syncCoinsToApi } from '@/lib/pet'
+import { useCoins } from '@/lib/use-coins'
+import { spendCoins } from '@/lib/pet'
 
-type AiLevel = 'easy' | 'medium' | 'hard'
+type AiLevel = 'easy' | 'medium' | 'hard' | 'hell'
 
 interface AiConfig {
   label: string
@@ -16,6 +17,9 @@ interface AiConfig {
   minDelay: number
   maxDelay: number
   emoji: string
+  entryFee: number      // 入场费（金币）
+  winReward: number     // 胜利奖励（每正确一题）
+  loseReward: number    // 失败奖励（每正确一题）
 }
 
 const AI_CONFIGS: Record<AiLevel, AiConfig> = {
@@ -26,6 +30,9 @@ const AI_CONFIGS: Record<AiLevel, AiConfig> = {
     minDelay: 3000,
     maxDelay: 6000,
     emoji: '🐣',
+    entryFee: 0,
+    winReward: 20,
+    loseReward: 10,
   },
   medium: {
     label: 'Medium',
@@ -34,6 +41,9 @@ const AI_CONFIGS: Record<AiLevel, AiConfig> = {
     minDelay: 1500,
     maxDelay: 3000,
     emoji: '🤖',
+    entryFee: 0,
+    winReward: 30,
+    loseReward: 15,
   },
   hard: {
     label: 'Hard',
@@ -42,6 +52,20 @@ const AI_CONFIGS: Record<AiLevel, AiConfig> = {
     minDelay: 800,
     maxDelay: 1500,
     emoji: '🧠',
+    entryFee: 50,         // 困难模式需50金币
+    winReward: 50,        // 每正确一题50金币，胜利额外奖励
+    loseReward: 20,
+  },
+  hell: {
+    label: 'Hell',
+    labelZh: '地狱',
+    accuracy: 0.99,
+    minDelay: 500,
+    maxDelay: 1000,
+    emoji: '🔥',
+    entryFee: 50,         // 地狱模式需50金币
+    winReward: 80,        // 每正确一题80金币
+    loseReward: 30,
   },
 }
 
@@ -67,6 +91,7 @@ function formatTime(ms: number): string {
 
 export default function AiBattleGame({ articles = [] }: { articles?: Article[] }) {
   const { locale } = useTranslation()
+  const { balance, refresh } = useCoins()
   const allWords = useMemo(() => WORD_BOOKS.flatMap((wb) => wb.words), [])
 
   const [sourceType, setSourceType] = useState<'wordbook' | 'article'>('wordbook')
@@ -114,9 +139,9 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
     return book ? book.words : allWords
   }, [allWords, selectedBookId, sourceType, selectedArticles])
 
-  // Phase: level selection → playing → result
-  const [phase, setPhase] = useState<'select' | 'playing' | 'result'>('select')
+  const [phase, setPhase] = useState<'select' | 'confirm' | 'playing' | 'result'>('select')
   const [aiLevel, setAiLevel] = useState<AiLevel>('medium')
+  const [insufficientCoins, setInsufficientCoins] = useState(false)
   const [round, setRound] = useState(0)
   const [userScore, setUserScore] = useState(0)
   const [aiScore, setAiScore] = useState(0)
@@ -140,12 +165,35 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   // Track used words to avoid repeats
   const usedWordIds = useRef(new Set<string>())
 
-  const cleanup = useCallback(() => {
-    if (aiTimerRef.current) {
-      clearTimeout(aiTimerRef.current)
-      aiTimerRef.current = null
+  const startBattle = async () => {
+    const config = AI_CONFIGS[aiLevel]
+
+    // 检查是否需要金币
+    if (config.entryFee > 0) {
+      if (balance < config.entryFee) {
+        setInsufficientCoins(true)
+        return
+      }
+
+      // 扣除入场费
+      const success = await spendCoins(config.entryFee)
+      if (!success) {
+        setInsufficientCoins(true)
+        return
+      }
+      await refresh()
     }
-  }, [])
+
+    // 开始对战
+    setPhase('playing')
+    setRound(0)
+    setUserScore(0)
+    setAiScore(0)
+    setUserCorrect(0)
+    setAiCorrect(0)
+    usedWordIds.current.clear()
+    pickWord()
+  }
 
   useEffect(() => cleanup, [cleanup])
 
@@ -226,23 +274,29 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
     const next = round + 1
     if (next >= totalRounds) {
       cleanup()
-      // Calculate coin reward
-      const difficultyMul = { easy: 1, medium: 1.5, hard: 2 }[aiLevel]
+      // Calculate coin reward based on new config
+      const config = AI_CONFIGS[aiLevel]
       const won = userScore > aiScore
       const draw = userScore === aiScore
-      let reward: number
+
+      // 基础奖励：每正确一题 * 对应难度奖励
+      let reward = userCorrect * (won ? config.winReward : config.loseReward)
+
+      // 额外奖励
       if (won) {
-        reward = Math.round(userCorrect * 20 * difficultyMul)
+        reward += Math.round(totalRounds * 5)  // 胜利额外奖励
       } else if (draw) {
-        reward = Math.round(userCorrect * 15)
-      } else {
-        reward = Math.round(userCorrect * 10)
+        reward += Math.round(totalRounds * 2)  // 平局小奖励
       }
-      if (reward > 0) {
-        addCoins(reward)
-        syncCoinsToApi(reward, 'battle_complete', aiLevel + ', ' + userCorrect + '/' + totalRounds + ' correct, ' + (won ? 'won' : draw ? 'tie' : 'lost'))
+
+      // 扣除入场费（如果是收费模式）
+      const netReward = reward - config.entryFee
+
+      if (netReward > 0) {
+        addCoins(netReward)
+        syncCoinsToApi(netReward, 'battle_complete', `${aiLevel}, ${userCorrect}/${totalRounds} correct, ${won ? 'won' : draw ? 'draw' : 'lost'}, entry:${config.entryFee}, reward:${reward}`)
       }
-      trackActivity('battle_complete', { userScore, aiScore, userCorrect, aiCorrect, aiLevel, totalRounds })
+      trackActivity('battle_complete', { userScore, aiScore, userCorrect, aiCorrect, aiLevel, totalRounds, entryFee: config.entryFee, reward })
       setPhase('result')
       return
     }
@@ -271,45 +325,94 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
         </div>
 
         {/* AI Level selector */}
-        <div className="flex gap-3 mb-6 max-w-md mx-auto">
+        <div className="grid grid-cols-2 gap-3 mb-6 max-w-md mx-auto">
           {(Object.entries(AI_CONFIGS) as [AiLevel, AiConfig][]).map(([key, cfg]) => (
             <button
               key={key}
               onClick={() => setAiLevel(key)}
-              className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
+              className={`py-3 rounded-xl text-sm font-medium transition-all ${
                 aiLevel === key
                   ? 'bg-orange-500 text-white shadow-sm ring-2 ring-orange-300'
                   : 'bg-white text-gray-500 border border-gray-200 hover:bg-orange-50'
               }`}
             >
               <span className="block text-lg mb-0.5">{cfg.emoji}</span>
-              {locale === 'zh' ? cfg.labelZh : cfg.label}
+              <span>{locale === 'zh' ? cfg.labelZh : cfg.label}</span>
+              {cfg.entryFee > 0 && (
+                <span className={`block text-xs mt-1 ${aiLevel === key ? 'text-orange-200' : 'text-amber-500'}`}>
+                  🪙 {cfg.entryFee}
+                </span>
+              )}
+              {cfg.entryFee === 0 && (
+                <span className={`block text-xs mt-1 ${aiLevel === key ? 'text-orange-200' : 'text-emerald-500'}`}>
+                  {locale === 'zh' ? '免费' : 'Free'}
+                </span>
+              )}
             </button>
           ))}
         </div>
 
         {/* AI stats */}
-        <div className="bg-white rounded-xl p-4 mb-6 max-w-md mx-auto text-sm text-gray-500">
+        <div className="bg-white rounded-xl p-4 mb-6 max-w-md mx-auto text-sm">
           {aiLevel === 'easy' && (
-            <p>
-              {locale === 'zh'
-                ? '🐣 简单模式：AI 正确率约 60%，答题慢（3-6秒），新手友好'
-                : '🐣 Easy: ~60% accuracy, slow (3-6s), beginner friendly'}
-            </p>
+            <div className="text-gray-600">
+              <p className="font-medium text-emerald-600 mb-1">
+                {locale === 'zh' ? '🐣 简单模式（免费）' : '🐣 Easy (Free)'}
+              </p>
+              <p className="text-gray-500 text-xs">
+                {locale === 'zh'
+                  ? 'AI 正确率约 60%，答题慢（3-6秒），新手友好'
+                  : 'AI ~60% accuracy, slow (3-6s), beginner friendly'}
+              </p>
+              <p className="text-amber-600 text-xs mt-2">
+                {locale === 'zh' ? '💰 胜利：每题20金币' : '💰 Win: 20 coins/question'}
+              </p>
+            </div>
           )}
           {aiLevel === 'medium' && (
-            <p>
-              {locale === 'zh'
-                ? '🤖 中等模式：AI 正确率约 80%，答题适中（1.5-3秒），有点挑战'
-                : '🤖 Medium: ~80% accuracy, moderate (1.5-3s), some challenge'}
-            </p>
+            <div className="text-gray-600">
+              <p className="font-medium text-emerald-600 mb-1">
+                {locale === 'zh' ? '🤖 中等模式（免费）' : '🤖 Medium (Free)'}
+              </p>
+              <p className="text-gray-500 text-xs">
+                {locale === 'zh'
+                  ? 'AI 正确率约 80%，答题适中（1.5-3秒），有点挑战'
+                  : 'AI ~80% accuracy, moderate (1.5-3s), some challenge'}
+              </p>
+              <p className="text-amber-600 text-xs mt-2">
+                {locale === 'zh' ? '💰 胜利：每题30金币' : '💰 Win: 30 coins/question'}
+              </p>
+            </div>
           )}
           {aiLevel === 'hard' && (
-            <p>
-              {locale === 'zh'
-                ? '🧠 困难模式：AI 正确率约 95%，答题快（0.8-1.5秒），高手对决'
-                : '🧠 Hard: ~95% accuracy, fast (0.8-1.5s), expert challenge'}
-            </p>
+            <div className="text-gray-600">
+              <p className="font-medium text-amber-600 mb-1">
+                {locale === 'zh' ? '🧠 困难模式（50金币入场）' : '🧠 Hard (50 coins entry)'}
+              </p>
+              <p className="text-gray-500 text-xs">
+                {locale === 'zh'
+                  ? 'AI 正确率约 95%，答题快（0.8-1.5秒），高手对决'
+                  : 'AI ~95% accuracy, fast (0.8-1.5s), expert challenge'}
+              </p>
+              <p className="text-amber-600 text-xs mt-2">
+                {locale === 'zh' ? '💰 入场费50，胜利每题50金币' : '💰 Entry: 50, Win: 50 coins/question'}
+              </p>
+            </div>
+          )}
+          {aiLevel === 'hell' && (
+            <div className="text-gray-600">
+              <p className="font-medium text-red-600 mb-1">
+                {locale === 'zh' ? '🔥 地狱模式（50金币入场）' : '🔥 Hell (50 coins entry)'}
+              </p>
+              <p className="text-gray-500 text-xs">
+                {locale === 'zh'
+                  ? 'AI 正确率约 99%，答题极快（0.5-1秒），极限挑战'
+                  : 'AI ~99% accuracy, very fast (0.5-1s), extreme challenge'}
+              </p>
+              <p className="text-amber-600 text-xs mt-2">
+                {locale === 'zh' ? '💰 入场费50，胜利每题80金币' : '💰 Entry: 50, Win: 80 coins/question'}
+              </p>
+            </div>
           )}
         </div>
 
@@ -446,12 +549,29 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
         </div>
 
         <div className="text-center">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="text-amber-500">🪙</span>
+            <span className="text-sm text-gray-600">{balance}</span>
+            {AI_CONFIGS[aiLevel].entryFee > 0 && (
+              <span className="text-xs text-amber-600">
+                (-{AI_CONFIGS[aiLevel].entryFee} {locale === 'zh' ? '入场费' : 'entry'})
+              </span>
+            )}
+          </div>
           <button
-            onClick={startGame}
-            className="px-8 py-3 rounded-xl text-base font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-sm hover:shadow-md transition-all"
+            onClick={startBattle}
+            disabled={sourceWords.length < totalRounds}
+            className="px-8 py-3 rounded-xl text-base font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-sm hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             ⚔️ {locale === 'zh' ? '开始对战' : 'Start Battle'}
           </button>
+          {insufficientCoins && AI_CONFIGS[aiLevel].entryFee > 0 && (
+            <p className="text-red-500 text-xs mt-2">
+              {locale === 'zh'
+                ? `金币不足，需要 ${AI_CONFIGS[aiLevel].entryFee} 金币`
+                : `Need ${AI_CONFIGS[aiLevel].entryFee} coins`}
+            </p>
+          )}
         </div>
       </div>
     )
@@ -499,15 +619,31 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
         {/* Coin reward */}
         <div className="text-center mb-6">
           {(() => {
-            const mul = { easy: 1, medium: 1.5, hard: 2 }[aiLevel]
-            let r
-            if (userWon) r = Math.round(userCorrect * 20 * mul)
-            else if (tie) r = Math.round(userCorrect * 15)
-            else r = Math.round(userCorrect * 10)
-            if (r <= 0) return null
-            return <p className="text-sm font-medium text-yellow-600">🪙 +{r} coins</p>
+            const config = AI_CONFIGS[aiLevel]
+            let reward = userCorrect * (userWon ? config.winReward : tie ? config.winReward * 0.5 : config.loseReward)
+            if (userWon) reward += totalRounds * 5
+            else if (tie) reward += totalRounds * 2
+            const netReward = reward - config.entryFee
+            if (netReward <= 0) return (
+              <p className="text-sm text-gray-500">
+                {locale === 'zh' ? '再接再厉！' : 'Keep trying!'}
+              </p>
+            )
+            return (
+              <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                <p className="text-lg font-bold text-amber-600">🪙 +{netReward}</p>
+                <p className="text-xs text-amber-500 mt-1">
+                  {locale === 'zh'
+                    ? `奖励：${reward} - 入场费：${config.entryFee}`
+                    : `Reward: ${reward} - Entry: ${config.entryFee}`}
+                </p>
+              </div>
+            )
           })()}
         </div>
+
+        {/* Ad after battle */}
+        <AdInterstitial />
 
         <div className="flex justify-center gap-3">
           <button

@@ -7,6 +7,9 @@ import type { Level, Article, Paragraph, VocabularyItem } from '@/lib/types'
 import { saveCustomArticle } from '@/lib/custom-articles'
 import { buildVocabDict, splitIntoParagraphs, extractVocabulary, suggestNewWords, assessLevel } from '@/lib/chinese-text'
 import { trackActivity } from '@/lib/activity'
+import { getImportLimitStatus, incrementImportCount, IMPORT_CONFIG } from '@/lib/import-limit'
+import { useCoins } from '@/lib/use-coins'
+import ImportLimitModal from './ImportLimitModal'
 
 interface ImportPageClientProps {
   levels: Level[]
@@ -20,6 +23,7 @@ type Step = 'input' | 'preview'
 export default function ImportPageClient({ levels, articles }: ImportPageClientProps) {
   const { t, locale } = useTranslation()
   const router = useRouter()
+  const { spend, balance } = useCoins()
   const [step, setStep] = useState<Step>('input')
   const [rawText, setRawText] = useState('')
   const [title, setTitle] = useState('')
@@ -39,6 +43,8 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   const [isTranslating, setIsTranslating] = useState(false)
   const [useAiClean, setUseAiClean] = useState(true)
   const [aiGeneratingTitle, setAiGeneratingTitle] = useState(false)
+  const [showLimitModal, setShowLimitModal] = useState(false)
+  const [limitStatus, setLimitStatus] = useState(getImportLimitStatus())
 
   const dict = useMemo(() => buildVocabDict(articles), [articles])
 
@@ -245,9 +251,38 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
     }
   }
 
-  const handleSave = () => {
+  const handleSaveClick = () => {
+    // 检查导入限制
+    const status = getImportLimitStatus()
+    setLimitStatus(status)
+
+    if (status.isOverLimit) {
+      // 需要金币，显示限制弹窗
+      setShowLimitModal(true)
+    } else {
+      // 免费导入，直接保存
+      handleSave()
+    }
+  }
+
+  const handleSave = async () => {
     setSaving(true)
     const id = `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+
+    // 如果需要金币，先扣除
+    const status = getImportLimitStatus()
+    if (status.isOverLimit) {
+      const success = await spend(IMPORT_CONFIG.EXTRA_COST)
+      if (!success) {
+        setError(locale === 'zh'
+          ? `金币不足，需要 ${IMPORT_CONFIG.EXTRA_COST} 金币`
+          : `Not enough coins. Need ${IMPORT_CONFIG.EXTRA_COST} coins`
+        )
+        setSaving(false)
+        return
+      }
+    }
+
     const article: Article = {
       id,
       title: title || rawText.split('\n')[0]?.trim().slice(0, 50) || '未命名文章',
@@ -258,7 +293,9 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
       vocabulary,
     }
     saveCustomArticle(article)
+    incrementImportCount()
     trackActivity('material_import', { wordCount: vocabulary.length, charCount: rawText.length })
+    setShowLimitModal(false)
     router.push(`/reading/custom/${id}`)
   }
 
@@ -629,6 +666,45 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
         </div>
       </div>
 
+      {/* Import limit status */}
+      <div className={`rounded-xl px-4 py-3 mb-6 flex items-center justify-between ${
+        limitStatus.isOverLimit ? 'bg-amber-50 border border-amber-200' : 'bg-emerald-50 border border-emerald-200'
+      }`}>
+        <div className="flex items-center gap-3">
+          <span className="text-xl">📥</span>
+          <div>
+            <p className={`text-sm font-medium ${
+              limitStatus.isOverLimit ? 'text-amber-700' : 'text-emerald-700'
+            }`}>
+              {locale === 'zh'
+                ? `今日导入：${limitStatus.used}/${limitStatus.freeLimit} 篇`
+                : `Today's imports: ${limitStatus.used}/${limitStatus.freeLimit}`
+              }
+            </p>
+            {limitStatus.isOverLimit ? (
+              <p className="text-xs text-amber-600">
+                {locale === 'zh'
+                  ? `超额导入需 ${IMPORT_CONFIG.EXTRA_COST} 金币/篇`
+                  : `Extra imports cost ${IMPORT_CONFIG.EXTRA_COST} coins each`
+                }
+              </p>
+            ) : (
+              <p className="text-xs text-emerald-600">
+                {locale === 'zh'
+                  ? `还可免费导入 ${limitStatus.remainingFree} 篇`
+                  : `${limitStatus.remainingFree} free imports remaining`
+                }
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-amber-500">🪙</span>
+          <span className="text-sm font-bold text-amber-600">{balance}</span>
+        </div>
+      </div>
+
       {/* Paragraphs */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
         <h2 className="text-lg font-bold text-gray-800 mb-4">
@@ -736,7 +812,7 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
 
       {/* Save button */}
       <button
-        onClick={handleSave}
+        onClick={handleSaveClick}
         disabled={saving}
         className="w-full py-3 rounded-xl text-base font-medium bg-emerald-500 text-white hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
       >
@@ -744,6 +820,15 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
           ? (locale === 'zh' ? '保存中...' : 'Saving...')
           : (locale === 'zh' ? '💾 保存到学习库' : '💾 Save to Library')}
       </button>
+
+      {/* Import Limit Modal */}
+      <ImportLimitModal
+        isOpen={showLimitModal}
+        status={limitStatus}
+        onConfirm={handleSave}
+        onCancel={() => setShowLimitModal(false)}
+        onEarnCoins={() => router.push('/learn')}
+      />
     </div>
   )
 }
