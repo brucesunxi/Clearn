@@ -150,8 +150,20 @@ function applyDecay(pet: PetState): PetState {
   }
 }
 
-/** Get current pet with decay applied (双写模式) */
-export async function getPet(): Promise<PetState> {
+/** Get current pet with decay applied (同步版本供组件使用) */
+export function getPet(): PetState {
+  const pet = getPetRaw()
+  const updated = applyDecay(pet)
+  if (updated.hunger !== pet.hunger || updated.happiness !== pet.happiness) {
+    savePet(updated)
+    // 异步同步到 Redis
+    saveRedisPet(updated).catch(() => {})
+  }
+  return updated
+}
+
+/** Get current pet with decay applied (异步版本优先 Redis) */
+export async function getPetAsync(): Promise<PetState> {
   // 优先从 Redis 获取
   const redisPet = await getRedisPetState()
   const pet = redisPet || getPetRaw()
@@ -200,8 +212,8 @@ export function getPetSync(): PetState {
 }
 
 /** Feed the pet */
-export async function feedPet(foodId: string): Promise<{ pet: PetState; inventory: Inventory; message: string }> {
-  const pet = await getPet()
+export function feedPet(foodId: string): { pet: PetState; inventory: Inventory; message: string } {
+  const pet = getPet()
   const inv = getInventoryRaw()
   const qty = inv.food[foodId] || 0
 
@@ -230,8 +242,8 @@ export async function feedPet(foodId: string): Promise<{ pet: PetState; inventor
   // 双写保存
   savePet(updatedPet)
   saveInventory(updatedInv)
-  await saveRedisPet(updatedPet)
-  await saveRedisInventory(updatedInv)
+  saveRedisPet(updatedPet).catch(() => {})
+  saveRedisInventory(updatedInv).catch(() => {})
 
   return {
     pet: updatedPet,
