@@ -21,6 +21,8 @@ export interface ImportLimitStatus {
 }
 
 export function getImportCount(): { count: number; date: string } {
+  if (typeof window === 'undefined') return { count: 0, date: new Date().toISOString().split('T')[0] }
+
   const today = new Date().toISOString().split('T')[0]
   const storedDate = localStorage.getItem(IMPORT_DATE_KEY)
   const storedCount = localStorage.getItem(IMPORT_COUNT_KEY)
@@ -40,6 +42,7 @@ export function getImportCount(): { count: number; date: string } {
 }
 
 export function incrementImportCount(): void {
+  if (typeof window === 'undefined') return
   const { count } = getImportCount()
   localStorage.setItem(IMPORT_COUNT_KEY, String(count + 1))
 }
@@ -80,6 +83,7 @@ export function checkImportCost(): { allowed: boolean; cost: number; message: st
 
 // 记录已导入的文章ID
 export function recordImportedArticle(articleId: string): void {
+  if (typeof window === 'undefined') return
   const imported = getImportedArticles()
   if (!imported.includes(articleId)) {
     imported.push(articleId)
@@ -89,6 +93,7 @@ export function recordImportedArticle(articleId: string): void {
 
 // 获取今日已导入的文章列表
 export function getImportedArticles(): string[] {
+  if (typeof window === 'undefined') return []
   const raw = localStorage.getItem(IMPORTED_ARTICLES_KEY)
   if (!raw) return []
   try {

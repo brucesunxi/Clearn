@@ -6,7 +6,8 @@ import { useTranslation } from '@/lib/i18n/context'
 import type { Article } from '@/lib/types'
 import { trackActivity } from '@/lib/activity'
 import { useCoins } from '@/lib/use-coins'
-import { spendCoins } from '@/lib/pet'
+import { spendCoins, addCoins, syncCoinsToApi } from '@/lib/pet'
+import { AdInterstitial } from '@/lib/adsense'
 
 type AiLevel = 'easy' | 'medium' | 'hard' | 'hell'
 
@@ -164,6 +165,13 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
 
   // Track used words to avoid repeats
   const usedWordIds = useRef(new Set<string>())
+
+  const cleanup = useCallback(() => {
+    if (aiTimerRef.current) {
+      clearTimeout(aiTimerRef.current)
+      aiTimerRef.current = null
+    }
+  }, [])
 
   const startBattle = async () => {
     const config = AI_CONFIGS[aiLevel]

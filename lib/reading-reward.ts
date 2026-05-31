@@ -17,6 +17,8 @@ export interface ReadingRewardStatus {
 }
 
 export function getReadingCount(): { count: number; date: string } {
+  if (typeof window === 'undefined') return { count: 0, date: new Date().toISOString().split('T')[0] }
+
   const today = new Date().toISOString().split('T')[0]
   const storedDate = localStorage.getItem(READING_DATE_KEY)
   const storedCount = localStorage.getItem(READING_COUNT_KEY)
@@ -36,6 +38,7 @@ export function getReadingCount(): { count: number; date: string } {
 }
 
 export function incrementReadingCount(): void {
+  if (typeof window === 'undefined') return
   const { count } = getReadingCount()
   localStorage.setItem(READING_COUNT_KEY, String(count + 1))
 }
@@ -59,6 +62,7 @@ export function getReadingRewardStatus(): ReadingRewardStatus {
 
 // 标记某篇文章的金币已领取
 export function markArticleRewardClaimed(articleId: string): void {
+  if (typeof window === 'undefined') return
   const claimed = getClaimedRewards()
   if (!claimed.includes(articleId)) {
     claimed.push(articleId)
@@ -68,6 +72,7 @@ export function markArticleRewardClaimed(articleId: string): void {
 
 // 获取已领取奖励的文章列表
 export function getClaimedRewards(): string[] {
+  if (typeof window === 'undefined') return []
   const raw = localStorage.getItem(READING_REWARD_KEY)
   if (!raw) return []
   try {
@@ -84,6 +89,7 @@ export function isArticleRewardClaimed(articleId: string): boolean {
 
 // 清理旧数据（可选）
 export function cleanupOldReadingData(): void {
+  if (typeof window === 'undefined') return
   localStorage.removeItem('daily_reading_count')
   localStorage.removeItem('daily_reading_date')
 }
