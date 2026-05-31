@@ -31,7 +31,12 @@ export async function POST(request: NextRequest) {
 
     const sent = await sendVerificationEmail(user.email, verToken)
     if (!sent) {
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+      // Check if MAILTRAP is configured
+      const hasMailtrap = !!process.env.MAILTRAP_API_KEY
+      if (!hasMailtrap) {
+        return NextResponse.json({ error: 'Email service not configured. Please contact admin.' }, { status: 500 })
+      }
+      return NextResponse.json({ error: 'Failed to send email. Please try again later.' }, { status: 500 })
     }
 
     return NextResponse.json({ success: true })

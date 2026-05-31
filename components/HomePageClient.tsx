@@ -7,6 +7,92 @@ import { useAuth } from '@/lib/auth-context'
 import { getDailyGoal, getTodayProgress, isCheckedInToday, getCheckInData } from '@/lib/checkin'
 import { getMasteredCount, getTotalWordsCount, getDueReviewCount } from '@/lib/words'
 
+const RESEND_COOLDOWN = 60 // 60 seconds
+
+function ResendButton({ locale }: { locale: string }) {
+  const [countdown, setCountdown] = useState(0)
+  const [isSending, setIsSending] = useState(false)
+  const [lastError, setLastError] = useState<string | null>(null)
+
+  // Load countdown from localStorage on mount
+  useEffect(() => {
+    const savedTime = localStorage.getItem('emailResendUntil')
+    if (savedTime) {
+      const remaining = Math.max(0, Math.ceil((parseInt(savedTime) - Date.now()) / 1000))
+      if (remaining > 0) {
+        setCountdown(remaining)
+      } else {
+        localStorage.removeItem('emailResendUntil')
+      }
+    }
+  }, [])
+
+  // Countdown timer
+  useEffect(() => {
+    if (countdown <= 0) return
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          localStorage.removeItem('emailResendUntil')
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [countdown])
+
+  const handleClick = async () => {
+    if (countdown > 0 || isSending) return
+
+    setIsSending(true)
+    setLastError(null)
+
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        credentials: 'same-origin'
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send')
+      }
+
+      // Success - start countdown
+      const until = Date.now() + RESEND_COOLDOWN * 1000
+      localStorage.setItem('emailResendUntil', until.toString())
+      setCountdown(RESEND_COOLDOWN)
+    } catch (e) {
+      setLastError(e instanceof Error ? e.message : '发送失败')
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const getButtonText = () => {
+    if (isSending) return locale === 'zh' ? '发送中...' : 'Sending...'
+    if (countdown > 0) return locale === 'zh' ? `重新发送 (${countdown}s)` : `Resend (${countdown}s)`
+    if (lastError) return locale === 'zh' ? '发送失败，重试' : 'Failed, retry'
+    return locale === 'zh' ? '重新发送' : 'Resend'
+  }
+
+  return (
+    <div>
+      <button
+        onClick={handleClick}
+        disabled={countdown > 0 || isSending}
+        className="mt-2 px-3 py-1 text-xs rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-amber-800 dark:text-amber-300 transition-colors"
+      >
+        {getButtonText()}
+      </button>
+      {lastError && (
+        <p className="mt-1 text-xs text-red-500">{lastError}</p>
+      )}
+    </div>
+  )
+}
+
 interface HomePageClientProps {
   totalArticles: number
 }
@@ -50,19 +136,7 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
                 ? '请检查收件箱（包括垃圾邮件），点击验证链接完成注册。如果没收到可点击重新发送。'
                 : 'Check your inbox (and spam) and click the verification link.'}
             </p>
-            <button
-              onClick={async (e) => {
-                const btn = e.currentTarget
-                btn.disabled = true
-                btn.textContent = locale === 'zh' ? '发送中...' : 'Sending...'
-                await fetch('/api/auth/resend-verification', { method: 'POST' })
-                btn.textContent = locale === 'zh' ? '✅ 已发送' : '✅ Sent'
-                setTimeout(() => { btn.disabled = false; btn.textContent = locale === 'zh' ? '重新发送' : 'Resend' }, 30000)
-              }}
-              className="mt-2 px-3 py-1 text-xs rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-800 dark:text-amber-300 transition-colors"
-            >
-              {locale === 'zh' ? '重新发送' : 'Resend'}
-            </button>
+            <ResendButton locale={locale} />
           </div>
         )}
 

@@ -262,6 +262,20 @@ export async function markEmailVerified(token: string): Promise<boolean> {
   } catch { return false }
 }
 
+/** Admin function: directly verify a user's email by email address */
+export async function verifyEmailByAddress(email: string): Promise<boolean> {
+  const redis = getRedis()
+  if (!redis) return false
+  try {
+    const user = await getUserByEmail(email)
+    if (!user) return false
+    user.emailVerified = true
+    user.verificationToken = null
+    await redis.set(userKey(user.userId), JSON.stringify(user))
+    return true
+  } catch { return false }
+}
+
 // ---- Inventory ----
 
 export interface InventoryData {
