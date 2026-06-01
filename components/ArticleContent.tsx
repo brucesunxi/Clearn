@@ -8,13 +8,19 @@ import WordCard from './WordCard'
 
 interface ArticleContentProps {
   article: Article
+  previewMode?: boolean
 }
 
-export default function ArticleContent({ article }: ArticleContentProps) {
+export default function ArticleContent({ article, previewMode }: ArticleContentProps) {
   const { t, locale } = useTranslation()
   const [selectedWord, setSelectedWord] = useState<VocabularyItem | null>(null)
   const [showTranslations, setShowTranslations] = useState(false)
   const [playingPara, setPlayingPara] = useState<number | null>(null)
+
+  // 预览模式只显示前两段
+  const displayParagraphs = previewMode
+    ? article.paragraphs.slice(0, 2)
+    : article.paragraphs
 
   const sortedVocab = useMemo(
     () =>
@@ -89,7 +95,7 @@ export default function ArticleContent({ article }: ArticleContentProps) {
 
       {/* Paragraphs with sentence-level audio */}
       <div className="space-y-8">
-        {article.paragraphs.map((p, i) => (
+        {displayParagraphs.map((p, i) => (
           <div key={i} className="group flex gap-2 items-start">
             {/* Speaker button — appears on hover */}
             <button

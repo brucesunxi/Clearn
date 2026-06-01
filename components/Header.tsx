@@ -193,16 +193,16 @@ export default function Header() {
               ) : (
                 <div className="flex items-center gap-2">
                   <Link
-                    href="/register"
+                    href="/login"
                     className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors border border-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 dark:border-gray-600"
                   >
-                    {locale === 'zh' ? '注册' : 'Register'}
+                    {locale === 'zh' ? '登录' : 'Login'}
                   </Link>
                   <Link
-                    href="/login"
-                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors border border-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-400 dark:border-blue-800"
+                    href="/register"
+                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-colors shadow-sm"
                   >
-                    {locale === 'zh' ? '登录' : 'Login'}
+                    {locale === 'zh' ? '免费注册 🎁' : 'Register 🎁'}
                   </Link>
                 </div>
               )}

@@ -6,9 +6,12 @@ import { useTranslation } from '@/lib/i18n/context'
 import { getMasteredCount, getTotalWordsCount, getDueReviewCount, getStageDistribution } from '@/lib/words'
 import { getCheckInData } from '@/lib/checkin'
 import CheckInCalendar from '@/components/CheckInCalendar'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from '@/components/AuthWall'
 
 export default function StatsPage() {
   const { locale } = useTranslation()
+  const { user, loading } = useAuth()
   const [mastered, setMastered] = useState(0)
   const [total, setTotal] = useState(0)
   const [due, setDue] = useState(0)
@@ -36,6 +39,25 @@ export default function StatsPage() {
     '15': locale === 'zh' ? '15天' : '15 Days',
     '30': locale === 'zh' ? '30天' : '30 Days',
     '90': locale === 'zh' ? '90天' : '90 Days',
+  }
+
+  // 登录检查
+  if (loading) {
+    return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">
+          📊 {locale === 'zh' ? '学习统计' : 'Learning Stats'}
+        </h1>
+        <AuthWall
+          featureName="学习统计"
+          description="查看学习统计需要登录账号。注册即送 500 金币开始学习！"
+        />
+      </div>
+    )
   }
 
   return (

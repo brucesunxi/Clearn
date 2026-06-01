@@ -5,6 +5,8 @@ import { useTranslation } from '@/lib/i18n/context'
 import { generateBoxes, processPrize } from '@/lib/blindbox'
 import type { DrawnPrize } from '@/lib/blindbox'
 import { trackActivity } from '@/lib/activity'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 const BOX_COST = 100
 
@@ -47,6 +49,7 @@ async function syncPetToApi() {
 
 export default function BlindBoxClient() {
   const { locale } = useTranslation()
+  const { user, loading } = useAuth()
   const [coins, setCoins] = useState(() => {
     if (typeof window === 'undefined') return 500
     try {
@@ -153,6 +156,31 @@ export default function BlindBoxClient() {
     setSelectedIndex(null)
     setBoxes([])
     setMessage('')
+  }
+
+  // 登录检查
+  if (loading) {
+    return <div className="max-w-lg mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <p className="text-5xl mb-3">🎁</p>
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            {locale === 'zh' ? '神秘盲盒' : 'Mystery Blind Box'}
+          </h1>
+          <p className="text-sm text-gray-400">
+            抽取盲盒赢取宠物食物和饰品！
+          </p>
+        </div>
+        <AuthWall
+          featureName="神秘盲盒"
+          description="抽取盲盒需要登录账号。注册即送 500 金币开始抽取！"
+        />
+      </div>
+    )
   }
 
   return (

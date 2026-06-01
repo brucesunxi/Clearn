@@ -5,6 +5,8 @@ import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article } from '@/lib/types'
 import { useCustomArticles } from '@/lib/use-custom-articles'
 import SpeakSession from './SpeakSession'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 interface SpeakPageClientProps {
   levels: Level[]
@@ -13,6 +15,7 @@ interface SpeakPageClientProps {
 
 export default function SpeakPageClient({ levels, articles: baseArticles }: SpeakPageClientProps) {
   const { t, locale } = useTranslation()
+  const { user, loading } = useAuth()
   const articles = useCustomArticles(baseArticles)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
@@ -29,6 +32,27 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
     : displayArticles
 
   useEffect(() => { setStarted(false) }, [selectedLevelId, selectedArticleIds])
+
+  // 加载中
+  if (loading) {
+    return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  // 未登录显示登录墙
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">🗣️ {t('speak.title', '口语练习')}</h1>
+          <p className="text-gray-400 text-sm">{t('speak.subtitle', '看中文，说出来')}</p>
+        </div>
+        <AuthWall
+          featureName="口语练习"
+          description="口语练习需要登录账号。注册即送 500 金币开始学习！"
+        />
+      </div>
+    )
+  }
 
   if (started) {
     return (

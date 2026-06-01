@@ -5,6 +5,8 @@ import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article } from '@/lib/types'
 import { useCustomArticles } from '@/lib/use-custom-articles'
 import ListenSession from './ListenSession'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 interface ListenPageClientProps {
   levels: Level[]
@@ -13,6 +15,7 @@ interface ListenPageClientProps {
 
 export default function ListenPageClient({ levels, articles: baseArticles }: ListenPageClientProps) {
   const { t, locale } = useTranslation()
+  const { user, loading } = useAuth()
   const articles = useCustomArticles(baseArticles)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
@@ -30,6 +33,27 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
 
   // Reset started when selection changes
   useEffect(() => { setStarted(false) }, [selectedLevelId, selectedArticleIds])
+
+  // 加载中
+  if (loading) {
+    return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  // 未登录显示登录墙
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">🎧 {t('listen.title', '听力练习')}</h1>
+          <p className="text-gray-400 text-sm">{t('listen.subtitle', '听中文，选意思')}</p>
+        </div>
+        <AuthWall
+          featureName="听力练习"
+          description="听力练习需要登录账号。注册即送 500 金币开始学习！"
+        />
+      </div>
+    )
+  }
 
   if (started) {
     return (

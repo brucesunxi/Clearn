@@ -8,6 +8,8 @@ import {
 } from '@/lib/pet'
 import type { PetState, Inventory } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 const ACCESSORY_POSITIONS: Record<string, { top: string; left: string; size: string }> = {
   red_scarf: { top: '62%', left: '40%', size: '28px' },
@@ -20,6 +22,7 @@ const ACCESSORY_POSITIONS: Record<string, { top: string; left: string; size: str
 
 export default function PetPageClient() {
   const { t, locale } = useTranslation()
+  const { user, loading } = useAuth()
   const [tab, setTab] = useState<'panda' | 'shop'>('panda')
   const [pet, setPet] = useState<PetState>(() => getPet())
   const [inv, setInv] = useState<Inventory>(() => getInventory())
@@ -127,6 +130,26 @@ export default function PetPageClient() {
   const statusText = petStatsText(pet)
   const hungerPct = pet.hunger
   const happinessPct = pet.happiness
+
+  // 登录检查
+  if (loading) {
+    return <div className="max-w-lg mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          🐼 {locale === 'zh' ? '我的熊猫' : 'My Panda'}
+        </h1>
+        <p className="text-gray-400 mb-6">照顾你的熊猫朋友，坚持学习让它成长！</p>
+        <AuthWall
+          featureName="熊猫伙伴"
+          description="养熊猫需要登录账号。注册即送 500 金币和一只可爱的熊猫！"
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8">

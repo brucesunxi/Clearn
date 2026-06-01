@@ -10,6 +10,8 @@ import { trackActivity } from '@/lib/activity'
 import { getImportLimitStatus, incrementImportCount, IMPORT_CONFIG } from '@/lib/import-limit'
 import { useCoins } from '@/lib/use-coins'
 import ImportLimitModal from './ImportLimitModal'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 interface ImportPageClientProps {
   levels: Level[]
@@ -22,6 +24,7 @@ type Step = 'input' | 'preview'
 
 export default function ImportPageClient({ levels, articles }: ImportPageClientProps) {
   const { t, locale } = useTranslation()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const { spend, balance } = useCoins()
   const [step, setStep] = useState<Step>('input')
@@ -330,6 +333,30 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
     vocabPage * VOCAB_PAGE_SIZE,
     (vocabPage + 1) * VOCAB_PAGE_SIZE
   )
+
+  // 登录检查
+  if (loading) {
+    return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">
+            📥 {locale === 'zh' ? '导入内容' : 'Import Content'}
+          </h1>
+          <p className="text-sm text-gray-400">
+            粘贴文本、上传 PDF 或输入网页链接，自动分析生成学习素材
+          </p>
+        </div>
+        <AuthWall
+          featureName="导入内容"
+          description="导入功能需要登录账号。注册即送 500 金币开始导入！"
+        />
+      </div>
+    )
+  }
 
   if (step === 'input') {
     return (

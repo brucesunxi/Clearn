@@ -8,6 +8,8 @@ import { trackActivity } from '@/lib/activity'
 import { useCoins } from '@/lib/use-coins'
 import { spendCoins, addCoins, syncCoinsToApi } from '@/lib/pet'
 import { AdInterstitial } from '@/lib/adsense'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 type AiLevel = 'easy' | 'medium' | 'hard' | 'hell'
 
@@ -92,6 +94,7 @@ function formatTime(ms: number): string {
 
 export default function AiBattleGame({ articles = [] }: { articles?: Article[] }) {
   const { locale } = useTranslation()
+  const { user, loading } = useAuth()
   const { balance, refresh } = useCoins()
   const allWords = useMemo(() => WORD_BOOKS.flatMap((wb) => wb.words), [])
 
@@ -158,6 +161,26 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   const [aiDone, setAiDone] = useState(false)
   const [userTime, setUserTime] = useState(0)
   const [aiTime, setAiTime] = useState(0)
+
+  // 登录检查
+  if (loading) {
+    return <div className="max-w-2xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">⚔️ AI 单词对战</h1>
+          <p className="text-gray-400 text-sm">和 AI 比拼中文词汇，赢取金币！</p>
+        </div>
+        <AuthWall
+          featureName="AI 对战"
+          description="AI 单词对战需要登录账号。注册即送 500 金币开始挑战！"
+        />
+      </div>
+    )
+  }
 
   const roundStartRef = useRef(0)
   const aiTimerRef = useRef<NodeJS.Timeout | null>(null)
