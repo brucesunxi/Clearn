@@ -183,7 +183,7 @@ function ArticleCardClient({
             className="text-xs px-2.5 py-0.5 rounded-full text-white font-medium"
             style={{ backgroundColor: article.level ? levelsColor[article.level - 1] : '#999' }}
           >
-            {t(`level.${article.level}.name`)}
+            {article.level ? t(`level.${article.level}.name`) : locale === 'zh' ? '其他' : 'Other'}
           </span>
           <span className="text-xs text-gray-400">
             📝 {article.vocabulary.length} {t('reading.newWords')}
