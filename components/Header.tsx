@@ -45,6 +45,12 @@ export default function Header() {
     initVoice()
     const read = () => {
       try {
+        // 如果未登录，不显示金币
+        if (!user) {
+          setCoins(0)
+          setHistory([])
+          return
+        }
         const raw = localStorage.getItem('panda-inventory')
         if (raw) {
           const inv = JSON.parse(raw)
@@ -55,9 +61,14 @@ export default function Header() {
     read()
     const t = setInterval(read, 1000)
     return () => clearInterval(t)
-  }, [])
+  }, [user])
 
   const fetchHistory = useCallback(async () => {
+    // 未登录不获取历史
+    if (!user) {
+      setHistory([])
+      return
+    }
     setHistoryLoading(true)
     try {
       const res = await fetch('/api/coins/history', {
@@ -70,7 +81,7 @@ export default function Header() {
     } catch {} finally {
       setHistoryLoading(false)
     }
-  }, [])
+  }, [user])
 
   const handleToggleHistory = () => {
     if (!showHistory) {
@@ -134,6 +145,7 @@ export default function Header() {
           <Link href="/blindbox" className="text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 font-medium transition-colors text-sm">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
           <Link href="/pet" className="text-gray-600 hover:text-green-500 dark:text-gray-300 dark:hover:text-green-400 font-medium transition-colors text-sm">🐼</Link>
         </div>
+        {user && (
           <div className="relative">
             <button
               onClick={handleToggleHistory}
@@ -175,6 +187,7 @@ export default function Header() {
               </>
             )}
           </div>
+        )}
           {!isAdminPage && !loading && (
             <>
               {user ? (
