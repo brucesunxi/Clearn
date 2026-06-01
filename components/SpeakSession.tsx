@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
 import { addCoins, syncCoinsToApi } from '@/lib/pet'
+import { trackActivity } from '@/lib/activity'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -104,7 +105,7 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
       setIdx((i) => i + 1); setHeard(''); setResult(null); setStatus('idle')
     } else {
       const earned = correct * 15 + 30
-      addCoins(earned); syncCoinsToApi(earned, 'speak_complete', correct + '/' + cards.length + ' correct'); setCoinsEarned(earned); setStep('result')
+      addCoins(earned); syncCoinsToApi(earned, 'speak_complete', correct + '/' + cards.length + ' correct'); trackActivity('speak_complete', { correct, total: cards.length, coins: earned }); setCoinsEarned(earned); setStep('result')
     }
   }
 

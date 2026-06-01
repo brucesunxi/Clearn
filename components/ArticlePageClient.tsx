@@ -9,6 +9,7 @@ import WordList from './WordList'
 import ArticleStudyButton from './ArticleStudyButton'
 import ArticleBreadcrumb from './ArticleBreadcrumb'
 import type { Article, Level } from '@/lib/types'
+import { trackActivity } from '@/lib/activity'
 
 interface ArticlePageClientProps {
   article: Article
@@ -23,6 +24,8 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
     incrementReadingCount()
     const currentStatus = getReadingRewardStatus()
     setStatus(currentStatus)
+    // 记录用户行为
+    trackActivity('article_read', { articleId: article.id, level: article.level })
   }, [])
 
   if (!status) {

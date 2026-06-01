@@ -504,6 +504,10 @@ export interface ActivityEntry {
 const ACTIVITY_IDS_KEY = 'activity:ids'
 const ACTIVITY_TTL_SEC = 60 * 60 * 24 * 30 // 30 days
 
+// 内存存储 fallback（仅用于本地开发）
+const memoryActivityStore = new Map<string, ActivityEntry>()
+const memoryActivityIds: string[] = []
+
 function generateActivityId(): string {
   return `act-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
@@ -518,7 +522,6 @@ export async function createActivity(
   detail?: string,
 ): Promise<ActivityEntry | null> {
   const redis = getRedis()
-  if (!redis) return null
   const entry: ActivityEntry = {
     id: generateActivityId(),
     userId,
@@ -526,12 +529,28 @@ export async function createActivity(
     detail: detail || '',
     createdAt: new Date().toISOString(),
   }
-  try {
-    await redis.set(activityKey(entry.id), JSON.stringify(entry), { ex: ACTIVITY_TTL_SEC })
-    await appendToArrayIndex(redis, ACTIVITY_IDS_KEY, entry.id)
-  } catch {
-    // Redis unavailable
+
+  if (redis) {
+    try {
+      await redis.set(activityKey(entry.id), JSON.stringify(entry), { ex: ACTIVITY_TTL_SEC })
+      await appendToArrayIndex(redis, ACTIVITY_IDS_KEY, entry.id)
+    } catch {
+      // Redis unavailable, fallback to memory
+    }
   }
+
+  // 内存 fallback（本地开发时使用）
+  memoryActivityStore.set(entry.id, entry)
+  if (!memoryActivityIds.includes(entry.id)) {
+    memoryActivityIds.push(entry.id)
+  }
+
+  // 限制内存存储大小（最多保留 500 条）
+  if (memoryActivityIds.length > 500) {
+    const oldestId = memoryActivityIds.shift()
+    if (oldestId) memoryActivityStore.delete(oldestId)
+  }
+
   return entry
 }
 
@@ -540,27 +559,41 @@ export async function getActivityEntries(
   pageSize: number,
 ): Promise<{ entries: ActivityEntry[]; total: number } | null> {
   const redis = getRedis()
-  if (!redis) return null
-  try {
-    const ids = await readArrayIndex(redis, ACTIVITY_IDS_KEY)
-    const total = ids.length
-    const start = (page - 1) * pageSize
-    const end = start + pageSize - 1
-    const pageIds = ids.slice(start, end + 1).reverse()
-    if (pageIds.length === 0) return { entries: [], total }
-    const rawEntries = await Promise.all(
-      pageIds.map((id: string) => redis.get<string>(activityKey(id))),
-    )
-    const entries = rawEntries
-      .filter((e) => e !== null && e !== undefined)
-      .map((e) => {
-        if (typeof e === 'string') return JSON.parse(e) as ActivityEntry
-        return e as unknown as ActivityEntry
-      })
-    return { entries, total }
-  } catch {
-    return { entries: [], total: 0 }
+  let entries: ActivityEntry[] = []
+  let total = 0
+
+  if (redis) {
+    try {
+      const ids = await readArrayIndex(redis, ACTIVITY_IDS_KEY)
+      total = ids.length
+      const start = (page - 1) * pageSize
+      const end = start + pageSize - 1
+      const pageIds = ids.slice(start, end + 1).reverse()
+      if (pageIds.length > 0) {
+        const rawEntries = await Promise.all(
+          pageIds.map((id: string) => redis.get<string>(activityKey(id))),
+        )
+        entries = rawEntries
+          .filter((e) => e !== null && e !== undefined)
+          .map((e) => {
+            if (typeof e === 'string') return JSON.parse(e) as ActivityEntry
+            return e as unknown as ActivityEntry
+          })
+        return { entries, total }
+      }
+    } catch {
+      // Redis error, fallback to memory
+    }
   }
+
+  // 内存 fallback
+  total = memoryActivityIds.length
+  const start = (page - 1) * pageSize
+  const end = start + pageSize - 1
+  const pageIds = memoryActivityIds.slice(start, end + 1).reverse()
+  entries = pageIds.map((id) => memoryActivityStore.get(id)!).filter(Boolean)
+
+  return { entries, total }
 }
 
 // ---- Word Progress ----

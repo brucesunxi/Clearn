@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
 import { addCoins, syncCoinsToApi } from '@/lib/pet'
+import { trackActivity } from '@/lib/activity'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -89,7 +90,7 @@ export default function ListenSession({ articles }: ListenSessionProps) {
       setIdx((i) => i + 1); setSelected(null); setRevealed(false)
     } else {
       const earned = correct * 10 + 20
-      addCoins(earned); syncCoinsToApi(earned, 'listen_complete', correct + '/' + questions.length + ' correct'); setCoinsEarned(earned); setStep('result')
+      addCoins(earned); syncCoinsToApi(earned, 'listen_complete', correct + '/' + questions.length + ' correct'); trackActivity('listen_complete', { correct, total: questions.length, coins: earned }); setCoinsEarned(earned); setStep('result')
     }
   }
 
