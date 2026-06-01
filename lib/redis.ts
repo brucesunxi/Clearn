@@ -566,9 +566,11 @@ export async function getActivityEntries(
     try {
       const ids = await readArrayIndex(redis, ACTIVITY_IDS_KEY)
       total = ids.length
+      // 先反转让最新的在前面，再分页
+      const reversedIds = [...ids].reverse()
       const start = (page - 1) * pageSize
-      const end = start + pageSize - 1
-      const pageIds = ids.slice(start, end + 1).reverse()
+      const end = start + pageSize
+      const pageIds = reversedIds.slice(start, end)
       if (pageIds.length > 0) {
         const rawEntries = await Promise.all(
           pageIds.map((id: string) => redis.get<string>(activityKey(id))),
@@ -586,11 +588,12 @@ export async function getActivityEntries(
     }
   }
 
-  // 内存 fallback
+  // 内存 fallback - 同样先反转再分页
   total = memoryActivityIds.length
+  const reversedIds = [...memoryActivityIds].reverse()
   const start = (page - 1) * pageSize
-  const end = start + pageSize - 1
-  const pageIds = memoryActivityIds.slice(start, end + 1).reverse()
+  const end = start + pageSize
+  const pageIds = reversedIds.slice(start, end)
   entries = pageIds.map((id) => memoryActivityStore.get(id)!).filter(Boolean)
 
   return { entries, total }
