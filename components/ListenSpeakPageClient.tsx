@@ -7,6 +7,8 @@ import { useCustomArticles } from '@/lib/use-custom-articles'
 import ListenSession from './ListenSession'
 import SpeakSession from './SpeakSession'
 import IntensiveListening from './IntensiveListening'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 interface ListenSpeakPageClientProps {
   levels: Level[]
@@ -17,6 +19,7 @@ type Tab = 'listen' | 'speak' | 'intensive'
 
 export default function ListenSpeakPageClient({ levels, articles: baseArticles }: ListenSpeakPageClientProps) {
   const { t, locale } = useTranslation()
+  const { user, loading } = useAuth()
   const articles = useCustomArticles(baseArticles)
   const [tab, setTab] = useState<Tab>('listen')
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
@@ -33,6 +36,30 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
     : displayArticles
 
   const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
+
+  // 登录检查
+  if (loading) {
+    return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            🎧 {t('listenspeak.title', '听力口语练习')}
+          </h1>
+          <p className="text-sm text-gray-400">
+            {locale === 'zh' ? '听力和口语练习，提升中文听说能力' : 'Practice listening and speaking Chinese'}
+          </p>
+        </div>
+        <AuthWall
+          featureName="听力口语练习"
+          description="听力口语练习需要登录账号。注册即送 500 金币开始学习！"
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">

@@ -16,6 +16,8 @@ import CheckInCalendar from '@/components/CheckInCalendar'
 import FlashcardSession from '@/components/FlashcardSession'
 import QuizSession from '@/components/QuizSession'
 import { AdBanner } from '@/lib/adsense'
+import { useAuth } from '@/lib/auth-context'
+import AuthWall from './AuthWall'
 
 interface LearnPageClientProps {
   levels: Level[]
@@ -61,9 +63,10 @@ function wordBookToArticles(wordBookId: number): Article[] {
   }]
 }
 
-export default function LearnPageClient({ levels, articles }: LearnPageClientProps) {
+export default function LearnPageClient({ levels, articles: baseArticles }: LearnPageClientProps) {
   const { t, locale } = useTranslation()
-  articles = useCustomArticles(articles)
+  const { user, loading } = useAuth()
+  const articles = useCustomArticles(baseArticles)
   const [mode, setMode] = useState<Mode>('flashcard')
   const [goal, setGoalState] = useState(10)
   const [progress, setProgress] = useState({ done: 0, goal: 10 })
@@ -138,6 +141,30 @@ export default function LearnPageClient({ levels, articles }: LearnPageClientPro
     setWordBook(level)
     saveBook(level)
     setSessionKey((k) => k + 1)
+  }
+
+  // 登录检查
+  if (loading) {
+    return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            📝 {t('wordmem.title', '单词记忆')}
+          </h1>
+          <p className="text-sm text-gray-400">
+            使用艾宾浩斯遗忘曲线科学记单词
+          </p>
+        </div>
+        <AuthWall
+          featureName="单词记忆"
+          description="单词记忆功能需要登录账号。注册即送 500 金币开始学习！"
+        />
+      </div>
+    )
   }
 
   return (
