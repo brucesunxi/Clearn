@@ -118,14 +118,16 @@ export async function addCoinHistory(
   }
 }
 
-export async function getCoinHistory(userId: string): Promise<CoinHistoryEntry[]> {
+export async function getCoinHistory(userId: string, limit: number = 50): Promise<CoinHistoryEntry[]> {
   const redis = getRedis()
   if (!redis) return []
   try {
     const ids = await readArrayIndex(redis, coinHistoryIndexKey(userId))
     if (ids.length === 0) return []
+    // 只取最近的 limit 条记录
+    const recentIds = ids.slice(-limit).reverse()
     const rawEntries = await Promise.all(
-      ids.map((id) => redis.get<any>(coinHistoryEntryKey(id))),
+      recentIds.map((id) => redis.get<any>(coinHistoryEntryKey(id))),
     )
     return rawEntries
       .filter((e) => e !== null && e !== undefined)
@@ -244,6 +246,17 @@ export async function getAllUsers(): Promise<UserRecord[]> {
     } while (cursor !== 0)
   } catch {}
   return users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+}
+
+export async function getUsersPaginated(
+  page: number,
+  pageSize: number,
+): Promise<{ users: UserRecord[]; total: number }> {
+  const allUsers = await getAllUsers()
+  const total = allUsers.length
+  const start = (page - 1) * pageSize
+  const end = start + pageSize
+  return { users: allUsers.slice(start, end), total }
 }
 
 export async function markEmailVerified(token: string): Promise<boolean> {

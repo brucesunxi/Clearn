@@ -59,6 +59,8 @@ export default function AdminFeedbackClient() {
   const [users, setUsers] = useState<UserEntry[]>([])
   const [usersLoading, setUsersLoading] = useState(false)
   const [usersError, setUsersError] = useState('')
+  const [usersPage, setUsersPage] = useState(1)
+  const [usersTotal, setUsersTotal] = useState(0)
 
   const pageSize = 20
 
@@ -95,14 +97,15 @@ export default function AdminFeedbackClient() {
     finally { setActLoading(false) }
   }, [adminKey])
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (p: number) => {
     setUsersLoading(true); setUsersError('')
     try {
-      const res = await fetch('/api/admin/users', { headers: { 'x-admin-key': adminKey } })
+      const params = new URLSearchParams({ page: String(p), pageSize: String(pageSize) })
+      const res = await fetch(`/api/admin/users?${params}`, { headers: { 'x-admin-key': adminKey } })
       if (res.status === 401) return handleSessionExpired()
       if (!res.ok) throw new Error()
       const data: { users: UserEntry[]; total: number } = await res.json()
-      setUsers(data.users)
+      setUsers(data.users); setUsersTotal(data.total)
     } catch { setUsersError('Failed to load users') }
     finally { setUsersLoading(false) }
   }, [adminKey])
@@ -116,8 +119,8 @@ export default function AdminFeedbackClient() {
   }, [step, adminKey, tab, actPage, actFilter, fetchActivity])
 
   useEffect(() => {
-    if (step === 'authenticated' && adminKey && tab === 'users') fetchUsers()
-  }, [step, adminKey, tab, fetchUsers])
+    if (step === 'authenticated' && adminKey && tab === 'users') fetchUsers(usersPage)
+  }, [step, adminKey, tab, usersPage, fetchUsers])
 
   // ---- Auth ----
   const handleAuth = async () => {
@@ -196,6 +199,7 @@ export default function AdminFeedbackClient() {
 
   const fbTotalPages = Math.max(1, Math.ceil(fbTotal / pageSize))
   const actTotalPages = Math.max(1, Math.ceil(actTotal / pageSize))
+  const usersTotalPages = Math.max(1, Math.ceil(usersTotal / pageSize))
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -313,6 +317,7 @@ export default function AdminFeedbackClient() {
         {/* Users Tab */}
         {tab === 'users' && (
           <>
+            <p className="text-sm text-gray-400 mb-3">Total: {usersTotal}</p>
             {usersError && <p className="mb-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{usersError}</p>}
             {usersLoading && <div className="text-center py-12 text-gray-400">Loading...</div>}
             {!usersLoading && users.length === 0 && (
@@ -336,9 +341,13 @@ export default function AdminFeedbackClient() {
                     </div>
                   ))}
                 </div>
-                <div className="px-4 py-2 border-t border-gray-100 text-xs text-gray-400 bg-gray-50">
-                  Total: {users.length} user{users.length !== 1 ? 's' : ''}
-                </div>
+              </div>
+            )}
+            {usersTotalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <button onClick={() => setUsersPage((p) => Math.max(1, p - 1))} disabled={usersPage <= 1} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">← Prev</button>
+                <span className="text-xs text-gray-400">{usersPage} / {usersTotalPages}</span>
+                <button onClick={() => setUsersPage((p) => Math.min(usersTotalPages, p + 1))} disabled={usersPage >= usersTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">Next →</button>
               </div>
             )}
           </>

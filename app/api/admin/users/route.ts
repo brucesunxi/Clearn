@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllUsers } from '@/lib/redis'
+import { getUsersPaginated } from '@/lib/redis'
 
 function checkAdmin(request: NextRequest): boolean {
   return request.headers.get('x-admin-key') === process.env.ADMIN_KEY
@@ -10,7 +10,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const users = await getAllUsers()
+  const { searchParams } = new URL(request.url)
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
+  const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get('pageSize') || '20', 10)))
+
+  const { users, total } = await getUsersPaginated(page, pageSize)
   const list = users.map((u) => ({
     userId: u.userId,
     email: u.email,
@@ -18,5 +22,5 @@ export async function GET(request: NextRequest) {
     emailVerified: u.emailVerified,
   }))
 
-  return NextResponse.json({ users: list, total: list.length })
+  return NextResponse.json({ users: list, total })
 }
