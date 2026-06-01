@@ -156,12 +156,12 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
             📝 {t('wordmem.title')}
           </h1>
           <p className="text-sm text-gray-400">
-            使用艾宾浩斯遗忘曲线科学记单词
+            {locale === 'zh' ? '使用艾宾浩斯遗忘曲线科学记单词' : 'Master words with the Ebbinghaus forgetting curve'}
           </p>
         </div>
         <AuthWall
-          featureName="单词记忆"
-          description="单词记忆功能需要登录账号。注册即送 500 金币开始学习！"
+          title={locale === 'zh' ? '单词记忆' : 'Word Memorization'}
+          description={locale === 'zh' ? '单词记忆功能需要登录账号。注册即送 500 金币开始学习！' : 'Log in to use word memorization. Sign up to get 500 coins!'}
         />
       </div>
     )

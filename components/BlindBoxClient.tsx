@@ -172,12 +172,12 @@ export default function BlindBoxClient() {
             {locale === 'zh' ? '神秘盲盒' : 'Mystery Blind Box'}
           </h1>
           <p className="text-sm text-gray-400">
-            抽取盲盒赢取宠物食物和饰品！
+            {locale === 'zh' ? '抽取盲盒赢取宠物食物和饰品！' : 'Open blind boxes to win pet food and accessories!'}
           </p>
         </div>
         <AuthWall
-          featureName="神秘盲盒"
-          description="抽取盲盒需要登录账号。注册即送 500 金币开始抽取！"
+          title={locale === 'zh' ? '神秘盲盒' : 'Mystery Blind Box'}
+          description={locale === 'zh' ? '抽取盲盒需要登录账号。注册即送 500 金币开始抽取！' : 'Log in to open blind boxes. Sign up to get 500 coins!'}
         />
       </div>
     )

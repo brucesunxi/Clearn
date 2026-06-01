@@ -54,8 +54,8 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
           </p>
         </div>
         <AuthWall
-          featureName="听力口语练习"
-          description="听力口语练习需要登录账号。注册即送 500 金币开始学习！"
+          title={locale === 'zh' ? '听力口语练习' : 'Listening & Speaking'}
+          description={locale === 'zh' ? '听力口语练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice listening and speaking. Sign up to get 500 coins!'}
         />
       </div>
     )

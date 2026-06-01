@@ -47,8 +47,8 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
           <p className="text-gray-400 text-sm">{t('speak.subtitle')}</p>
         </div>
         <AuthWall
-          featureName="口语练习"
-          description="口语练习需要登录账号。注册即送 500 金币开始学习！"
+          title={locale === 'zh' ? '口语练习' : 'Speaking Practice'}
+          description={locale === 'zh' ? '口语练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice speaking. Sign up to get 500 coins!'}
         />
       </div>
     )

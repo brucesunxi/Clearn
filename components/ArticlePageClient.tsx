@@ -11,6 +11,7 @@ import ArticleBreadcrumb from './ArticleBreadcrumb'
 import type { Article, Level } from '@/lib/types'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
+import { useTranslation } from '@/lib/i18n/context'
 import AuthWall from './AuthWall'
 
 interface ArticlePageClientProps {
@@ -20,6 +21,7 @@ interface ArticlePageClientProps {
 
 export default function ArticlePageClient({ article, level }: ArticlePageClientProps) {
   const { user, loading } = useAuth()
+  const { locale } = useTranslation()
   const [status, setStatus] = useState<ReadingRewardStatus | null>(null)
 
   useEffect(() => {
@@ -47,8 +49,8 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
         </div>
         <div className="mt-8">
           <AuthWall
-            title="阅读完整文章"
-            description="阅读完整内容需要登录账号。注册即送 500 金币开始学习！"
+            title={locale === 'zh' ? '阅读完整文章' : 'Read Full Article'}
+            description={locale === 'zh' ? '阅读完整内容需要登录账号。注册即送 500 金币开始学习！' : 'Log in to read the full article. Sign up to get 500 coins!'}
           />
         </div>
       </div>

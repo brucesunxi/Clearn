@@ -28,7 +28,7 @@ const EBBINGHAUS_INTERVALS = [0, 1, 2, 4, 7, 15, 30, 90]
 const MAX_ATTEMPTS = 3
 
 export default function FlashcardSession({ articles, onComplete }: FlashcardSessionProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [step, setStep] = useState<'config' | 'learning' | 'summary'>('config')
   const [newCount, setNewCount] = useState(5)
   const [reviewCount, setReviewCount] = useState(5)
@@ -281,19 +281,19 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
 
       {/* What's next */}
       <div className="mb-6 text-left">
-        <h3 className="text-sm font-medium text-gray-600 mb-3">🎯 {t('session.again').includes('again') ? 'Next Step?' : '接下来做什么？'}</h3>
+        <h3 className="text-sm font-medium text-gray-600 mb-3">🎯 {locale === 'zh' ? '接下来做什么？' : 'What\'s next?'}</h3>
         <div className="flex flex-wrap gap-2">
           <a href="/pet"
             className="flex-1 min-w-[100px] px-3 py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium text-center transition-colors">
-            🐼 {correctCount > 0 ? '喂熊猫 +快乐' : '看看熊猫'}
+            🐼 {locale === 'zh' ? (correctCount > 0 ? '喂熊猫 +快乐' : '看看熊猫') : (correctCount > 0 ? 'Feed panda +happy' : 'Visit panda')}
           </a>
           <a href="/practice"
             className="flex-1 min-w-[100px] px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium text-center transition-colors">
-            🎧 听力练习
+            🎧 {locale === 'zh' ? '听力练习' : 'Listening'}
           </a>
           <a href="/stats"
             className="flex-1 min-w-[100px] px-3 py-2 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-medium text-center transition-colors">
-            📊 学习统计
+            📊 {locale === 'zh' ? '学习统计' : 'Statistics'}
           </a>
         </div>
       </div>

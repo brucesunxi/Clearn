@@ -64,7 +64,7 @@ function ResendButton({ locale }: { locale: string }) {
       localStorage.setItem('emailResendUntil', until.toString())
       setCountdown(RESEND_COOLDOWN)
     } catch (e) {
-      setLastError(e instanceof Error ? e.message : '发送失败')
+      setLastError(e instanceof Error ? e.message : (locale === 'zh' ? '发送失败' : 'Send failed'))
     } finally {
       setIsSending(false)
     }

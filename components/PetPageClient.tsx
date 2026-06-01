@@ -142,10 +142,10 @@ export default function PetPageClient() {
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
           🐼 {locale === 'zh' ? '我的熊猫' : 'My Panda'}
         </h1>
-        <p className="text-gray-400 mb-6">照顾你的熊猫朋友，坚持学习让它成长！</p>
+        <p className="text-gray-400 mb-6">{locale === 'zh' ? '照顾你的熊猫朋友，坚持学习让它成长！' : 'Take care of your panda friend and keep learning to help it grow!'}</p>
         <AuthWall
-          featureName="熊猫伙伴"
-          description="养熊猫需要登录账号。注册即送 500 金币和一只可爱的熊猫！"
+          title={locale === 'zh' ? '熊猫伙伴' : 'Panda Companion'}
+          description={locale === 'zh' ? '养熊猫需要登录账号。注册即送 500 金币和一只可爱的熊猫！' : 'Log in to adopt a panda. Sign up to get 500 coins and a cute panda!'}
         />
       </div>
     )

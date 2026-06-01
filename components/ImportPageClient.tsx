@@ -347,12 +347,12 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
             📥 {locale === 'zh' ? '导入内容' : 'Import Content'}
           </h1>
           <p className="text-sm text-gray-400">
-            粘贴文本、上传 PDF 或输入网页链接，自动分析生成学习素材
+            {locale === 'zh' ? '粘贴文本、上传 PDF 或输入网页链接，自动分析生成学习素材' : 'Paste text, upload PDF, or enter a URL to auto-generate learning materials'}
           </p>
         </div>
         <AuthWall
-          featureName="导入内容"
-          description="导入功能需要登录账号。注册即送 500 金币开始导入！"
+          title={locale === 'zh' ? '导入内容' : 'Import Content'}
+          description={locale === 'zh' ? '导入功能需要登录账号。注册即送 500 金币开始导入！' : 'Log in to import content. Sign up to get 500 coins!'}
         />
       </div>
     )

@@ -48,8 +48,8 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
           <p className="text-gray-400 text-sm">{t('listen.subtitle')}</p>
         </div>
         <AuthWall
-          featureName="听力练习"
-          description="听力练习需要登录账号。注册即送 500 金币开始学习！"
+          title={locale === 'zh' ? '听力练习' : 'Listening Practice'}
+          description={locale === 'zh' ? '听力练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice listening. Sign up to get 500 coins!'}
         />
       </div>
     )

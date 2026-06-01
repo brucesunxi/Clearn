@@ -171,12 +171,12 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">⚔️ AI 单词对战</h1>
-          <p className="text-gray-400 text-sm">和 AI 比拼中文词汇，赢取金币！</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">⚔️ {locale === 'zh' ? 'AI 单词对战' : 'AI Word Battle'}</h1>
+          <p className="text-gray-400 text-sm">{locale === 'zh' ? '和 AI 比拼中文词汇，赢取金币！' : 'Battle AI with Chinese vocabulary and win coins!'}</p>
         </div>
         <AuthWall
-          featureName="AI 对战"
-          description="AI 单词对战需要登录账号。注册即送 500 金币开始挑战！"
+          title={locale === 'zh' ? 'AI 单词对战' : 'AI Word Battle'}
+          description={locale === 'zh' ? 'AI 单词对战需要登录账号。注册即送 500 金币开始挑战！' : 'Log in to battle AI. Sign up to get 500 coins!'}
         />
       </div>
     )
