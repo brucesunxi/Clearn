@@ -47,13 +47,15 @@ export default function RootLayout({
         <meta name="google-adsense-account" content="ca-pub-9711589934416529" />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9711589934416529" crossOrigin="anonymous" />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-9K8RD1K13S" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18197467032" />
         <script
           dangerouslySetInnerHTML={{
             __html: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 
-gtag('config', 'G-9K8RD1K13S');`,
+gtag('config', 'G-9K8RD1K13S');
+gtag('config', 'AW-18197467032');`,
           }}
         />
       </head>
