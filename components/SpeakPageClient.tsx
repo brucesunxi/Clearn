@@ -43,8 +43,8 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">🗣️ {t('speak.title', '口语练习')}</h1>
-          <p className="text-gray-400 text-sm">{t('speak.subtitle', '看中文，说出来')}</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">🗣️ {t('speak.title')}</h1>
+          <p className="text-gray-400 text-sm">{t('speak.subtitle')}</p>
         </div>
         <AuthWall
           featureName="口语练习"

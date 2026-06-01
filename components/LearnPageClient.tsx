@@ -153,7 +153,7 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            📝 {t('wordmem.title', '单词记忆')}
+            📝 {t('wordmem.title')}
           </h1>
           <p className="text-sm text-gray-400">
             使用艾宾浩斯遗忘曲线科学记单词

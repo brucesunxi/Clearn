@@ -44,8 +44,8 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">🎧 {t('listen.title', '听力练习')}</h1>
-          <p className="text-gray-400 text-sm">{t('listen.subtitle', '听中文，选意思')}</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-1">🎧 {t('listen.title')}</h1>
+          <p className="text-gray-400 text-sm">{t('listen.subtitle')}</p>
         </div>
         <AuthWall
           featureName="听力练习"

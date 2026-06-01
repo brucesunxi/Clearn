@@ -47,7 +47,7 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            🎧 {t('listenspeak.title', '听力口语练习')}
+            🎧 {t('listenspeak.title')}
           </h1>
           <p className="text-sm text-gray-400">
             {locale === 'zh' ? '听力和口语练习，提升中文听说能力' : 'Practice listening and speaking Chinese'}
