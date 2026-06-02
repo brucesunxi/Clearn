@@ -19,9 +19,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
     }
 
-    // Get existing anonymous userId if any
-    const existingUserId = request.headers.get('x-user-id') || ''
-    const userId = existingUserId || `user-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+    // 每个账号使用独立 userId，不复用旧的
+    const userId = `user-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
     const passwordHash = await hashPassword(password)
     const created = await createUser(userId, normalizedEmail, passwordHash)
