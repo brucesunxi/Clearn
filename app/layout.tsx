@@ -55,7 +55,14 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 
 gtag('config', 'G-9K8RD1K13S');
-gtag('config', 'AW-18197467032');`,
+gtag('config', 'AW-18197467032');
+
+// 网页浏览转化跟踪
+gtag('event', 'conversion', {
+  'send_to': 'AW-18197467032/yQDSCKTF_rYcEJifneVD',
+  'value': 1.0,
+  'currency': 'USD'
+});`,
           }}
         />
       </head>

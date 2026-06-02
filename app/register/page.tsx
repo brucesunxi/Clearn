@@ -27,6 +27,12 @@ export default function RegisterPage() {
     setLoading(false)
 
     if (result.success) {
+      // 触发 Google Ads 注册成功转化
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'conversion', {
+          'send_to': 'AW-18197467032/注册成功事件代码',
+        })
+      }
       router.push('/')
     } else {
       setError(result.error || 'Registration failed')
