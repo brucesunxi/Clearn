@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { useTranslation } from '@/lib/i18n/context'
 import VerifyWall from '@/components/VerifyWall'
 
 export default function RegisterPage() {
   const { user, register } = useAuth()
+  const { t, locale } = useTranslation()
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,10 +24,10 @@ export default function RegisterPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            📝 {useTranslation().locale === 'zh' ? '欢迎加入熊猫汉语' : 'Welcome to Panda Chinese'}
+            📝 {locale === 'zh' ? '欢迎加入熊猫汉语' : 'Welcome to Panda Chinese'}
           </h1>
           <p className="text-sm text-gray-400">
-            {useTranslation().locale === 'zh' ? '验证邮箱后开始学习' : 'Verify your email to start learning'}
+            {locale === 'zh' ? '验证邮箱后开始学习' : 'Verify your email to start learning'}
           </p>
         </div>
         <VerifyWall />
