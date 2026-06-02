@@ -61,8 +61,13 @@ export default function AdminFeedbackClient() {
   const [usersError, setUsersError] = useState('')
   const [usersPage, setUsersPage] = useState(1)
   const [usersTotal, setUsersTotal] = useState(0)
+  const [usersFilter, setUsersFilter] = useState<'all' | 'recent'>('all')
+
+  // Activity date filter
+  const [actDateFilter, setActDateFilter] = useState<'all' | 'recent'>('all')
 
   const pageSize = 20
+  const RECENT_DAYS = 2
 
   useEffect(() => {
     const saved = sessionStorage.getItem('admin-key')
@@ -271,6 +276,23 @@ export default function AdminFeedbackClient() {
         {/* Activity Tab */}
         {tab === 'activity' && (
           <>
+            {actDateFilter === 'recent' && actEntries.length > 0 && (
+              <div className="mb-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <p className="text-sm font-medium text-blue-800 mb-2">📊 最近两天统计</p>
+                <div className="flex gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-blue-600">
+                      {actEntries.filter((e) => {
+                        const entryDate = new Date(e.createdAt)
+                        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+                        return entryDate >= twoDaysAgo
+                      }).length}
+                    </p>
+                    <p className="text-xs text-blue-500">活动总数</p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-3 mb-4">
               <p className="text-sm text-gray-400">Total: {actTotal}</p>
               <select value={actFilter} onChange={(e) => { setActFilter(e.target.value); setActPage(1) }}
@@ -278,13 +300,52 @@ export default function AdminFeedbackClient() {
                 <option value="">All actions</option>
                 {ACTION_KEYS.map((key) => (<option key={key} value={key}>{ACTION_META[key].emoji} {ACTION_META[key].label}</option>))}
               </select>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActDateFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    actDateFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  All time
+                </button>
+                <button
+                  onClick={() => setActDateFilter('recent')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    actDateFilter === 'recent' ? 'bg-blue-500 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  Last 2 days
+                </button>
+              </div>
             </div>
             {actError && <p className="mb-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{actError}</p>}
             {actLoading && <div className="text-center py-12 text-gray-400">Loading...</div>}
             {!actLoading && actEntries.length === 0 && <div className="text-center py-12"><p className="text-4xl mb-3">📊</p><p className="text-gray-400">No activity yet</p></div>}
-            {!actLoading && actEntries.length > 0 && (
+            {!actLoading && actEntries.length > 0 && actEntries.filter((e) => !actFilter || e.action === actFilter).filter((e) => {
+              if (actDateFilter !== 'recent') return true
+              const entryDate = new Date(e.createdAt)
+              const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+              return entryDate >= twoDaysAgo
+            }).length === 0 && (
+              <div className="text-center py-12"><p className="text-4xl mb-3">📭</p><p className="text-gray-400">No activity in the last 2 days</p></div>
+            )}
+            {!actLoading && actEntries.length > 0 && actEntries.filter((e) => !actFilter || e.action === actFilter).filter((e) => {
+              if (actDateFilter !== 'recent') return true
+              const entryDate = new Date(e.createdAt)
+              const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+              return entryDate >= twoDaysAgo
+            }).length > 0 && (
               <div className="space-y-2">
-                {actEntries.filter((e) => !actFilter || e.action === actFilter).map((entry) => {
+                {actEntries
+                  .filter((e) => !actFilter || e.action === actFilter)
+                  .filter((e) => {
+                    if (actDateFilter !== 'recent') return true
+                    const entryDate = new Date(e.createdAt)
+                    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+                    return entryDate >= twoDaysAgo
+                  })
+                  .map((entry) => {
                   const meta = ACTION_META[entry.action] || { emoji: '❓', label: entry.action }
                   let detailText = ''
                   try { if (entry.detail) { const d = JSON.parse(entry.detail); detailText = Object.entries(d).map(([k, v]) => `${k}: ${v}`).join(' · ') } } catch {}
@@ -317,13 +378,61 @@ export default function AdminFeedbackClient() {
         {/* Users Tab */}
         {tab === 'users' && (
           <>
-            <p className="text-sm text-gray-400 mb-3">Total: {usersTotal}</p>
+            {usersFilter === 'recent' && users.length > 0 && (
+              <div className="mb-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                <p className="text-sm font-medium text-green-800 mb-2">📈 最近两天新增会员</p>
+                <div className="flex gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-600">
+                      {users.filter((u) => {
+                        const userDate = new Date(u.createdAt)
+                        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+                        return userDate >= twoDaysAgo
+                      }).length}
+                    </p>
+                    <p className="text-xs text-green-500">新增用户</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-400">Total: {usersTotal}</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setUsersFilter('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    usersFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  All users
+                </button>
+                <button
+                  onClick={() => setUsersFilter('recent')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    usersFilter === 'recent' ? 'bg-blue-500 text-white' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  Last 2 days
+                </button>
+              </div>
+            </div>
             {usersError && <p className="mb-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{usersError}</p>}
             {usersLoading && <div className="text-center py-12 text-gray-400">Loading...</div>}
             {!usersLoading && users.length === 0 && (
               <div className="text-center py-12"><p className="text-4xl mb-3">👥</p><p className="text-gray-400">No users registered yet</p></div>
             )}
-            {!usersLoading && users.length > 0 && (
+            {!usersLoading && users.length > 0 && usersFilter === 'recent' && users.filter((u) => {
+              const userDate = new Date(u.createdAt)
+              const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+              return userDate >= twoDaysAgo
+            }).length === 0 && (
+              <div className="text-center py-12"><p className="text-4xl mb-3">📭</p><p className="text-gray-400">No new users in the last 2 days</p></div>
+            )}
+            {!usersLoading && users.length > 0 && (usersFilter !== 'recent' || users.filter((u) => {
+              const userDate = new Date(u.createdAt)
+              const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+              return userDate >= twoDaysAgo
+            }).length > 0) && (
               <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 text-xs font-medium text-gray-500 grid grid-cols-4 gap-4">
                   <span>Email</span>
@@ -332,7 +441,14 @@ export default function AdminFeedbackClient() {
                   <span>Verified</span>
                 </div>
                 <div className="divide-y divide-gray-50">
-                  {users.map((u) => (
+                  {users
+                    .filter((u) => {
+                      if (usersFilter !== 'recent') return true
+                      const userDate = new Date(u.createdAt)
+                      const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+                      return userDate >= twoDaysAgo
+                    })
+                    .map((u) => (
                     <div key={u.userId} className="px-4 py-3 text-xs text-gray-600 grid grid-cols-4 gap-4 items-center">
                       <span className="truncate font-medium">{u.email}</span>
                       <span className="font-mono truncate">{u.userId.slice(0, 12)}...</span>
