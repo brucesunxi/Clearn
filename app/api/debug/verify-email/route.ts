@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByEmail } from '@/lib/redis'
+import { getUserByEmail, verifyEmailByAddress } from '@/lib/redis'
 
 export async function GET(request: NextRequest) {
   const key = request.nextUrl.searchParams.get('key')
@@ -13,10 +13,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
+  if (user.emailVerified) {
+    return NextResponse.json({ message: 'Already verified', email: user.email, verified: true })
+  }
+
+  const ok = await verifyEmailByAddress(email)
   return NextResponse.json({
+    message: ok ? 'Email verified!' : 'Verification failed',
     email: user.email,
-    userId: user.userId,
-    emailVerified: user.emailVerified,
-    already_verified: user.emailVerified,
+    verified: ok
   })
 }
