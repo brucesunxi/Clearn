@@ -9,8 +9,7 @@ import { useCoins } from '@/lib/use-coins'
 import { spendCoins, addCoins, syncCoinsToApi } from '@/lib/pet'
 import { AdInterstitial } from '@/lib/adsense'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 type AiLevel = 'easy' | 'medium' | 'hard' | 'hell'
 
@@ -162,33 +161,11 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   const [aiDone, setAiDone] = useState(false)
   const [userTime, setUserTime] = useState(0)
   const [aiTime, setAiTime] = useState(0)
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   // 登录检查
   if (loading) {
     return <div className="max-w-2xl mx-auto px-4 py-8">Loading...</div>
-  }
-
-  if (!user) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">⚔️ {locale === 'zh' ? 'AI 单词对战' : 'AI Word Battle'}</h1>
-          <p className="text-gray-400 text-sm">{locale === 'zh' ? '和 AI 比拼中文词汇，赢取金币！' : 'Battle AI with Chinese vocabulary and win coins!'}</p>
-        </div>
-        <AuthWall
-          title={locale === 'zh' ? 'AI 单词对战' : 'AI Word Battle'}
-          description={locale === 'zh' ? 'AI 单词对战需要登录账号。注册即送 500 金币开始挑战！' : 'Log in to battle AI. Sign up to get 500 coins!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
   }
 
   const roundStartRef = useRef(0)
@@ -206,6 +183,8 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   }, [])
 
   const startBattle = async () => {
+    if (!user) { setBannerType('register'); return }
+    if (!user.emailVerified) { setBannerType('verify'); return }
     const config = AI_CONFIGS[aiLevel]
 
     // 检查是否需要金币
@@ -363,6 +342,9 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
               : 'Choose AI difficulty and battle your vocabulary!'}
           </p>
         </div>
+        {bannerType && (
+          <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+        )}
 
         {/* AI Level selector */}
         <div className="grid grid-cols-2 gap-3 mb-6 max-w-md mx-auto">

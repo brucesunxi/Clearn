@@ -17,9 +17,9 @@ export default function ArticleContent({ article, previewMode }: ArticleContentP
   const [showTranslations, setShowTranslations] = useState(false)
   const [playingPara, setPlayingPara] = useState<number | null>(null)
 
-  // 预览模式只显示前两段
+  // 预览模式显示前一半
   const displayParagraphs = previewMode
-    ? article.paragraphs.slice(0, 2)
+    ? article.paragraphs.slice(0, Math.max(2, Math.ceil(article.paragraphs.length / 2)))
     : article.paragraphs
 
   const sortedVocab = useMemo(

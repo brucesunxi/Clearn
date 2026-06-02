@@ -7,8 +7,7 @@ import { getMasteredCount, getTotalWordsCount, getDueReviewCount, getStageDistri
 import { getCheckInData } from '@/lib/checkin'
 import CheckInCalendar from '@/components/CheckInCalendar'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from '@/components/AuthWall'
-import VerifyWall from '@/components/VerifyWall'
+import TrialBanner from '@/components/TrialBanner'
 
 export default function StatsPage() {
   const { locale } = useTranslation()
@@ -19,6 +18,7 @@ export default function StatsPage() {
   const [stageDist, setStageDist] = useState<Record<number, number>>({})
   const [streak, setStreak] = useState(0)
   const [showCalendar, setShowCalendar] = useState(false)
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   useEffect(() => {
     setMastered(getMasteredCount())
@@ -45,28 +45,6 @@ export default function StatsPage() {
   // 登录检查
   if (loading) {
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
-  }
-
-  if (!user) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          📊 {locale === 'zh' ? '学习统计' : 'Learning Stats'}
-        </h1>
-        <AuthWall
-          featureName="学习统计"
-          description="查看学习统计需要登录账号。注册即送 500 金币开始学习！"
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
   }
 
   return (
@@ -142,6 +120,21 @@ export default function StatsPage() {
           🎯 {locale === 'zh' ? '练习测试' : 'Practice Quiz'}
         </Link>
       </div>
+
+      {/* 引导 */}
+      {bannerType && (
+        <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+      )}
+      {!user && (
+        <div className="mt-6">
+          <TrialBanner type="register" />
+        </div>
+      )}
+      {user && !user.emailVerified && (
+        <div className="mt-6">
+          <TrialBanner type="verify" />
+        </div>
+      )}
     </div>
   )
 }

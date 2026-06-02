@@ -8,8 +8,7 @@ import ListenSession from './ListenSession'
 import SpeakSession from './SpeakSession'
 import IntensiveListening from './IntensiveListening'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 interface ListenSpeakPageClientProps {
   levels: Level[]
@@ -38,36 +37,11 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
 
   const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
 
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
+
   // 登录检查
   if (loading) {
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
-  }
-
-  if (!user) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            🎧 {t('listenspeak.title')}
-          </h1>
-          <p className="text-sm text-gray-400">
-            {locale === 'zh' ? '听力和口语练习，提升中文听说能力' : 'Practice listening and speaking Chinese'}
-          </p>
-        </div>
-        <AuthWall
-          title={locale === 'zh' ? '听力口语练习' : 'Listening & Speaking'}
-          description={locale === 'zh' ? '听力口语练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice listening and speaking. Sign up to get 500 coins!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
   }
 
   return (
@@ -174,10 +148,23 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
         </button>
       </div>
 
+      {/* 引导条 */}
+      {bannerType && (
+        <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+      )}
+
       {/* Content */}
-      {tab === 'listen' && <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />}
-      {tab === 'intensive' && <IntensiveListening articles={sessionArticles} />}
-      {tab === 'speak' && <SpeakSession articles={sessionArticles} />}
+      {!user ? (
+        <TrialBanner type="register" />
+      ) : !user.emailVerified ? (
+        <TrialBanner type="verify" />
+      ) : tab === 'listen' ? (
+        <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />
+      ) : tab === 'intensive' ? (
+        <IntensiveListening articles={sessionArticles} />
+      ) : (
+        <SpeakSession articles={sessionArticles} />
+      )}
     </div>
   )
 }

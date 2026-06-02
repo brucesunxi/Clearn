@@ -11,8 +11,7 @@ import { getImportLimitStatus, incrementImportCount, IMPORT_CONFIG } from '@/lib
 import { useCoins } from '@/lib/use-coins'
 import ImportLimitModal from './ImportLimitModal'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 interface ImportPageClientProps {
   levels: Level[]
@@ -49,6 +48,7 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   const [aiGeneratingTitle, setAiGeneratingTitle] = useState(false)
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [limitStatus, setLimitStatus] = useState(getImportLimitStatus())
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   const dict = useMemo(() => buildVocabDict(articles), [articles])
 
@@ -256,6 +256,8 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   }
 
   const handleSaveClick = () => {
+    if (!user) { setBannerType('register'); return }
+    if (!user.emailVerified) { setBannerType('verify'); return }
     // 检查导入限制
     const status = getImportLimitStatus()
     setLimitStatus(status)
@@ -340,32 +342,7 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
   }
 
-  if (!user) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">
-            📥 {locale === 'zh' ? '导入内容' : 'Import Content'}
-          </h1>
-          <p className="text-sm text-gray-400">
-            {locale === 'zh' ? '粘贴文本、上传 PDF 或输入网页链接，自动分析生成学习素材' : 'Paste text, upload PDF, or enter a URL to auto-generate learning materials'}
-          </p>
-        </div>
-        <AuthWall
-          title={locale === 'zh' ? '导入内容' : 'Import Content'}
-          description={locale === 'zh' ? '导入功能需要登录账号。注册即送 500 金币开始导入！' : 'Log in to import content. Sign up to get 500 coins!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
-  }
+  // User and email verification are gated on save via banner
 
   if (step === 'input') {
     return (
@@ -605,6 +582,9 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
         <p className="text-sm text-gray-400">
           {locale === 'zh' ? '确认内容后保存到学习库' : 'Confirm and save to your learning library'}
         </p>
+        {bannerType && (
+          <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+        )}
       </div>
 
       {/* Config section */}

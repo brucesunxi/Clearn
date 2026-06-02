@@ -9,8 +9,7 @@ import {
 import type { PetState, Inventory } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 const ACCESSORY_POSITIONS: Record<string, { top: string; left: string; size: string }> = {
   red_scarf: { top: '62%', left: '40%', size: '28px' },
@@ -87,6 +86,8 @@ export default function PetPageClient() {
   }
 
   const handleFeed = (foodId: string) => {
+    if (!user) { setBannerType('register'); return }
+    if (!user.emailVerified) { setBannerType('verify'); return }
     const result = feedPet(foodId)
     setPet(result.pet)
     setInv(result.inventory)
@@ -96,6 +97,8 @@ export default function PetPageClient() {
   }
 
   const handleBuyFood = (foodId: string) => {
+    if (!user) { setBannerType('register'); return }
+    if (!user.emailVerified) { setBannerType('verify'); return }
     const ok = buyFood(foodId, 1)
     if (ok) {
       setInv(getInventory())
@@ -110,6 +113,8 @@ export default function PetPageClient() {
   }
 
   const handleBuyAccessory = (accId: string) => {
+    if (!user) { setBannerType('register'); return }
+    if (!user.emailVerified) { setBannerType('verify'); return }
     const ok = buyAccessory(accId)
     if (ok) {
       setInv(getInventory())
@@ -131,33 +136,11 @@ export default function PetPageClient() {
   const statusText = petStatsText(pet)
   const hungerPct = pet.hunger
   const happinessPct = pet.happiness
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   // 登录检查
   if (loading) {
     return <div className="max-w-lg mx-auto px-4 py-8">Loading...</div>
-  }
-
-  if (!user) {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          🐼 {locale === 'zh' ? '我的熊猫' : 'My Panda'}
-        </h1>
-        <p className="text-gray-400 mb-6">{locale === 'zh' ? '照顾你的熊猫朋友，坚持学习让它成长！' : 'Take care of your panda friend and keep learning to help it grow!'}</p>
-        <AuthWall
-          title={locale === 'zh' ? '熊猫伙伴' : 'Panda Companion'}
-          description={locale === 'zh' ? '养熊猫需要登录账号。注册即送 500 金币和一只可爱的熊猫！' : 'Log in to adopt a panda. Sign up to get 500 coins and a cute panda!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
   }
 
   return (
@@ -168,11 +151,15 @@ export default function PetPageClient() {
       <p className="text-gray-400 mb-6">{locale === 'zh' ? '照顾你的熊猫朋友吧！' : 'Take care of your panda friend!'}</p>
 
       {/* Coins display */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2 mb-6 flex items-center gap-2 text-sm">
+      <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2 mb-4 flex items-center gap-2 text-sm">
         <span className="text-lg">🪙</span>
         <span className="font-bold text-yellow-700">{inv.coins}</span>
         <span className="text-yellow-500">{locale === 'zh' ? '金币' : 'coins'}</span>
       </div>
+
+      {bannerType && (
+        <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+      )}
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">

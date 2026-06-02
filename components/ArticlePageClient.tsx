@@ -12,8 +12,7 @@ import type { Article, Level } from '@/lib/types'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
 import { useTranslation } from '@/lib/i18n/context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 interface ArticlePageClientProps {
   article: Article
@@ -24,6 +23,8 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
   const { user, loading } = useAuth()
   const { locale } = useTranslation()
   const [status, setStatus] = useState<ReadingRewardStatus | null>(null)
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
+  const isFullAccess = user && user.emailVerified
 
   useEffect(() => {
     if (!user) return
@@ -40,53 +41,52 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
     return <div className="max-w-5xl mx-auto px-4 py-8">Loading...</div>
   }
 
-  // 未登录显示登录墙
-  if (!user) {
-    return (
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <ArticleBreadcrumb level={level} articleLevel={article.level} />
-        <div className="mt-4">
-          <ArticleContent article={article} previewMode />
-        </div>
-        <div className="mt-8">
-          <AuthWall
-            title={locale === 'zh' ? '阅读完整文章' : 'Read Full Article'}
-            description={locale === 'zh' ? '阅读完整内容需要登录账号。注册即送 500 金币开始学习！' : 'Log in to read the full article. Sign up to get 500 coins!'}
-          />
-        </div>
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
-  }
-
-  if (!status) {
+  if (isFullAccess && !status) {
     return <div className="max-w-5xl mx-auto px-4 py-8">Loading...</div>
   }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <ArticleBreadcrumb level={level} articleLevel={article.level} />
-      <ReadingRewardToast status={status} articleId={article.id} />
 
-      {/* Main content */}
-      <ArticleContent article={article} />
+      {/* Reading reward toast only for full access */}
+      {isFullAccess && status && (
+        <ReadingRewardToast status={status} articleId={article.id} />
+      )}
+
+      {/* Main content — preview for guests, full for others */}
+      <ArticleContent article={article} previewMode={!isFullAccess} />
 
       <AdBanner />
 
-      {/* Vocabulary list */}
-      <WordList vocabulary={article.vocabulary} articleId={article.id} />
+      {/* For guests: show register banner after content preview */}
+      {!user && (
+        <div className="mt-8">
+          <TrialBanner type="register" />
+        </div>
+      )}
 
-      {/* Learn this lesson's words */}
-      <div className="mt-8 text-center">
-        <ArticleStudyButton />
-      </div>
+      {/* For unverified: show verify banner */}
+      {user && !user.emailVerified && (
+        <div className="mt-8">
+          <TrialBanner type="verify" />
+        </div>
+      )}
+
+      {/* Dismissable banner triggered by action */}
+      {bannerType && (
+        <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+      )}
+
+      {/* Vocabulary list and study button — full access only */}
+      {isFullAccess && (
+        <>
+          <WordList vocabulary={article.vocabulary} articleId={article.id} />
+          <div className="mt-8 text-center">
+            <ArticleStudyButton />
+          </div>
+        </>
+      )}
     </div>
   )
 }

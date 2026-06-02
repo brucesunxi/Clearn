@@ -6,8 +6,7 @@ import type { Level, Article } from '@/lib/types'
 import { useCustomArticles } from '@/lib/use-custom-articles'
 import ListenSession from './ListenSession'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 interface ListenPageClientProps {
   levels: Level[]
@@ -22,6 +21,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
   const [artPage, setArtPage] = useState(0)
   const [started, setStarted] = useState(false)
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   // Display: level-filtered only (always show all articles in the grid)
   const displayArticles = selectedLevelId !== null
@@ -38,30 +38,6 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
   // 加载中
   if (loading) {
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
-  }
-
-  // 未登录显示登录墙
-  if (!user) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">🎧 {t('listen.title')}</h1>
-          <p className="text-gray-400 text-sm">{t('listen.subtitle')}</p>
-        </div>
-        <AuthWall
-          title={locale === 'zh' ? '听力练习' : 'Listening Practice'}
-          description={locale === 'zh' ? '听力练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice listening. Sign up to get 500 coins!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
   }
 
   if (started) {
@@ -197,9 +173,17 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         </div>
       )}
 
-            {/* Start button */}
+      {bannerType && (
+        <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+      )}
+
+      {/* Start button */}
       <button
-        onClick={() => setStarted(true)}
+        onClick={() => {
+          if (!user) { setBannerType('register'); return }
+          if (!user.emailVerified) { setBannerType('verify'); return }
+          setStarted(true)
+        }}
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all"
       >
         {selectedArticleIds.length > 0

@@ -6,8 +6,7 @@ import { generateBoxes, processPrize } from '@/lib/blindbox'
 import type { DrawnPrize } from '@/lib/blindbox'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 const BOX_COST = 100
 
@@ -63,6 +62,7 @@ export default function BlindBoxClient() {
   const [boxes, setBoxes] = useState<DrawnPrize[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [message, setMessage] = useState('')
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   // Periodically refresh coins from localStorage (other tabs/operations may change it)
   useEffect(() => {
@@ -99,6 +99,8 @@ export default function BlindBoxClient() {
   }
 
   const handleBuyBoxes = async () => {
+    if (!user) { setBannerType('register'); return }
+    if (!user.emailVerified) { setBannerType('verify'); return }
     if (coins < BOX_COST) {
       setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
       return
@@ -159,37 +161,8 @@ export default function BlindBoxClient() {
     setMessage('')
   }
 
-  // 登录检查
   if (loading) {
     return <div className="max-w-lg mx-auto px-4 py-8">Loading...</div>
-  }
-
-  if (!user) {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <p className="text-5xl mb-3">🎁</p>
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            {locale === 'zh' ? '神秘盲盒' : 'Mystery Blind Box'}
-          </h1>
-          <p className="text-sm text-gray-400">
-            {locale === 'zh' ? '抽取盲盒赢取宠物食物和饰品！' : 'Open blind boxes to win pet food and accessories!'}
-          </p>
-        </div>
-        <AuthWall
-          title={locale === 'zh' ? '神秘盲盒' : 'Mystery Blind Box'}
-          description={locale === 'zh' ? '抽取盲盒需要登录账号。注册即送 500 金币开始抽取！' : 'Log in to open blind boxes. Sign up to get 500 coins!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
   }
 
   return (
@@ -206,6 +179,9 @@ export default function BlindBoxClient() {
         <p className="text-sm text-yellow-600 font-semibold mt-2">
           🪙 {coins} {locale === 'zh' ? '金币' : 'coins'}
         </p>
+        {bannerType && (
+          <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+        )}
       </div>
 
       {/* Idle state — buy boxes */}

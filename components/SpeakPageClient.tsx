@@ -6,8 +6,7 @@ import type { Level, Article } from '@/lib/types'
 import { useCustomArticles } from '@/lib/use-custom-articles'
 import SpeakSession from './SpeakSession'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 interface SpeakPageClientProps {
   levels: Level[]
@@ -22,6 +21,7 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
   const [artPage, setArtPage] = useState(0)
   const [started, setStarted] = useState(false)
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   // Display: level-filtered only (always show all articles in the grid)
   const displayArticles = selectedLevelId !== null
@@ -37,30 +37,6 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
   // 加载中
   if (loading) {
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
-  }
-
-  // 未登录显示登录墙
-  if (!user) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">🗣️ {t('speak.title')}</h1>
-          <p className="text-gray-400 text-sm">{t('speak.subtitle')}</p>
-        </div>
-        <AuthWall
-          title={locale === 'zh' ? '口语练习' : 'Speaking Practice'}
-          description={locale === 'zh' ? '口语练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice speaking. Sign up to get 500 coins!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <VerifyWall />
-      </div>
-    )
   }
 
   if (started) {
@@ -174,7 +150,15 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
         </div>
       )}
 
-            <button onClick={() => setStarted(true)}
+      {bannerType && (
+        <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+      )}
+
+            <button onClick={() => {
+          if (!user) { setBannerType('register'); return }
+          if (!user.emailVerified) { setBannerType('verify'); return }
+          setStarted(true)
+        }}
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 shadow-sm transition-all">
         {selectedArticleIds.length > 0
           ? (locale === 'zh' ? `🗣️ 开始口语 (${sessionArticles.length}篇)` : `🗣️ Start Speaking (${sessionArticles.length} articles)`)

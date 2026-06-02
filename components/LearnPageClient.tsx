@@ -17,8 +17,7 @@ import FlashcardSession from '@/components/FlashcardSession'
 import QuizSession from '@/components/QuizSession'
 import { AdBanner } from '@/lib/adsense'
 import { useAuth } from '@/lib/auth-context'
-import AuthWall from './AuthWall'
-import VerifyWall from './VerifyWall'
+import TrialBanner from './TrialBanner'
 
 interface LearnPageClientProps {
   levels: Level[]
@@ -144,44 +143,11 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
     setSessionKey((k) => k + 1)
   }
 
+  const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
+
   // 登录检查
   if (loading) {
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
-  }
-
-  if (!user) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            📝 {t('wordmem.title')}
-          </h1>
-          <p className="text-sm text-gray-400">
-            {locale === 'zh' ? '使用艾宾浩斯遗忘曲线科学记单词' : 'Master words with the Ebbinghaus forgetting curve'}
-          </p>
-        </div>
-        <AuthWall
-          title={locale === 'zh' ? '单词记忆' : 'Word Memorization'}
-          description={locale === 'zh' ? '单词记忆功能需要登录账号。注册即送 500 金币开始学习！' : 'Log in to use word memorization. Sign up to get 500 coins!'}
-        />
-      </div>
-    )
-  }
-
-  if (!user.emailVerified) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            📝 {t('wordmem.title')}
-          </h1>
-          <p className="text-sm text-gray-400">
-            {locale === 'zh' ? '使用艾宾浩斯遗忘曲线科学记单词' : 'Master words with the Ebbinghaus forgetting curve'}
-          </p>
-        </div>
-        <VerifyWall />
-      </div>
-    )
   }
 
   return (
@@ -425,8 +391,22 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
         </button>
       </div>
 
+      {/* 引导条 */}
+      {bannerType && (
+        <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
+      )}
+
       {/* Learning session */}
-      {mode === 'flashcard' ? (
+      {!user ? (
+        <div className="text-center py-8">
+          <p className="text-gray-400 mb-4 text-sm">
+            {locale === 'zh' ? '注册后即可开始闪卡学习和单词测验' : 'Sign up to start flashcards and quizzes'}
+          </p>
+          <TrialBanner type="register" />
+        </div>
+      ) : !user.emailVerified ? (
+        <TrialBanner type="verify" />
+      ) : mode === 'flashcard' ? (
         <FlashcardSession key={sessionKey} articles={filteredArticles} onComplete={handleSessionComplete} />
       ) : (
         <QuizSession articles={filteredArticles} />
