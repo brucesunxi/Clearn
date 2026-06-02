@@ -36,7 +36,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
 
   try {
     // 使用 Mailtrap Testing API
-    const res = await fetch('https://sandbox.api.mailtrap.io/api/send/2735688/4662259', {
+    const res = await fetch('https://sandbox.api.mailtrap.io/api/send/4662259', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${MAILTRAP_API_KEY}`,
