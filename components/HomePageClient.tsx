@@ -109,6 +109,19 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
   const [dueReviews, setDueReviews] = useState(0)
 
   useEffect(() => {
+    // 未登录时显示默认空状态
+    if (!user) {
+      setGoal(10)
+      setProgress({ done: 0, goal: 10 })
+      setCheckedIn(false)
+      setStreak(0)
+      setMastered(0)
+      setTotalWords(0)
+      setDueReviews(0)
+      return
+    }
+
+    // 已登录时加载真实数据
     setGoal(getDailyGoal())
     setProgress(getTodayProgress())
     setCheckedIn(isCheckedInToday())
@@ -116,7 +129,7 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
     setMastered(getMasteredCount())
     setTotalWords(getTotalWordsCount())
     setDueReviews(getDueReviewCount())
-  }, [])
+  }, [user])
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 md:py-16">
