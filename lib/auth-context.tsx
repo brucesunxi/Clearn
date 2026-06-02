@@ -69,14 +69,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     try {
+      const anonId = typeof window !== 'undefined' ? localStorage.getItem('chineselearn-user-id') || '' : ''
       const res = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(anonId ? { 'x-user-id': anonId } : {}) },
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
       if (res.ok) {
         await fetchUser()
+        if (data.userId && typeof window !== 'undefined') {
+          localStorage.setItem('chineselearn-user-id', data.userId)
+        }
         return { success: true }
       }
       return { success: false, error: data.error || 'Login failed' }
@@ -99,6 +103,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await res.json()
       if (res.ok) {
         await fetchUser()
+        if (data.userId && typeof window !== 'undefined') {
+          localStorage.setItem('chineselearn-user-id', data.userId)
+        }
         return { success: true, emailSent: data.emailSent, emailVerified: data.emailVerified }
       }
       return { success: false, error: data.error || 'Registration failed' }

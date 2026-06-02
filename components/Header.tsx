@@ -40,7 +40,7 @@ export default function Header() {
   const [history, setHistory] = useState<CoinHistoryEntry[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
 
-  // Read coins from localStorage + sync to API in background
+  // Read coins from localStorage + sync from server in background
   useEffect(() => {
     initVoice()
     const read = () => {
@@ -59,6 +59,17 @@ export default function Header() {
       } catch {}
     }
     read()
+    // 从服务器获取真实余额（JWT cookie 会自动发送）
+    if (user) {
+      fetch('/api/coins')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && typeof data.balance === 'number') {
+            setCoins(data.balance)
+          }
+        })
+        .catch(() => {})
+    }
     const t = setInterval(read, 1000)
     return () => clearInterval(t)
   }, [user])

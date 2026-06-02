@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createUser, setVerificationToken } from '@/lib/redis'
+import { createUser, setVerificationToken, getCoins, addCoins, addCoinHistory } from '@/lib/redis'
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth'
 import { sendVerificationEmail } from '@/lib/mail'
 
@@ -38,6 +38,21 @@ export async function POST(request: NextRequest) {
       console.error('Failed to send verification email:', e)
       return false
     })
+
+    // 从匿名账号迁移金币到新注册账号
+    const anonId = request.headers.get('x-user-id')
+    if (anonId && anonId.startsWith('anon-')) {
+      try {
+        const anonCoins = await getCoins(anonId)
+        if (anonCoins > 500) {
+          const migratedCoins = anonCoins - 500 // 只迁移额外获得的，不迁移起始500
+          await addCoins(userId, migratedCoins)
+          await addCoinHistory(userId, migratedCoins, 'earn', await getCoins(userId), `Migrated from anonymous account`)
+        }
+      } catch {
+        // migration failure is non-critical
+      }
+    }
 
     const jwt = await signToken(userId)
     const response = NextResponse.json({ success: true, userId, emailVerified: false, emailSent })

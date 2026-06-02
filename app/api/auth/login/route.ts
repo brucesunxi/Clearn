@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserByEmail } from '@/lib/redis'
+import { getUserByEmail, getCoins, addCoins, addCoinHistory } from '@/lib/redis'
 import { verifyPassword, signToken, setAuthCookie } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
@@ -22,6 +22,22 @@ export async function POST(request: NextRequest) {
     }
 
     const token = await signToken(user.userId)
+
+    // 迁移匿名金币到注册账号（处理注册前攒的金币）
+    const anonId = request.headers.get('x-user-id')
+    if (anonId && anonId.startsWith('anon-') && anonId !== user.userId) {
+      try {
+        const anonCoins = await getCoins(anonId)
+        if (anonCoins > 500) {
+          const migratedCoins = anonCoins - 500
+          await addCoins(user.userId, migratedCoins)
+          await addCoinHistory(user.userId, migratedCoins, 'earn', await getCoins(user.userId), `Migrated from anonymous account`)
+        }
+      } catch {
+        // non-critical
+      }
+    }
+
     const response = NextResponse.json({ success: true, userId: user.userId })
     setAuthCookie(response, token)
 
