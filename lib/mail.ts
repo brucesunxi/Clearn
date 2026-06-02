@@ -9,11 +9,12 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
 
   const link = `https://pandahan.xyz/verify-email?token=${encodeURIComponent(token)}`
 
-  // Mailtrap 需要特定的请求格式
+  // Mailtrap Testing API - 发送到虚拟收件箱
   const payload = {
-    from: { email: FROM_EMAIL, name: '熊猫汉语' },
     to: [{ email: to }],
+    from: { email: FROM_EMAIL, name: '熊猫汉语' },
     subject: '验证您的邮箱 - 熊猫汉语',
+    text: `感谢您的注册！请访问以下链接验证您的邮箱：${link}\n\n此链接24小时内有效。`,
     html: `
       <div style="max-width:480px;margin:40px auto;font-family:Arial,sans-serif;text-align:center">
         <h1 style="color:#333;font-size:24px">🐼 熊猫汉语</h1>
@@ -34,7 +35,8 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
   console.log('[Mail] From:', FROM_EMAIL)
 
   try {
-    const res = await fetch('https://send.api.mailtrap.io/api/send', {
+    // 使用 Mailtrap Testing API
+    const res = await fetch('https://sandbox.api.mailtrap.io/api/send/2735688/4662259', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${MAILTRAP_API_KEY}`,
@@ -46,7 +48,6 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
     if (!res.ok) {
       const body = await res.text()
       console.error('[Mail] API error:', res.status, body)
-      // 详细错误信息
       try {
         const err = JSON.parse(body)
         console.error('[Mail] Error details:', err)
