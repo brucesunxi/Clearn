@@ -9,6 +9,7 @@ import SpeakSession from './SpeakSession'
 import IntensiveListening from './IntensiveListening'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 interface ListenSpeakPageClientProps {
   levels: Level[]
@@ -57,6 +58,14 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
           title={locale === 'zh' ? '听力口语练习' : 'Listening & Speaking'}
           description={locale === 'zh' ? '听力口语练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice listening and speaking. Sign up to get 500 coins!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

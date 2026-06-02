@@ -8,11 +8,18 @@ interface AuthUser {
   emailVerified: boolean
 }
 
+interface RegisterResult {
+  success: boolean
+  error?: string
+  emailSent?: boolean
+  emailVerified?: boolean
+}
+
 interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  register: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  register: (email: string, password: string) => Promise<RegisterResult>
   logout: () => Promise<void>
 }
 
@@ -92,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await res.json()
       if (res.ok) {
         await fetchUser()
-        return { success: true }
+        return { success: true, emailSent: data.emailSent, emailVerified: data.emailVerified }
       }
       return { success: false, error: data.error || 'Registration failed' }
     } catch {

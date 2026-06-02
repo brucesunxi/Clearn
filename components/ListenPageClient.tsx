@@ -7,6 +7,7 @@ import { useCustomArticles } from '@/lib/use-custom-articles'
 import ListenSession from './ListenSession'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 interface ListenPageClientProps {
   levels: Level[]
@@ -51,6 +52,14 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
           title={locale === 'zh' ? '听力练习' : 'Listening Practice'}
           description={locale === 'zh' ? '听力练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice listening. Sign up to get 500 coins!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

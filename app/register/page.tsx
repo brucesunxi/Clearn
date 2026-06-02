@@ -4,15 +4,34 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import VerifyWall from '@/components/VerifyWall'
 
 export default function RegisterPage() {
-  const { register } = useAuth()
+  const { user, register } = useAuth()
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [justRegistered, setJustRegistered] = useState(false)
+
+  // 注册后未验证，直接显示 VerifyWall
+  if (justRegistered && user && !user.emailVerified) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            📝 {useTranslation().locale === 'zh' ? '欢迎加入熊猫汉语' : 'Welcome to Panda Chinese'}
+          </h1>
+          <p className="text-sm text-gray-400">
+            {useTranslation().locale === 'zh' ? '验证邮箱后开始学习' : 'Verify your email to start learning'}
+          </p>
+        </div>
+        <VerifyWall />
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +46,13 @@ export default function RegisterPage() {
     setLoading(false)
 
     if (result.success) {
-      router.push('/')
+      // 如果已验证（极少情况），直接跳转
+      if (result.emailVerified) {
+        router.push('/')
+      } else {
+        // 标记为刚注册，显示 verify wall
+        setJustRegistered(true)
+      }
     } else {
       setError(result.error || 'Registration failed')
     }

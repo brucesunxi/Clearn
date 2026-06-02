@@ -7,6 +7,7 @@ import type { DrawnPrize } from '@/lib/blindbox'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 const BOX_COST = 100
 
@@ -179,6 +180,14 @@ export default function BlindBoxClient() {
           title={locale === 'zh' ? '神秘盲盒' : 'Mystery Blind Box'}
           description={locale === 'zh' ? '抽取盲盒需要登录账号。注册即送 500 金币开始抽取！' : 'Log in to open blind boxes. Sign up to get 500 coins!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

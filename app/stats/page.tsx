@@ -8,6 +8,7 @@ import { getCheckInData } from '@/lib/checkin'
 import CheckInCalendar from '@/components/CheckInCalendar'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from '@/components/AuthWall'
+import VerifyWall from '@/components/VerifyWall'
 
 export default function StatsPage() {
   const { locale } = useTranslation()
@@ -56,6 +57,14 @@ export default function StatsPage() {
           featureName="学习统计"
           description="查看学习统计需要登录账号。注册即送 500 金币开始学习！"
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

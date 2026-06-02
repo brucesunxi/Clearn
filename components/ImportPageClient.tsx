@@ -12,6 +12,7 @@ import { useCoins } from '@/lib/use-coins'
 import ImportLimitModal from './ImportLimitModal'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 interface ImportPageClientProps {
   levels: Level[]
@@ -354,6 +355,14 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
           title={locale === 'zh' ? '导入内容' : 'Import Content'}
           description={locale === 'zh' ? '导入功能需要登录账号。注册即送 500 金币开始导入！' : 'Log in to import content. Sign up to get 500 coins!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

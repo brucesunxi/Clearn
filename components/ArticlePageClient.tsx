@@ -13,6 +13,7 @@ import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
 import { useTranslation } from '@/lib/i18n/context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 interface ArticlePageClientProps {
   article: Article
@@ -53,6 +54,14 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
             description={locale === 'zh' ? '阅读完整内容需要登录账号。注册即送 500 金币开始学习！' : 'Log in to read the full article. Sign up to get 500 coins!'}
           />
         </div>
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

@@ -10,6 +10,7 @@ import type { PetState, Inventory } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 const ACCESSORY_POSITIONS: Record<string, { top: string; left: string; size: string }> = {
   red_scarf: { top: '62%', left: '40%', size: '28px' },
@@ -147,6 +148,14 @@ export default function PetPageClient() {
           title={locale === 'zh' ? '熊猫伙伴' : 'Panda Companion'}
           description={locale === 'zh' ? '养熊猫需要登录账号。注册即送 500 金币和一只可爱的熊猫！' : 'Log in to adopt a panda. Sign up to get 500 coins and a cute panda!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

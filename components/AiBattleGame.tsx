@@ -10,6 +10,7 @@ import { spendCoins, addCoins, syncCoinsToApi } from '@/lib/pet'
 import { AdInterstitial } from '@/lib/adsense'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 type AiLevel = 'easy' | 'medium' | 'hard' | 'hell'
 
@@ -178,6 +179,14 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
           title={locale === 'zh' ? 'AI 单词对战' : 'AI Word Battle'}
           description={locale === 'zh' ? 'AI 单词对战需要登录账号。注册即送 500 金币开始挑战！' : 'Log in to battle AI. Sign up to get 500 coins!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

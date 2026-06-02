@@ -7,6 +7,7 @@ import { useCustomArticles } from '@/lib/use-custom-articles'
 import SpeakSession from './SpeakSession'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 interface SpeakPageClientProps {
   levels: Level[]
@@ -50,6 +51,14 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
           title={locale === 'zh' ? '口语练习' : 'Speaking Practice'}
           description={locale === 'zh' ? '口语练习需要登录账号。注册即送 500 金币开始学习！' : 'Log in to practice speaking. Sign up to get 500 coins!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <VerifyWall />
       </div>
     )
   }

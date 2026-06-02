@@ -18,6 +18,7 @@ import QuizSession from '@/components/QuizSession'
 import { AdBanner } from '@/lib/adsense'
 import { useAuth } from '@/lib/auth-context'
 import AuthWall from './AuthWall'
+import VerifyWall from './VerifyWall'
 
 interface LearnPageClientProps {
   levels: Level[]
@@ -163,6 +164,22 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
           title={locale === 'zh' ? '单词记忆' : 'Word Memorization'}
           description={locale === 'zh' ? '单词记忆功能需要登录账号。注册即送 500 金币开始学习！' : 'Log in to use word memorization. Sign up to get 500 coins!'}
         />
+      </div>
+    )
+  }
+
+  if (!user.emailVerified) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            📝 {t('wordmem.title')}
+          </h1>
+          <p className="text-sm text-gray-400">
+            {locale === 'zh' ? '使用艾宾浩斯遗忘曲线科学记单词' : 'Master words with the Ebbinghaus forgetting curve'}
+          </p>
+        </div>
+        <VerifyWall />
       </div>
     )
   }
