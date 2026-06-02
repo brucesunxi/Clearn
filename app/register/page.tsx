@@ -30,7 +30,9 @@ export default function RegisterPage() {
       // 触发 Google Ads 注册成功转化
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'conversion', {
-          'send_to': 'AW-18197467032/注册成功事件代码',
+          'send_to': 'AW-18197467032/IG2TCOzEpbccEJifneVD',
+          'value': 1.0,
+          'currency': 'USD'
         })
       }
       router.push('/')
