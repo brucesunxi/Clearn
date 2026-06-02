@@ -48,6 +48,16 @@ export default function RegisterPage() {
     setLoading(false)
 
     if (result.success) {
+      // 注册成功转化追踪
+      try {
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'conversion', {
+            'send_to': 'AW-18197467032/IG2TCOzEpbccEJifneVD',
+            'value': 1.0,
+            'currency': 'USD'
+          })
+        }
+      } catch(e) {}
       // 如果已验证（极少情况），直接跳转
       if (result.emailVerified) {
         router.push('/')

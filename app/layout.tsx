@@ -52,7 +52,21 @@ export default function RootLayout({
             __html: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-9K8RD1K13S');`,
+gtag('config', 'G-9K8RD1K13S');
+
+// 检测网络，Google 服务可达才加载 Ads
+fetch('https://www.googletagmanager.com/gtag/js?id=AW-18197467032', {method:'HEAD',mode:'no-cors'})
+  .then(function(){
+    var s=document.createElement('script');
+    s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id=AW-18197467032';
+    document.head.appendChild(s);
+    setTimeout(function(){
+      gtag('config','AW-18197467032');
+      gtag('event','conversion',{'send_to':'AW-18197467032/yQDSCKTF_rYcEJifneVD','value':1.0,'currency':'USD'});
+    },1000);
+  })
+  .catch(function(){});`,
           }}
         />
       </head>
