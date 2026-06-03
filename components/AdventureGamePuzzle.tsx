@@ -543,11 +543,12 @@ export default function AdventureGamePuzzle({ level }: AdventureGamePuzzleProps)
         </div>
       </div>
 
-      {/* Target Word */}
+      {/* Target: show English meaning, hide Chinese word */}
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-4 text-center">
-        <p className="text-xs text-gray-500 mb-1">Find this character in the grid:</p>
-        <div className="text-5xl font-bold text-gray-800 mb-1">{targetWord}</div>
-        <p className="text-sm text-gray-400">{targetPinyin} - {targetMeaning}</p>
+        <p className="text-xs text-gray-500 mb-1">Find the Chinese word for:</p>
+        <div className="text-3xl font-bold text-blue-600 mb-1">{targetMeaning}</div>
+        <p className="text-sm text-gray-400">pinyin: {targetPinyin}</p>
+        <div className="mt-2 text-lg text-gray-300">? ? ?</div>
       </div>
 
       {/* Grid */}
