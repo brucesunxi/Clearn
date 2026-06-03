@@ -1,33 +1,31 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { generateBoxes, processPrize } from '@/lib/blindbox'
 import type { DrawnPrize } from '@/lib/blindbox'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
+import { useCoins } from '@/lib/use-coins'
 import TrialBanner from './TrialBanner'
 
 const BOX_COST = 100
-
-function userId(): string {
-  if (typeof window === 'undefined') return ''
-  let id = localStorage.getItem('chineselearn-user-id')
-  if (!id) {
-    id = `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
-    localStorage.setItem('chineselearn-user-id', id)
-  }
-  return id
-}
 
 async function syncInventoryToApi() {
   try {
     const raw = localStorage.getItem('panda-inventory')
     if (!raw) return
     const inv = JSON.parse(raw)
+    const headersRes = await fetch('/api/auth/me', { credentials: 'include' })
+    const authData = await headersRes.json()
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (!authData.user?.userId) {
+      const id = localStorage.getItem('chineselearn-user-id')
+      if (id) headers['x-user-id'] = id
+    }
     await fetch('/api/inventory', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': userId() },
+      headers,
       body: JSON.stringify({
         inventory: { food: inv.food || {}, accessories: inv.accessories || {}, equipped: inv.equipped || [] },
       }),
@@ -39,9 +37,16 @@ async function syncPetToApi() {
   try {
     const raw = localStorage.getItem('panda-pet')
     if (!raw) return
+    const headersRes = await fetch('/api/auth/me', { credentials: 'include' })
+    const authData = await headersRes.json()
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (!authData.user?.userId) {
+      const id = localStorage.getItem('chineselearn-user-id')
+      if (id) headers['x-user-id'] = id
+    }
     await fetch('/api/inventory', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-user-id': userId() },
+      headers,
       body: JSON.stringify({ pet: JSON.parse(raw) }),
     })
   } catch { /* silently fail */ }
@@ -50,53 +55,12 @@ async function syncPetToApi() {
 export default function BlindBoxClient() {
   const { locale } = useTranslation()
   const { user, loading } = useAuth()
-  const [coins, setCoins] = useState(() => {
-    if (typeof window === 'undefined') return 500
-    try {
-      const raw = localStorage.getItem('panda-inventory')
-      if (raw) return JSON.parse(raw).coins || 500
-    } catch {}
-    return 500
-  })
+  const { balance: coins, spend, refresh } = useCoins()
   const [phase, setPhase] = useState<'idle' | 'boxes'>('idle')
   const [boxes, setBoxes] = useState<DrawnPrize[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [message, setMessage] = useState('')
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
-
-  // Periodically refresh coins from localStorage (other tabs/operations may change it)
-  useEffect(() => {
-    const t = setInterval(() => {
-      try {
-        const raw = localStorage.getItem('panda-inventory')
-        if (raw) {
-          const inv = JSON.parse(raw)
-          setCoins((prev: number) => (prev !== inv.coins ? inv.coins : prev))
-        }
-      } catch {}
-    }, 1000)
-    return () => clearInterval(t)
-  }, [])
-
-  // Helper: update localStorage coins + sync to API (fire-and-forget)
-  const updateCoins = (newCoins: number) => {
-    setCoins(newCoins)
-    try {
-      const raw = localStorage.getItem('panda-inventory')
-      const inv = raw ? JSON.parse(raw) : { food: {}, accessories: {}, equipped: [] }
-      inv.coins = newCoins
-      localStorage.setItem('panda-inventory', JSON.stringify(inv))
-      // Sync to API in background (best-effort)
-      fetch('/api/inventory', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-user-id': userId() },
-        body: JSON.stringify({
-          inventory: { food: inv.food || {}, accessories: inv.accessories || {}, equipped: inv.equipped || [] },
-          pet: (() => { try { return JSON.parse(localStorage.getItem('panda-pet') || 'null') } catch { return null } })(),
-        }),
-      }).catch(() => {})
-    } catch {}
-  }
 
   const handleBuyBoxes = async () => {
     if (!user) { setBannerType('register'); return }
@@ -105,10 +69,11 @@ export default function BlindBoxClient() {
       setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
       return
     }
-    updateCoins(coins - BOX_COST)
-    // Record box purchase in coin history
-    const { syncSpendToApi } = await import('@/lib/pet')
-    syncSpendToApi(BOX_COST, 'box_open', 'box')
+    const ok = await spend(BOX_COST)
+    if (!ok) {
+      setMessage(locale === 'zh' ? '扣款失败，请重试' : 'Payment failed. Try again.')
+      return
+    }
     setBoxes(generateBoxes())
     setSelectedIndex(null)
     setMessage('')
@@ -126,12 +91,15 @@ export default function BlindBoxClient() {
       return
     }
 
-    // Coin prizes → add to localStorage + sync to API
+    // Coin prizes
     if (prize.type === 'coins' && prize.coinAmount) {
-      const { addCoins, syncCoinsToApi } = await import('@/lib/pet')
-      addCoins(prize.coinAmount)
-      syncCoinsToApi(prize.coinAmount, 'box_prize', '' + prize.coinAmount + ' coins')
-      setCoins((prev: number) => prev + prize.coinAmount!)
+      await fetch('/api/coins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ amount: prize.coinAmount, reason: 'box_prize', detail: prize.coinAmount + ' coins from blind box' }),
+      })
+      refresh()
       setMessage(locale === 'zh' ? `获得 ${prize.coinAmount} 金币！` : `Got ${prize.coinAmount} coins!`)
       return
     }
@@ -147,15 +115,22 @@ export default function BlindBoxClient() {
 
     // Food / accessory / bundle
     processPrize(prize)
-    setCoins((prev: number) => {
-      if (prize.type === 'bundle' && prize.bundleItems) {
-        const coinTotal = prize.bundleItems
-          .filter((i) => i.type === 'coins')
-          .reduce((s, i) => s + i.amount, 0)
-        return prev + coinTotal
+
+    // Bundle may contain coins
+    if (prize.type === 'bundle' && prize.bundleItems) {
+      const coinTotal = prize.bundleItems
+        .filter((i) => i.type === 'coins')
+        .reduce((s, i) => s + i.amount, 0)
+      if (coinTotal > 0) {
+        await fetch('/api/coins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ amount: coinTotal, reason: 'box_prize', detail: coinTotal + ' coins from bundle' }),
+        })
+        refresh()
       }
-      return prev
-    })
+    }
 
     await syncInventoryToApi()
     await syncPetToApi()
