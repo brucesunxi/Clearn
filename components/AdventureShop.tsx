@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useCoins } from '@/lib/use-coins'
 import type { EquipmentItem } from '@/lib/adventure'
 import EquipmentPanel from './EquipmentPanel'
@@ -18,19 +19,29 @@ export default function AdventureShop({ shop }: AdventureShopProps) {
   const [energy, setEnergy] = useState({ current: 100, max: 100 })
   const [loading, setLoading] = useState(true)
   const [purchaseStatus, setPurchaseStatus] = useState<{ message: string; error?: boolean } | null>(null)
+  const [authCheck, setAuthCheck] = useState<'loading' | 'anon' | 'authenticated'>('loading')
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/adventure/equipment').then(r => r.json()),
-      fetch('/api/adventure/energy').then(r => r.json()),
-    ])
-      .then(([equipData, energyData]) => {
-        if (equipData.equipped) setEquipped(equipData.equipped)
-        if (equipData.owned) setInventory(equipData.owned)
-        if (equipData.stats) setStats(equipData.stats)
-        if (energyData.energy) setEnergy(energyData.energy)
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(data => {
+        if (!data.user) {
+          setAuthCheck('anon')
+          setLoading(false)
+          return
+        }
+        setAuthCheck('authenticated')
+        return Promise.all([
+          fetch('/api/adventure/equipment').then(r => r.json()),
+          fetch('/api/adventure/energy').then(r => r.json()),
+        ]).then(([equipData, energyData]) => {
+          if (equipData.equipped) setEquipped(equipData.equipped)
+          if (equipData.owned) setInventory(equipData.owned)
+          if (equipData.stats) setStats(equipData.stats)
+          if (energyData.energy) setEnergy(energyData.energy)
+        })
       })
-      .catch(console.error)
+      .catch(() => { setAuthCheck('anon') })
       .finally(() => setLoading(false))
   }, [])
 
@@ -93,6 +104,39 @@ export default function AdventureShop({ shop }: AdventureShopProps) {
 
   if (loading) {
     return <div className="text-center py-12">Loading shop...</div>
+  }
+
+  if (authCheck === 'anon') {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-20 text-center">
+        <div className="text-8xl mb-6">🛍️</div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-3">Equipment Shop</h1>
+        <p className="text-gray-500 mb-6">
+          Sign in to browse and buy equipment!<br />
+          登录后即可浏览和购买装备！
+        </p>
+        <div className="flex flex-col gap-3">
+          <Link
+            href="/register"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold text-lg hover:from-emerald-600 hover:to-green-700 transition-all shadow-lg"
+          >
+            🚀 Sign Up
+          </Link>
+          <Link
+            href="/login"
+            className="w-full py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-all text-sm"
+          >
+            Log In
+          </Link>
+          <Link
+            href="/adventure"
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            ← Back to adventure map
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   // Group by slot

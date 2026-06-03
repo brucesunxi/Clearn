@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useCoins } from '@/lib/use-coins'
 
 interface Question {
@@ -58,6 +59,15 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
   const [levelUp, setLevelUp] = useState(false)
   const [doubleXp, setDoubleXp] = useState(false)
   const [droppedItem, setDroppedItem] = useState<{ name: string; emoji: string } | null>(null)
+  const [authState, setAuthState] = useState<'loading' | 'anon' | 'authenticated'>('loading')
+
+  // Check auth on mount
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => setAuthState(d.user ? 'authenticated' : 'anon'))
+      .catch(() => setAuthState('anon'))
+  }, [])
 
   // Player stats from equipment
   const [playerStats, setPlayerStats] = useState({ power: 0, defense: 0, luck: 0 })
@@ -326,12 +336,33 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
     generateQuestions()
   }
 
-  if (loading) {
+  if (loading || authState === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">🐼</div>
           <p className="text-gray-500">Preparing adventure...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (authState === 'anon') {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-20 text-center">
+        <div className="text-8xl mb-6">🔒</div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Login Required</h1>
+        <p className="text-gray-500 mb-6">Sign in to play adventures! 登录后即可开始冒险！</p>
+        <div className="flex flex-col gap-3">
+          <Link href="/register" className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold hover:from-emerald-600 hover:to-green-700 transition-all shadow-lg">
+            🚀 Sign Up
+          </Link>
+          <Link href="/login" className="w-full py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-all text-sm">
+            Log In
+          </Link>
+          <Link href="/adventure" className="text-sm text-gray-400 hover:text-gray-600">
+            ← Back to map
+          </Link>
         </div>
       </div>
     )

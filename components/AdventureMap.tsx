@@ -21,28 +21,39 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
   const [petExpToNext, setPetExpToNext] = useState(100)
   const [completedLevels, setCompletedLevels] = useState<number[]>([])
   const [adventureStats, setAdventureStats] = useState<{ totalLevelsPlayed: number; totalLevelsCompleted: number; totalCoinsEarned: number; totalExpEarned: number; lastPlayDate: string } | null>(null)
+  const [session, setSession] = useState<'loading' | 'anon' | 'authenticated'>('loading')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/adventure/energy').then(r => r.json()),
-      fetch('/api/adventure/equipment').then(r => r.json()),
-      fetch('/api/adventure/pet').then(r => r.json()),
-      fetch('/api/adventure/levels').then(r => r.json()),
-      fetch('/api/adventure/stats').then(r => r.json()),
-    ])
-      .then(([energyData, equipData, petData, levelData, statsData]) => {
-        if (energyData.energy) setEnergy(energyData.energy)
-        if (equipData.stats) setStats(equipData.stats)
-        if (petData.petLevel) {
-          setPetLevel(petData.petLevel.level)
-          setPetExp(petData.petLevel.exp)
-          setPetExpToNext(petData.petLevel.expToNext)
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(data => {
+        const authed = !!data.user
+        setSession(authed ? 'authenticated' : 'anon')
+        if (!authed) {
+          setLoading(false)
+          return
         }
-        if (levelData.completed) setCompletedLevels(levelData.completed)
-        if (statsData.stats) setAdventureStats(statsData.stats)
+        // Authenticated — fetch all adventure data
+        return Promise.all([
+          fetch('/api/adventure/energy').then(r => r.json()),
+          fetch('/api/adventure/equipment').then(r => r.json()),
+          fetch('/api/adventure/pet').then(r => r.json()),
+          fetch('/api/adventure/levels').then(r => r.json()),
+          fetch('/api/adventure/stats').then(r => r.json()),
+        ]).then(([energyData, equipData, petData, levelData, statsData]) => {
+          if (energyData.energy) setEnergy(energyData.energy)
+          if (equipData.stats) setStats(equipData.stats)
+          if (petData.petLevel) {
+            setPetLevel(petData.petLevel.level)
+            setPetExp(petData.petLevel.exp)
+            setPetExpToNext(petData.petLevel.expToNext)
+          }
+          if (levelData.completed) setCompletedLevels(levelData.completed)
+          if (statsData.stats) setAdventureStats(statsData.stats)
+        })
       })
-      .catch(console.error)
+      .catch(() => { setSession('anon'); setLoading(false) })
       .finally(() => setLoading(false))
   }, [])
 
@@ -73,6 +84,57 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
 
   if (loading) {
     return <div className="text-center py-12">Loading adventure map...</div>
+  }
+
+  if (session === 'anon') {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-20 text-center">
+        <div className="text-8xl mb-6">🗺️</div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-3">Adventure Awaits!</h1>
+        <p className="text-gray-500 mb-6">
+          Sign in to challenge levels, earn rewards, and level up your panda!<br />
+          登录后即可挑战关卡、赢取奖励、提升熊猫等级！
+        </p>
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6 text-left space-y-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚔️</span>
+            <span className="text-sm text-gray-700">Battle bosses with Chinese vocabulary quizzes</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🧩</span>
+            <span className="text-sm text-gray-700">Solve puzzles and navigate mazes</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">💰</span>
+            <span className="text-sm text-gray-700">Earn coins and buy powerful equipment</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🐼</span>
+            <span className="text-sm text-gray-700">Level up your panda pet to Lv.50</span>
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Link
+            href="/register"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold text-lg hover:from-emerald-600 hover:to-green-700 transition-all shadow-lg"
+          >
+            🚀 Get Started — Sign Up
+          </Link>
+          <Link
+            href="/login"
+            className="w-full py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-all text-sm"
+          >
+            Already have an account? Log in
+          </Link>
+          <Link
+            href="/"
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            ← Back to home
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
