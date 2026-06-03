@@ -100,7 +100,7 @@ export default function Header() {
         {user && (
           <div className="relative">
             <Link
-              href="/coins"
+              href="/profile"
               className="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-full hover:bg-yellow-100 transition-colors cursor-pointer dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-400 dark:hover:bg-yellow-900/50"
             >
               <span>🪙</span>
