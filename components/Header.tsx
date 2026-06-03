@@ -40,37 +40,47 @@ export default function Header() {
   const [history, setHistory] = useState<CoinHistoryEntry[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
 
-  // Read coins from localStorage + sync from server in background
+  // 获取金币余额 - 与 useCoins hook 保持一致的逻辑
   useEffect(() => {
     initVoice()
-    const read = () => {
+
+    const fetchCoins = async () => {
+      // 未登录时不显示金币
+      if (!user) {
+        setCoins(0)
+        setHistory([])
+        return
+      }
+
       try {
-        // 如果未登录，不显示金币
-        if (!user) {
-          setCoins(0)
-          setHistory([])
-          return
+        // 先检查是否是登录用户
+        const authRes = await fetch('/api/auth/me', { credentials: 'include' })
+        const authData = await authRes.json()
+
+        const headers: HeadersInit = { 'Content-Type': 'application/json' }
+
+        // 如果不是登录用户，发送 x-user-id header
+        if (!authData.user?.userId) {
+          const id = localStorage.getItem('chineselearn-user-id') ||
+            `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+          localStorage.setItem('chineselearn-user-id', id)
+          headers['x-user-id'] = id
         }
-        const raw = localStorage.getItem('panda-inventory')
-        if (raw) {
-          const inv = JSON.parse(raw)
-          setCoins((prev) => (prev !== inv.coins ? inv.coins : prev))
-        }
-      } catch {}
-    }
-    read()
-    // 从服务器获取真实余额（JWT cookie 会自动发送）
-    if (user) {
-      fetch('/api/coins')
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data && typeof data.balance === 'number') {
+
+        const res = await fetch('/api/coins', { headers })
+        if (res.ok) {
+          const data = await res.json()
+          if (typeof data.balance === 'number') {
             setCoins(data.balance)
           }
-        })
-        .catch(() => {})
+        }
+      } catch {
+        // silently fail
+      }
     }
-    const t = setInterval(read, 1000)
+
+    fetchCoins()
+    const t = setInterval(fetchCoins, 1000)
     return () => clearInterval(t)
   }, [user])
 
