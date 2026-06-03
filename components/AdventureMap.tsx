@@ -246,6 +246,31 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
           )
         })}
       </div>
+
+      {/* Adventure Stats */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <h3 className="font-bold text-gray-700 mb-3 flex items-center gap-2 text-sm">
+          <span>📊</span> Adventure Stats
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
+          <div>
+            <div className="text-xl font-bold text-green-600">{completedLevels.length}/{levels.length}</div>
+            <div className="text-gray-500 text-xs">Levels Cleared</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-purple-600">Lv.{petLevel}</div>
+            <div className="text-gray-500 text-xs">Pet Level</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-amber-600">⚔️ {stats.power}</div>
+            <div className="text-gray-500 text-xs">Total Power</div>
+          </div>
+          <div>
+            <div className="text-xl font-bold text-blue-600">🛡️ {stats.defense}</div>
+            <div className="text-gray-500 text-xs">Total Defense</div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
