@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 const USER_ID_KEY = 'chineselearn-user-id'
 
-function getUserId(): string {
+function getAnonymousId(): string {
   if (typeof window === 'undefined') return ''
   let id = localStorage.getItem(USER_ID_KEY)
   if (!id) {
@@ -14,11 +14,29 @@ function getUserId(): string {
   return id
 }
 
-function headers(): HeadersInit {
-  return {
+async function getAuthHeaders(): Promise<HeadersInit> {
+  const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    'x-user-id': getUserId(),
   }
+
+  // Check if user is logged in via JWT
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' })
+    if (res.ok) {
+      const data = await res.json()
+      if (data.user?.userId) {
+        // User is logged in, don't send x-user-id header
+        // Server will use JWT cookie instead
+        return headers
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  // Anonymous user - send x-user-id header
+  headers['x-user-id'] = getAnonymousId()
+  return headers
 }
 
 export function useCoins() {
@@ -28,10 +46,11 @@ export function useCoins() {
   const refresh = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch('/api/coins', { headers: headers() })
+      const headers = await getAuthHeaders()
+      const res = await fetch('/api/coins', { headers })
       if (res.ok) {
         const data = await res.json()
-        setBalance(data.balance)
+        setBalance(data.balance ?? 0)
       }
     } catch {
       // silently fail
@@ -48,19 +67,20 @@ export function useCoins() {
 
   const spend = useCallback(async (amount: number): Promise<boolean> => {
     try {
+      const headers = await getAuthHeaders()
       const res = await fetch('/api/coins/spend', {
         method: 'POST',
-        headers: headers(),
+        headers,
         body: JSON.stringify({ amount }),
       })
       if (res.ok) {
         const data = await res.json()
-        setBalance(data.balance)
+        setBalance(data.balance ?? 0)
         return true
       }
       if (res.status === 402) {
         const data = await res.json()
-        setBalance(data.balance)
+        setBalance(data.balance ?? 0)
       }
       return false
     } catch {
@@ -69,15 +89,16 @@ export function useCoins() {
   }, [])
 
   const add = useCallback(async (amount: number): Promise<number> => {
+    const headers = await getAuthHeaders()
     const res = await fetch('/api/coins', {
       method: 'POST',
-      headers: headers(),
+      headers,
       body: JSON.stringify({ amount }),
     })
     if (res.ok) {
       const data = await res.json()
-      setBalance(data.balance)
-      return data.balance
+      setBalance(data.balance ?? 0)
+      return data.balance ?? 0
     }
     return balance
   }, [balance])
