@@ -36,7 +36,7 @@ interface AdventureGamePuzzleProps {
 
 export default function AdventureGamePuzzle({ level }: AdventureGamePuzzleProps) {
   const router = useRouter()
-  const { balance } = useCoins()
+  const { balance, refresh } = useCoins()
   const [gameState, setGameState] = useState<'ready' | 'playing' | 'completed' | 'failed'>('ready')
   const [grid, setGrid] = useState<PuzzleCell[]>([])
   const [targetWord, setTargetWord] = useState('')
@@ -261,6 +261,7 @@ export default function AdventureGamePuzzle({ level }: AdventureGamePuzzleProps)
     const data = await res.json()
     if (data.rewards) {
       setRewards({ coins: data.rewards.coins, exp: data.rewards.exp })
+      refresh() // Refresh coins display
     }
     if (data.levelUp) setLevelUp(true)
     if (data.doubleXp) setDoubleXp(true)

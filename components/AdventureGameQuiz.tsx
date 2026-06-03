@@ -38,7 +38,7 @@ const REVIVE_COST = 50
 
 export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
   const router = useRouter()
-  const { balance } = useCoins()
+  const { balance, refresh } = useCoins()
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentQ, setCurrentQ] = useState(0)
   const [combo, setCombo] = useState(0)
@@ -244,6 +244,7 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
     const data = await res.json()
     if (data.rewards) {
       setRewards({ coins: data.rewards.coins, exp: data.rewards.exp })
+      refresh() // Refresh coins display
     }
     if (data.levelUp) setLevelUp(true)
     if (data.doubleXp) setDoubleXp(true)
