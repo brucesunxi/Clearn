@@ -90,7 +90,7 @@ export default function ListenSession({ articles }: ListenSessionProps) {
       setIdx((i) => i + 1); setSelected(null); setRevealed(false)
     } else {
       const earned = correct * 10 + 20
-      addCoins(earned); syncCoinsToApi(earned, 'listen_complete', correct + '/' + questions.length + ' correct'); trackActivity('listen_complete', { correct, total: questions.length, coins: earned }); setCoinsEarned(earned); setStep('result')
+      addCoins(earned); syncCoinsToApi(earned, 'listen_complete', correct + '/' + questions.length + ' correct'); trackActivity('listen_complete', { correct, total: questions.length, coins: earned }); fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'listen_complete' }) }).catch(() => {}); setCoinsEarned(earned); setStep('result')
     }
   }
 

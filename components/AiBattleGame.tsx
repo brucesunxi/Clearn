@@ -316,6 +316,7 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
         syncCoinsToApi(netReward, 'battle_complete', `${aiLevel}, ${userCorrect}/${totalRounds} correct, ${won ? 'won' : draw ? 'draw' : 'lost'}, entry:${config.entryFee}, reward:${reward}`)
       }
       trackActivity('battle_complete', { userScore, aiScore, userCorrect, aiCorrect, aiLevel, totalRounds, entryFee: config.entryFee, reward })
+      fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'battle_win' }) }).catch(() => {})
       setPhase('result')
       return
     }

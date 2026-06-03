@@ -121,6 +121,7 @@ export default function QuizSession({ articles }: QuizSessionProps) {
       addCoins(coinsEarned)
       syncCoinsToApi(coinsEarned, 'quiz_complete', correctCount + '/' + questions.length + ' correct')
       trackActivity('quiz_complete', { correct: correctCount, total: questions.length, coins: coinsEarned })
+      fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'quiz_complete' }) }).catch(() => {})
       setCoinsEarned(coinsEarned)
       setStep('result')
     }

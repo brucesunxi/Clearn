@@ -486,6 +486,12 @@ export async function completeLevel(
 
 // --------------- 装备系统 ---------------
 
+export async function getOwnedItems(userId: string): Promise<string[]> {
+  const key = `adventure:items:${userId}`
+  const data = await getJson(key)
+  return (data && Array.isArray(data)) ? data as string[] : []
+}
+
 export async function getEquippedItems(userId: string): Promise<string[]> {
   const key = `adventure:equipped:${userId}`
   const data = await getJson(key)

@@ -105,7 +105,7 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
       setIdx((i) => i + 1); setHeard(''); setResult(null); setStatus('idle')
     } else {
       const earned = correct * 15 + 30
-      addCoins(earned); syncCoinsToApi(earned, 'speak_complete', correct + '/' + cards.length + ' correct'); trackActivity('speak_complete', { correct, total: cards.length, coins: earned }); setCoinsEarned(earned); setStep('result')
+      addCoins(earned); syncCoinsToApi(earned, 'speak_complete', correct + '/' + cards.length + ' correct'); trackActivity('speak_complete', { correct, total: cards.length, coins: earned }); fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'speak_complete' }) }).catch(() => {}); setCoinsEarned(earned); setStep('result')
     }
   }
 

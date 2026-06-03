@@ -85,6 +85,7 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
           onComplete?.()
           const cr = results.filter(r => r.correct === true).length + (correct ? 1 : 0)
           trackActivity('study_complete', { correct: cr, wrong: results.length + 1 - cr, total: cards.length, accuracy: Math.round((cr / (results.length + 1)) * 100) })
+          fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'study_complete' }) }).catch(() => {})
           setStep('summary')
         } else {
           setCurrentIndex(idx + 1)
@@ -102,6 +103,7 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
             onComplete?.()
             const cr = results.filter(r => r.correct === true).length
             trackActivity('study_complete', { correct: cr, wrong: results.length + 1 - cr, total: cards.length, accuracy: Math.round((cr / (results.length + 1)) * 100) })
+            fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'study_complete' }) }).catch(() => {})
             setStep('summary')
           } else {
             setCurrentIndex(idx + 1)

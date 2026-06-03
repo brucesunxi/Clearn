@@ -34,6 +34,7 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
     setStatus(currentStatus)
     // 记录用户行为
     trackActivity('article_read', { articleId: article.id, level: article.level })
+    fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'article_read' }) }).catch(() => {})
   }, [user, article])
 
   // 加载中

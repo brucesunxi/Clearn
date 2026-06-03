@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getEquipmentShop, buyEquipment, equipItem, getEquippedItems, calculateTotalStats } from '@/lib/adventure'
+import { getEquipmentShop, buyEquipment, equipItem, getEquippedItems, getOwnedItems, calculateTotalStats } from '@/lib/adventure'
 import { getUserIdFromRequest } from '@/lib/auth'
 
 // GET - 获取装备商店和已装备物品
@@ -12,11 +12,13 @@ export async function GET(request: NextRequest) {
   try {
     const shop = getEquipmentShop()
     const equipped = await getEquippedItems(userId)
+    const owned = await getOwnedItems(userId)
     const stats = await calculateTotalStats(userId)
 
     return NextResponse.json({
       shop,
       equipped,
+      owned,
       stats
     })
   } catch (error) {

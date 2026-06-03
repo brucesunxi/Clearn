@@ -17,22 +17,18 @@ export default function AdventureShop({ shop }: AdventureShopProps) {
   const [stats, setStats] = useState({ power: 0, defense: 0, luck: 0, energy: 100 })
   const [energy, setEnergy] = useState({ current: 100, max: 100 })
   const [loading, setLoading] = useState(true)
-  const [purchaseStatus, setPurchaseStatus] = useState<string | null>(null)
+  const [purchaseStatus, setPurchaseStatus] = useState<{ message: string; error?: boolean } | null>(null)
 
   useEffect(() => {
-    // Fetch equipment data
-    fetch('/api/adventure/equipment')
-      .then(res => res.json())
-      .then(data => {
-        if (data.equipped) setEquipped(data.equipped)
-        if (data.stats) setStats(data.stats)
-      })
-      .catch(console.error)
-
-    fetch('/api/adventure/energy')
-      .then(res => res.json())
-      .then(data => {
-        if (data.energy) setEnergy(data.energy)
+    Promise.all([
+      fetch('/api/adventure/equipment').then(r => r.json()),
+      fetch('/api/adventure/energy').then(r => r.json()),
+    ])
+      .then(([equipData, energyData]) => {
+        if (equipData.equipped) setEquipped(equipData.equipped)
+        if (equipData.owned) setInventory(equipData.owned)
+        if (equipData.stats) setStats(equipData.stats)
+        if (energyData.energy) setEnergy(energyData.energy)
       })
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -40,18 +36,23 @@ export default function AdventureShop({ shop }: AdventureShopProps) {
 
   const handleBuy = async (item: EquipmentItem) => {
     if (balance < item.price) {
-      setPurchaseStatus('Not enough coins!')
+      setPurchaseStatus({ message: 'Not enough coins!', error: true })
       return
     }
 
-    const result = await spend(item.price)
-    if (result) {
-      // Update inventory
-      setInventory([...inventory, item.id])
-      setPurchaseStatus(`Purchased ${item.name}!`)
+    const res = await fetch('/api/adventure/equipment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemId: item.id, action: 'buy' })
+    })
+    const data = await res.json()
+
+    if (data.success) {
+      setInventory(prev => [...prev, item.id])
+      setPurchaseStatus({ message: `Purchased ${item.name}!` })
       refresh()
     } else {
-      setPurchaseStatus('Purchase failed')
+      setPurchaseStatus({ message: data.error || 'Purchase failed', error: true })
     }
   }
 
@@ -117,8 +118,12 @@ export default function AdventureShop({ shop }: AdventureShopProps) {
 
       {/* Purchase Status */}
       {purchaseStatus && (
-        <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-center">
-          {purchaseStatus}
+        <div
+          className={`px-4 py-2 rounded-lg text-center ${
+            purchaseStatus.error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+          }`}
+        >
+          {purchaseStatus.message}
         </div>
       )}
 
