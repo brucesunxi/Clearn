@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import { speak, cancelSpeech } from '@/lib/tts'
+import { trackActivity } from '@/lib/activity'
 import type { Article } from '@/lib/types'
 
 interface IntensiveListeningProps {
@@ -95,6 +96,27 @@ export default function IntensiveListening({ articles }: IntensiveListeningProps
   const handleReplay = () => {
     playSentence(currentIdx)
   }
+
+  // Restore energy when completing intensive listening
+  const energyRestoredRef = useRef(false)
+  useEffect(() => {
+    if (step === 'done' && !energyRestoredRef.current) {
+      energyRestoredRef.current = true
+      fetch('/api/adventure/energy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activity: 'intensive_listen' }),
+      }).catch(() => {})
+      // Add coins for completing
+      try {
+        const raw = localStorage.getItem('panda-inventory')
+        const inv = raw ? JSON.parse(raw) : { food: {}, accessories: {}, equipped: [], coins: 500 }
+        inv.coins = (inv.coins || 500) + 15
+        localStorage.setItem('panda-inventory', JSON.stringify(inv))
+      } catch {}
+      trackActivity('intensive_listen', { articleId: selectedArticle?.id || '' })
+    }
+  }, [step, selectedArticle])
 
   // Article selection screen
   if (step === 'select') {

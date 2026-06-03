@@ -37,7 +37,7 @@ const REVIVE_COST = 50
 
 export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
   const router = useRouter()
-  const { add, balance } = useCoins()
+  const { balance } = useCoins()
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentQ, setCurrentQ] = useState(0)
   const [combo, setCombo] = useState(0)
@@ -181,7 +181,7 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
       const newPlayerHp = correct ? playerHp : Math.max(0, playerHp - damageTaken)
 
       if (correct && newBossHp <= 0) {
-        completeLevel()
+        completeLevel(correctCount + 1, answeredCount + 1)
       } else if (!correct && newPlayerHp <= 0) {
         // Player defeated! Notify server
         setGameState('failed')
@@ -217,17 +217,8 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
     }, 1200)
   }
 
-  const completeLevel = async () => {
+  const completeLevel = async (finalCorrect?: number, finalAnswered?: number) => {
     setGameState('completed')
-
-    const baseCoins = level.rewards.coins.min +
-      Math.floor(Math.random() * (level.rewards.coins.max - level.rewards.coins.min))
-    const luckCoins = Math.floor(baseCoins * luckBonus / 100)
-    const totalCoins = baseCoins + luckCoins
-    const expEarned = level.rewards.exp + Math.floor(10 * correctCount / Math.max(1, answeredCount || 1))
-
-    setRewards({ coins: totalCoins, exp: expEarned })
-    add(totalCoins)
 
     const res = await fetch('/api/adventure/levels', {
       method: 'POST',
@@ -235,17 +226,20 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
       body: JSON.stringify({
         levelId: level.id,
         action: 'complete',
-        score: correctCount,
-        correctCount,
-        totalCount: answeredCount || questions.length
+        score: finalCorrect ?? correctCount,
+        correctCount: finalCorrect ?? correctCount,
+        totalCount: finalAnswered ?? (answeredCount || questions.length)
       })
     })
     const data = await res.json()
+    if (data.rewards) {
+      setRewards({ coins: data.rewards.coins, exp: data.rewards.exp })
+    }
     if (data.levelUp) setLevelUp(true)
     if (data.doubleXp) setDoubleXp(true)
     if (data.droppedItem) {
-      const shop = await fetch('/api/adventure/equipment').then(r => r.json())
-      const item = shop.shop?.find((i: { id: string }) => i.id === data.droppedItem)
+      const shopRes = await fetch('/api/adventure/equipment').then(r => r.json())
+      const item = shopRes.shop?.find((i: { id: string }) => i.id === data.droppedItem)
       if (item) setDroppedItem({ name: item.name, emoji: item.emoji })
     }
   }
@@ -348,9 +342,18 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="text-6xl mb-6">😴</div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{error}</h2>
+        <p className="text-sm text-gray-500 mt-2">
+          {error.includes('power') || error.includes('defense') || error.includes('equipment')
+            ? 'You need better equipment to challenge this level!'
+            : 'Complete learning activities to restore energy!'}
+        </p>
         <div className="flex gap-3 justify-center mt-6">
           <button onClick={retry} className="px-6 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600">Try Again</button>
-          <button onClick={() => router.push('/adventure')} className="px-6 py-2 rounded-xl bg-gray-500 text-white hover:bg-gray-600">Back to Map</button>
+          {error.includes('power') || error.includes('defense') || error.includes('equipment') ? (
+            <button onClick={() => router.push('/adventure/shop')} className="px-6 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600">🛍️ Go to Shop</button>
+          ) : (
+            <button onClick={() => router.push('/adventure')} className="px-6 py-2 rounded-xl bg-gray-500 text-white hover:bg-gray-600">Back to Map</button>
+          )}
         </div>
       </div>
     )
@@ -393,6 +396,18 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
           <span>🛡️ Defense {playerStats.defense} (DMG taken {damageTaken})</span>
           <span>🍀 Luck {playerStats.luck} (+{luckBonus}% coins)</span>
         </div>
+
+        <details className="mb-6 text-left bg-blue-50 rounded-xl p-4">
+          <summary className="text-sm font-medium text-blue-700 cursor-pointer">📖 How to play</summary>
+          <div className="mt-3 text-sm text-gray-600 space-y-2">
+            <p>❓ Answer <strong>multiple-choice</strong> questions about Chinese vocabulary</p>
+            <p>⚔️ Correct answer deals <strong>{damagePerHit} DMG</strong> to the boss</p>
+            <p>🛡️ Wrong answer: panda takes <strong>{damageTaken} DMG</strong></p>
+            <p>🔥 Get <strong>consecutive correct</strong> answers for a combo streak!</p>
+            <p>🎯 Defeat the boss to clear the level</p>
+            <p>💀 If your HP reaches 0, you can <strong>revive for 50 coins</strong></p>
+          </div>
+        </details>
 
         <button
           onClick={handleStart}

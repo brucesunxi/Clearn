@@ -12,6 +12,8 @@ export type ActionType =
   | 'shop_purchase'
   | 'article_read'
   | 'material_import'
+  | 'intensive_listen'
+  | 'adventure_level_complete'
 
 export function trackActivity(action: ActionType, detail?: Record<string, unknown>): void {
   if (typeof window === 'undefined') return

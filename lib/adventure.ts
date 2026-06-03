@@ -72,6 +72,7 @@ export const ADVENTURE_CONFIG = {
     battle_win: 15,
     checkin: 20,
     study_complete: 5,
+    intensive_listen: 10,
   },
   pet: {
     maxLevel: 50,
@@ -106,22 +107,22 @@ export function getAdventureLevels(): AdventureLevel[] {
       totalQuestions: 5,
       requirements: {},
       rewards: { coins: { min: 20, max: 40 }, exp: 20 },
-      gameType: 'quiz',
+      gameType: 'puzzle',
     },
     {
       id: 2,
       name: '竹海漫步',
       nameEn: 'Bamboo Sea Walk',
       emoji: '🌿',
-      description: '在广袤的竹海中漫步，回答更多中文词汇问题',
-      descriptionEn: 'Stroll through the vast bamboo sea answering more Chinese vocabulary questions',
+      description: '在广袤的竹海中漫步，找到隐藏的汉字',
+      descriptionEn: 'Stroll through the vast bamboo sea finding hidden characters',
       theme: 'bamboo-forest',
       difficulty: 1,
       requiredEnergy: 10,
       totalQuestions: 5,
       requirements: {},
       rewards: { coins: { min: 25, max: 45 }, exp: 25 },
-      gameType: 'quiz',
+      gameType: 'puzzle',
     },
     {
       id: 3,
@@ -166,7 +167,7 @@ export function getAdventureLevels(): AdventureLevel[] {
       totalQuestions: 7,
       requirements: { minLevel: 3, minPower: 25 },
       rewards: { coins: { min: 50, max: 90 }, exp: 55 },
-      gameType: 'quiz',
+      gameType: 'maze',
     },
     {
       id: 6,
@@ -181,7 +182,7 @@ export function getAdventureLevels(): AdventureLevel[] {
       totalQuestions: 7,
       requirements: { minLevel: 3, minPower: 30 },
       rewards: { coins: { min: 55, max: 100 }, exp: 65 },
-      gameType: 'quiz',
+      gameType: 'maze',
     },
     {
       id: 7,
@@ -423,8 +424,15 @@ export async function calculateNaturalRegen(userId: string): Promise<number> {
 
 export async function updateEnergy(userId: string, delta: number): Promise<PandaEnergy> {
   const current = await getEnergy(userId)
-  const newCurrent = Math.max(0, Math.min(current.max, current.current + delta))
-  const updated: PandaEnergy = { ...current, current: newCurrent, lastRegen: new Date().toISOString() }
+  // Calculate effective max from equipment
+  let effectiveMax = current.max
+  try {
+    const stats = await calculateTotalStats(userId)
+    effectiveMax = stats.energy
+  } catch { /* ignore */ }
+
+  const newCurrent = Math.max(0, Math.min(effectiveMax, current.current + delta))
+  const updated: PandaEnergy = { ...current, current: newCurrent, max: effectiveMax, lastRegen: new Date().toISOString() }
   await setJson(`adventure:energy:${userId}`, updated)
   return updated
 }
@@ -443,9 +451,10 @@ export async function getCompletedLevelIds(userId: string): Promise<number[]> {
 }
 
 export async function getUnlockedLevels(userId: string): Promise<AdventureLevel[]> {
-  const [completedLevels, petData] = await Promise.all([
+  const [completedLevels, petData, stats] = await Promise.all([
     getCompletedLevelIds(userId),
     getPetLevel(userId),
+    calculateTotalStats(userId),
   ])
 
   const petLevel = petData.level
@@ -454,7 +463,8 @@ export async function getUnlockedLevels(userId: string): Promise<AdventureLevel[
   return allLevels.filter(level => {
     const levelReq = level.requirements.minLevel || 1
     if (petLevel < levelReq) return false
-    // Level 1 is always unlocked; others require the previous level completed
+    if (level.requirements.minPower && stats.power < level.requirements.minPower) return false
+    if (level.requirements.minDefense && stats.defense < level.requirements.minDefense) return false
     if (level.id > 1) {
       const prevCompleted = completedLevels.includes(level.id - 1)
       const selfCompleted = completedLevels.includes(level.id)
@@ -473,7 +483,11 @@ export async function startLevel(userId: string, levelId: number): Promise<{
   const level = getLevelById(levelId)
   if (!level) return { success: false, message: 'Level not found' }
 
-  const energy = await getEnergy(userId)
+  const [energy, stats] = await Promise.all([
+    getEnergy(userId),
+    calculateTotalStats(userId),
+  ])
+
   if (energy.current < level.requiredEnergy) {
     return {
       success: false,
@@ -482,7 +496,22 @@ export async function startLevel(userId: string, levelId: number): Promise<{
     }
   }
 
+  if (level.requirements.minPower && stats.power < level.requirements.minPower) {
+    return { success: false, message: `Need ${level.requirements.minPower} power (current: ${stats.power}). Buy better equipment!`, requires: { power: level.requirements.minPower - stats.power } }
+  }
+  if (level.requirements.minDefense && stats.defense < level.requirements.minDefense) {
+    return { success: false, message: `Need ${level.requirements.minDefense} defense (current: ${stats.defense}). Buy better equipment!`, requires: { defense: level.requirements.minDefense - stats.defense } }
+  }
+
   const updated = await updateEnergy(userId, -level.requiredEnergy)
+
+  // Track last play date (not total - that's handled by completeLevel)
+  try {
+    const stats = await getAdventureStats(userId)
+    stats.lastPlayDate = new Date().toISOString()
+    await setJson(`adventure:stats:${userId}`, stats)
+  } catch { /* ignore */ }
+
   return { success: true, message: 'Level started!', energyLeft: updated.current }
 }
 
@@ -511,9 +540,18 @@ export async function completeLevel(
   }
 
   const accuracy = result.totalCount > 0 ? result.correctCount / result.totalCount : 0
-  const coinsEarned = Math.floor(
+  let coinsEarned = Math.floor(
     level.rewards.coins.min + (level.rewards.coins.max - level.rewards.coins.min) * accuracy
   )
+
+  // Apply luck bonus
+  try {
+    const playerStats = await calculateTotalStats(userId)
+    const luckBonus = Math.floor(playerStats.luck / 3)
+    if (luckBonus > 0) {
+      coinsEarned = Math.floor(coinsEarned * (1 + luckBonus / 100))
+    }
+  } catch { /* ignore */ }
 
   let expEarned = level.rewards.exp + Math.floor(10 * accuracy)
 
@@ -524,6 +562,9 @@ export async function completeLevel(
     doubleXp = true
     await markDailyLevel(userId)
   }
+
+  // Track adventure stats (increments totalLevelsPlayed and totalLevelsCompleted)
+  try { await updateAdventureStats(userId, { completed: true, coinsEarned, expEarned }) } catch { /* ignore */ }
 
   // Add coins using existing coins API
   try { await addCoins(userId, coinsEarned) } catch { /* ignore */ }
@@ -564,6 +605,26 @@ export async function getMaxEquippableSlots(userId: string): Promise<number> {
   const petData = await getPetLevel(userId)
   const allSlots = ['head', 'body', 'accessory', 'weapon', 'shield', 'foot']
   return allSlots.filter(s => petData.level >= getSlotUnlockLevel(s)).length
+}
+
+// --------------- 同步能量上限 ---------------
+
+async function syncEnergyMax(userId: string): Promise<void> {
+  const key = `adventure:energy:${userId}`
+  const data = await getJson(key)
+  if (data && typeof data === 'object') {
+    const e = data as Record<string, unknown>
+    if (typeof e.current === 'number') {
+      try {
+        const stats = await calculateTotalStats(userId)
+        const newMax = stats.energy
+        const newCurrent = Math.min(e.current as number, newMax)
+        if (e.max !== newMax || e.current !== newCurrent) {
+          await setJson(key, { ...e, current: newCurrent, max: newMax })
+        }
+      } catch { /* ignore */ }
+    }
+  }
 }
 
 // --------------- 每日闯关 ---------------
@@ -799,11 +860,15 @@ export async function equipItem(userId: string, itemId: string, shouldEquip: boo
       })
       filtered.push(itemId)
       await setJson(key, filtered)
+      // Sync energy max after equip
+      try { await syncEnergyMax(userId) } catch { /* ignore */ }
       return { success: true, message: 'Item equipped', equipped: filtered }
     }
   } else {
     const filtered = equipped.filter(id => id !== itemId)
     await setJson(key, filtered)
+    // Sync energy max after unequip
+    try { await syncEnergyMax(userId) } catch { /* ignore */ }
     return { success: true, message: 'Item unequipped', equipped: filtered }
   }
 
@@ -851,4 +916,37 @@ export async function addPetExperience(userId: string, exp: number): Promise<{
 
 function getExpToNext(level: number): number {
   return Math.floor(ADVENTURE_CONFIG.pet.expPerLevel * Math.pow(ADVENTURE_CONFIG.pet.expMultiplier, level - 1))
+}
+
+// --------------- 冒险统计 ---------------
+
+export interface AdventureStats {
+  totalLevelsPlayed: number
+  totalLevelsCompleted: number
+  totalCoinsEarned: number
+  totalExpEarned: number
+  lastPlayDate: string
+}
+
+export async function getAdventureStats(userId: string): Promise<AdventureStats> {
+  const key = `adventure:stats:${userId}`
+  const data = await getJson(key)
+  if (data && typeof data === 'object') {
+    return data as AdventureStats
+  }
+  return { totalLevelsPlayed: 0, totalLevelsCompleted: 0, totalCoinsEarned: 0, totalExpEarned: 0, lastPlayDate: '' }
+}
+
+export async function updateAdventureStats(
+  userId: string,
+  update: { completed: boolean; coinsEarned: number; expEarned: number }
+): Promise<AdventureStats> {
+  const stats = await getAdventureStats(userId)
+  stats.totalLevelsPlayed++
+  if (update.completed) stats.totalLevelsCompleted++
+  stats.totalCoinsEarned += update.coinsEarned
+  stats.totalExpEarned += update.expEarned
+  stats.lastPlayDate = new Date().toISOString()
+  await setJson(`adventure:stats:${userId}`, stats)
+  return stats
 }

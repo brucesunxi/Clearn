@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getLevelById } from '@/lib/adventure'
 import AdventureGameQuiz from '@/components/AdventureGameQuiz'
+import AdventureGamePuzzle from '@/components/AdventureGamePuzzle'
+import AdventureGameMaze from '@/components/AdventureGameMaze'
 
 interface PlayPageProps {
   params: { levelId: string }
@@ -27,11 +29,12 @@ export default function PlayPage({ params }: PlayPageProps) {
     notFound()
   }
 
-  // Render different game types
   switch (level.gameType) {
+    case 'puzzle':
+      return <AdventureGamePuzzle level={level} />
+    case 'maze':
+      return <AdventureGameMaze level={level} />
     case 'quiz':
-      return <AdventureGameQuiz level={level} />
-    // Add other game types here
     default:
       return <AdventureGameQuiz level={level} />
   }

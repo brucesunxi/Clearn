@@ -20,6 +20,7 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
   const [petExp, setPetExp] = useState(0)
   const [petExpToNext, setPetExpToNext] = useState(100)
   const [completedLevels, setCompletedLevels] = useState<number[]>([])
+  const [adventureStats, setAdventureStats] = useState<{ totalLevelsPlayed: number; totalLevelsCompleted: number; totalCoinsEarned: number; totalExpEarned: number; lastPlayDate: string } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -28,8 +29,9 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
       fetch('/api/adventure/equipment').then(r => r.json()),
       fetch('/api/adventure/pet').then(r => r.json()),
       fetch('/api/adventure/levels').then(r => r.json()),
+      fetch('/api/adventure/stats').then(r => r.json()),
     ])
-      .then(([energyData, equipData, petData, levelData]) => {
+      .then(([energyData, equipData, petData, levelData, statsData]) => {
         if (energyData.energy) setEnergy(energyData.energy)
         if (equipData.stats) setStats(equipData.stats)
         if (petData.petLevel) {
@@ -38,6 +40,7 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
           setPetExpToNext(petData.petLevel.expToNext)
         }
         if (levelData.completed) setCompletedLevels(levelData.completed)
+        if (statsData.stats) setAdventureStats(statsData.stats)
       })
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -130,6 +133,19 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
         </div>
       </div>
 
+      {/* All Levels Completed Celebration */}
+      {completedLevels.length >= levels.length && (
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-2xl p-6 text-center">
+          <div className="text-5xl mb-3">👑</div>
+          <h2 className="text-2xl font-bold text-orange-700 mb-1">All Levels Complete!</h2>
+          <p className="text-orange-600 mb-3">You've conquered every challenge! You are the Panda Master!</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/adventure/shop" className="px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 font-medium text-sm">🛍️ Check the Shop</Link>
+            <Link href="/blindbox" className="px-4 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600 font-medium text-sm">🎁 Try Blind Boxes</Link>
+          </div>
+        </div>
+      )}
+
       {/* Energy Recovery Hint */}
       {energy.current < 20 && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
@@ -147,8 +163,22 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {levels.map((level) => {
           const isCompleted = completedLevels.includes(level.id)
-          const isLocked = level.requirements.minLevel && petLevel < level.requirements.minLevel
+          const prevCompleted = level.id === 1 || completedLevels.includes(level.id - 1)
+          const meetsLevelReq = !level.requirements.minLevel || petLevel >= level.requirements.minLevel
+          const meetsPowerReq = !level.requirements.minPower || stats.power >= level.requirements.minPower
+          const meetsDefenseReq = !level.requirements.minDefense || stats.defense >= level.requirements.minDefense
+          const isLocked = !prevCompleted || !meetsLevelReq || !meetsPowerReq || !meetsDefenseReq
+          const lockReason = !meetsLevelReq
+            ? `Pet level ${level.requirements.minLevel} required`
+            : !meetsPowerReq
+            ? `⚔️ ${level.requirements.minPower} power required (${stats.power})`
+            : !meetsDefenseReq
+            ? `🛡️ ${level.requirements.minDefense} defense required (${stats.defense})`
+            : !prevCompleted
+            ? `Complete "${levels.find(l => l.id === level.id - 1)?.name}" first`
+            : ''
           const hasEnergy = energy.current >= level.requiredEnergy
+          const isPlayable = !isLocked && hasEnergy
 
           return (
             <div
@@ -161,7 +191,7 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
                   : 'bg-gradient-to-br ' + getThemeGradient(level.theme) + ' hover:shadow-lg cursor-pointer'
               }`}
               onClick={() => {
-                if (!isLocked && hasEnergy && !isCompleted) {
+                if (isPlayable && !isCompleted) {
                   router.push(`/adventure/play/${level.id}`)
                 }
               }}
@@ -225,11 +255,11 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
               )}
 
               {/* Locked Overlay */}
-              {isLocked && (
+              {isLocked && !isCompleted && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-200/80 rounded-2xl">
-                  <div className="text-center">
+                  <div className="text-center px-4">
                     <div className="text-2xl mb-2">🔒</div>
-                    <p className="text-sm text-gray-600">Level {level.requirements.minLevel} required</p>
+                    <p className="text-sm text-gray-600">{lockReason}</p>
                   </div>
                 </div>
               )}
@@ -263,14 +293,25 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
             <div className="text-gray-500 text-xs">Pet Level</div>
           </div>
           <div>
-            <div className="text-xl font-bold text-amber-600">⚔️ {stats.power}</div>
-            <div className="text-gray-500 text-xs">Total Power</div>
+            <div className="text-xl font-bold text-amber-600">{adventureStats?.totalLevelsCompleted || 0}</div>
+            <div className="text-gray-500 text-xs">Total Clears</div>
           </div>
           <div>
-            <div className="text-xl font-bold text-blue-600">🛡️ {stats.defense}</div>
-            <div className="text-gray-500 text-xs">Total Defense</div>
+            <div className="text-xl font-bold text-yellow-600">💰 {adventureStats?.totalCoinsEarned || 0}</div>
+            <div className="text-gray-500 text-xs">Coins Earned</div>
           </div>
         </div>
+        <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs text-gray-500">
+          <div>⚔️ Power {stats.power}</div>
+          <div>🛡️ Defense {stats.defense}</div>
+          <div>🍀 Luck {stats.luck}</div>
+          <div>🎮 {adventureStats?.totalLevelsPlayed || 0} plays</div>
+        </div>
+        {adventureStats?.lastPlayDate && (
+          <div className="mt-2 text-center text-xs text-gray-400">
+            Last played: {new Date(adventureStats.lastPlayDate).toLocaleDateString()}
+          </div>
+        )}
       </div>
 
       {/* Next Milestones */}
