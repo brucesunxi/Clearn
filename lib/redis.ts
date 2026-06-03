@@ -53,7 +53,7 @@ export async function addCoins(userId: string, amount: number): Promise<number> 
   const redis = getRedis()
   if (!redis) return STARTING_COINS + amount
   const current = await getCoins(userId)
-  const newBalance = current + amount
+  const newBalance = (current ?? STARTING_COINS) + amount
   await redis.set(getCoinsKey(userId), newBalance)
   return newBalance
 }

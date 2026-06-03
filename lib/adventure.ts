@@ -567,7 +567,11 @@ export async function completeLevel(
   try { await updateAdventureStats(userId, { completed: true, coinsEarned, expEarned }) } catch { /* ignore */ }
 
   // Add coins using existing coins API
-  try { await addCoins(userId, coinsEarned) } catch { /* ignore */ }
+  try {
+    await addCoins(userId, coinsEarned)
+  } catch (err) {
+    console.error('Failed to add coins:', err)
+  }
 
   const petResult = await addPetExperience(userId, expEarned)
 
