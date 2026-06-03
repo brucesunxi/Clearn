@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getRedis, getCheckin, setCheckin, addCoins, addCoinHistory } from '@/lib/redis'
+import { updateEnergy } from '@/lib/adventure'
 import { getUserIdFromRequest } from '@/lib/auth'
 
 function today(): string {
@@ -72,5 +73,8 @@ export async function POST(request: NextRequest) {
   const coins = await addCoins(uid, 20)
   addCoinHistory(uid, 20, 'checkin', coins, 'streak ' + data.currentStreak + ' days')
 
-  return NextResponse.json({ checkin: data, checkedInToday: true, coins })
+  // Restore 20 adventure energy on check-in
+  const energy = await updateEnergy(uid, 20)
+
+  return NextResponse.json({ checkin: data, checkedInToday: true, coins, energy })
 }

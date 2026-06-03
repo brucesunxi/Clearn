@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getEnergy, updateEnergy, calculateNaturalRegen, gainEnergyFromActivity } from '@/lib/adventure'
+import { spendCoins, getCoins, addCoinHistory } from '@/lib/redis'
 import { getUserIdFromRequest } from '@/lib/auth'
 
 // GET - 获取当前能量
@@ -33,7 +34,36 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { activity, amount } = body
+    const { activity, amount, action } = body
+
+    // Recharge action - buy energy with coins
+    if (action === 'recharge') {
+      const ENERGY_PER_POTION = 30
+      const COST_PER_POTION = 30
+
+      const balance = await getCoins(userId)
+      if (balance < COST_PER_POTION) {
+        return NextResponse.json({
+          error: 'Not enough coins',
+          requires: { coins: COST_PER_POTION - balance }
+        }, { status: 400 })
+      }
+
+      const spendResult = await spendCoins(userId, COST_PER_POTION)
+      if (!spendResult.success) {
+        return NextResponse.json({ error: 'Transaction failed' }, { status: 400 })
+      }
+
+      const energy = await updateEnergy(userId, ENERGY_PER_POTION)
+
+      return NextResponse.json({
+        success: true,
+        energy,
+        gained: ENERGY_PER_POTION,
+        balance: spendResult.balance,
+        message: `Bought ${ENERGY_PER_POTION} energy for ${COST_PER_POTION} coins`
+      })
+    }
 
     if (!activity) {
       return NextResponse.json({ error: 'Activity type required' }, { status: 400 })

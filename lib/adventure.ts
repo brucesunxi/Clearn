@@ -401,27 +401,22 @@ export async function getCompletedLevelIds(userId: string): Promise<number[]> {
 }
 
 export async function getUnlockedLevels(userId: string): Promise<AdventureLevel[]> {
-  const completedKey = `adventure:completed:${userId}`
-  let completedLevels: number[] = []
-  let petLevel = 1
+  const [completedLevels, petData] = await Promise.all([
+    getCompletedLevelIds(userId),
+    getPetLevel(userId),
+  ])
 
-  const completedData = await getJson(completedKey)
-  if (completedData && Array.isArray(completedData)) {
-    completedLevels = completedData as number[]
-  }
-
-  const petData = await getPetLevel(userId)
-  petLevel = petData.level
-
+  const petLevel = petData.level
   const allLevels = getAdventureLevels()
+
   return allLevels.filter(level => {
     const levelReq = level.requirements.minLevel || 1
     if (petLevel < levelReq) return false
+    // Level 1 is always unlocked; others require the previous level completed
     if (level.id > 1) {
-      const prevLevel = allLevels.find(l => l.id === level.id - 1)
-      if (prevLevel && !completedLevels.includes(prevLevel.id)) {
-        if (!completedLevels.includes(level.id)) return false
-      }
+      const prevCompleted = completedLevels.includes(level.id - 1)
+      const selfCompleted = completedLevels.includes(level.id)
+      if (!prevCompleted && !selfCompleted) return false
     }
     return true
   })

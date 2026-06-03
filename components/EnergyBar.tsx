@@ -1,5 +1,7 @@
 'use client'
 
+import { ADVENTURE_CONFIG } from '@/lib/adventure'
+
 interface EnergyBarProps {
   energy: { current: number; max: number }
   showRegen?: boolean
@@ -39,5 +41,3 @@ export default function EnergyBar({ energy, showRegen = true }: EnergyBarProps) 
     </div>
   )
 }
-
-import { ADVENTURE_CONFIG } from '@/lib/adventure'

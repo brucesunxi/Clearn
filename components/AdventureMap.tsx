@@ -77,7 +77,25 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Energy */}
-          <EnergyBar energy={energy} />
+          <div>
+            <EnergyBar energy={energy} />
+            <button
+              onClick={async () => {
+                const res = await fetch('/api/adventure/energy', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ action: 'recharge' })
+                })
+                const data = await res.json()
+                if (data.success) {
+                  setEnergy(data.energy)
+                }
+              }}
+              className="mt-1 text-xs text-amber-600 hover:text-amber-700 font-medium"
+            >
+              ⚡ Buy +30 energy (30 coins)
+            </button>
+          </div>
 
           {/* Stats */}
           <EquipmentPanel stats={stats} compact />
