@@ -98,21 +98,24 @@ export default function Header() {
           <Link href="/pet" className="text-gray-600 hover:text-green-500 dark:text-gray-300 dark:hover:text-green-400 font-medium transition-colors text-sm">🐼</Link>
         </div>
         {user && (
-          <div className="relative">
-            <Link
-              href="/profile"
-              className="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-full hover:bg-yellow-100 transition-colors cursor-pointer dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-400 dark:hover:bg-yellow-900/50"
-            >
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-full dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-400">
               <span>🪙</span>
               <span className="font-semibold">{coins}</span>
-            </Link>
+            </div>
           </div>
         )}
           {!isAdminPage && !loading && (
             <>
               {user ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 hidden sm:inline max-w-[100px] truncate dark:text-gray-400">{user.email}</span>
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors border border-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 dark:border-gray-600"
+                  >
+                    <span className="text-base">👤</span>
+                    <span className="max-w-[100px] truncate">{user.email}</span>
+                  </Link>
                   {!user.emailVerified && (
                     <span className="text-[11px] text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded dark:bg-amber-900/30 dark:text-amber-400" title="Email not verified">⚠️</span>
                   )}
