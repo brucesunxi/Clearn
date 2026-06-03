@@ -394,6 +394,12 @@ export function gainEnergyFromActivity(activity: string): number {
 
 // --------------- 关卡系统 ---------------
 
+export async function getCompletedLevelIds(userId: string): Promise<number[]> {
+  const key = `adventure:completed:${userId}`
+  const data = await getJson(key)
+  return (data && Array.isArray(data)) ? data as number[] : []
+}
+
 export async function getUnlockedLevels(userId: string): Promise<AdventureLevel[]> {
   const completedKey = `adventure:completed:${userId}`
   let completedLevels: number[] = []

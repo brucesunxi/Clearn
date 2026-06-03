@@ -16,28 +16,27 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
   const [energy, setEnergy] = useState({ current: 100, max: 100 })
   const [stats, setStats] = useState({ power: 0, defense: 0, luck: 0 })
   const [petLevel, setPetLevel] = useState(1)
+  const [petExp, setPetExp] = useState(0)
+  const [petExpToNext, setPetExpToNext] = useState(100)
+  const [completedLevels, setCompletedLevels] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch energy and stats
-    fetch('/api/adventure/energy')
-      .then(res => res.json())
-      .then(data => {
-        if (data.energy) setEnergy(data.energy)
-      })
-      .catch(console.error)
-
-    fetch('/api/adventure/equipment')
-      .then(res => res.json())
-      .then(data => {
-        if (data.stats) setStats(data.stats)
-      })
-      .catch(console.error)
-
-    fetch('/api/adventure/pet')
-      .then(res => res.json())
-      .then(data => {
-        if (data.petLevel) setPetLevel(data.petLevel.level)
+    Promise.all([
+      fetch('/api/adventure/energy').then(r => r.json()),
+      fetch('/api/adventure/equipment').then(r => r.json()),
+      fetch('/api/adventure/pet').then(r => r.json()),
+      fetch('/api/adventure/levels').then(r => r.json()),
+    ])
+      .then(([energyData, equipData, petData, levelData]) => {
+        if (energyData.energy) setEnergy(energyData.energy)
+        if (equipData.stats) setStats(equipData.stats)
+        if (petData.petLevel) {
+          setPetLevel(petData.petLevel.level)
+          setPetExp(petData.petLevel.exp)
+          setPetExpToNext(petData.petLevel.expToNext)
+        }
+        if (levelData.completed) setCompletedLevels(levelData.completed)
       })
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -83,25 +82,52 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
           {/* Stats */}
           <EquipmentPanel stats={stats} compact />
 
-          {/* Level & Shop Link */}
-          <div className="flex items-center justify-between">
-            <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Pet Level</div>
-              <div className="text-2xl font-bold text-purple-600">Lv.{petLevel}</div>
+          {/* Pet Level & Shop */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🐼</span>
+                <span className="font-medium text-gray-700">Pet Level</span>
+              </div>
+              <span className="text-lg font-bold text-purple-600">Lv.{petLevel}</span>
             </div>
-            <Link
-              href="/adventure/shop"
-              className="px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium"
-            >
-              🛍️ Shop
-            </Link>
+            {/* XP Progress */}
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
+              <div
+                className="h-full bg-gradient-to-r from-purple-400 to-purple-600 transition-all duration-300"
+                style={{ width: `${Math.round((petExp / Math.max(1, petExpToNext)) * 100)}%` }}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-gray-500">{petExp}/{petExpToNext} XP</span>
+              <Link
+                href="/adventure/shop"
+                className="px-4 py-1.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium text-sm"
+              >
+                🛍️ Shop
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Energy Recovery Hint */}
+      {energy.current < 20 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+          <p className="text-amber-700 font-medium mb-2">⚡ Low energy! Complete learning activities to recharge:</p>
+          <div className="flex flex-wrap justify-center gap-2 text-sm">
+            <Link href="/reading" className="px-3 py-1 bg-white rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50">📖 Read</Link>
+            <Link href="/learn" className="px-3 py-1 bg-white rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50">📝 Quiz</Link>
+            <Link href="/listen" className="px-3 py-1 bg-white rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50">🎧 Listen</Link>
+            <Link href="/speak" className="px-3 py-1 bg-white rounded-lg border border-amber-200 text-amber-600 hover:bg-amber-50">🗣️ Speak</Link>
+          </div>
+        </div>
+      )}
+
       {/* Level Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {levels.map((level) => {
+          const isCompleted = completedLevels.includes(level.id)
           const isLocked = level.requirements.minLevel && petLevel < level.requirements.minLevel
           const hasEnergy = energy.current >= level.requiredEnergy
 
@@ -109,18 +135,27 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
             <div
               key={level.id}
               className={`relative rounded-2xl p-6 transition-all ${
-                isLocked
+                isCompleted
+                  ? 'bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-300'
+                  : isLocked
                   ? 'bg-gray-100 opacity-60'
                   : 'bg-gradient-to-br ' + getThemeGradient(level.theme) + ' hover:shadow-lg cursor-pointer'
               }`}
               onClick={() => {
-                if (!isLocked && hasEnergy) {
+                if (!isLocked && hasEnergy && !isCompleted) {
                   router.push(`/adventure/play/${level.id}`)
                 }
               }}
             >
+              {/* Completion Badge */}
+              {isCompleted && (
+                <div className="absolute top-4 left-4">
+                  <span className="text-2xl">✅</span>
+                </div>
+              )}
+
               {/* Difficulty Badge */}
-              <div className="absolute top-4 right-4">
+              <div className={`absolute top-4 ${isCompleted ? 'right-4' : 'right-4'}`}>
                 <div className={`w-8 h-8 rounded-full ${getDifficultyColor(level.difficulty)} flex items-center justify-center text-white font-bold text-sm`}>
                   {level.difficulty}
                 </div>
@@ -153,6 +188,23 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
                 <span>✨ +{level.rewards.exp} XP</span>
               </div>
 
+              {/* Completed Replay Button */}
+              {isCompleted && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (hasEnergy) router.push(`/adventure/play/${level.id}`)
+                  }}
+                  className={`mt-3 w-full py-2 rounded-lg font-medium text-sm transition-colors ${
+                    hasEnergy
+                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {hasEnergy ? '🔄 Replay' : '😴 No Energy'}
+                </button>
+              )}
+
               {/* Locked Overlay */}
               {isLocked && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-200/80 rounded-2xl">
@@ -164,7 +216,7 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
               )}
 
               {/* Low Energy Warning */}
-              {!isLocked && !hasEnergy && (
+              {!isLocked && !isCompleted && !hasEnergy && (
                 <div className="absolute inset-0 flex items-center justify-center bg-red-100/80 rounded-2xl">
                   <div className="text-center">
                     <div className="text-2xl mb-2">😴</div>

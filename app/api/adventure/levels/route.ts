@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdventureLevels, getLevelById, getUnlockedLevels, startLevel, completeLevel } from '@/lib/adventure'
+import { getAdventureLevels, getLevelById, getUnlockedLevels, getCompletedLevelIds, startLevel, completeLevel } from '@/lib/adventure'
 import { getUserIdFromRequest } from '@/lib/auth'
 
 // GET - 获取关卡列表
@@ -22,7 +22,8 @@ export async function GET(request: NextRequest) {
     }
 
     const levels = await getUnlockedLevels(userId)
-    return NextResponse.json({ levels })
+    const completed = await getCompletedLevelIds(userId)
+    return NextResponse.json({ levels, completed })
   } catch (error) {
     console.error('Error fetching levels:', error)
     return NextResponse.json({ error: 'Failed to fetch levels' }, { status: 500 })
