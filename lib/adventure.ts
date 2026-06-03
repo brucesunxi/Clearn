@@ -2,7 +2,7 @@
 // 熊猫冒险闯关游戏 - 核心数据结构和逻辑
 // ============================================================
 
-import { getRedis, addCoins, getCoins } from './redis'
+import { getRedis, addCoins, getCoins, getPet, setPet } from './redis'
 
 // --------------- 类型定义 ---------------
 
@@ -71,11 +71,21 @@ export const ADVENTURE_CONFIG = {
     speak_complete: 8,
     battle_win: 15,
     checkin: 20,
+    study_complete: 5,
   },
   pet: {
     maxLevel: 50,
     expPerLevel: 100,
     expMultiplier: 1.5,
+  },
+  revive: {
+    cost: 50,
+    restoreBossHpFraction: 0.5,
+  },
+  slotUnlock: {
+    weapon: 3,
+    shield: 5,
+    foot: 7,
   },
 }
 
@@ -326,6 +336,28 @@ export function getEquipmentShop(): EquipmentItem[] {
       description: '精美的玉项链，提升幸运和能量上限',
       descriptionEn: 'An exquisite jade necklace that boosts luck and energy',
     },
+    {
+      id: 'running-shoes',
+      name: '跑鞋',
+      nameEn: 'Running Shoes',
+      emoji: '👟',
+      price: 55,
+      slot: 'foot',
+      stats: { power: 5, luck: 3 },
+      description: '轻便的跑鞋，提升速度和幸运',
+      descriptionEn: 'Light running shoes that boost speed and luck',
+    },
+    {
+      id: 'bamboo-sandals',
+      name: '竹拖鞋',
+      nameEn: 'Bamboo Sandals',
+      emoji: '🩴',
+      price: 40,
+      slot: 'foot',
+      stats: { defense: 4, energy: 10 },
+      description: '舒适的竹拖鞋，增加防御和能量',
+      descriptionEn: 'Comfortable bamboo sandals that boost defense and energy',
+    },
   ]
 }
 
@@ -453,6 +485,8 @@ export async function completeLevel(
   message: string
   rewards?: { coins: number; exp: number }
   levelUp?: boolean
+  doubleXp?: boolean
+  droppedItem?: string
 }> {
   const level = getLevelById(levelId)
   if (!level) return { success: false, message: 'Level not found' }
@@ -470,19 +504,144 @@ export async function completeLevel(
   const coinsEarned = Math.floor(
     level.rewards.coins.min + (level.rewards.coins.max - level.rewards.coins.min) * accuracy
   )
-  const expEarned = level.rewards.exp + Math.floor(10 * accuracy)
+
+  let expEarned = level.rewards.exp + Math.floor(10 * accuracy)
+
+  // First daily level gets double XP
+  let doubleXp = false
+  if (await isFirstDailyLevel(userId)) {
+    expEarned *= 2
+    doubleXp = true
+    await markDailyLevel(userId)
+  }
 
   // Add coins using existing coins API
   try { await addCoins(userId, coinsEarned) } catch { /* ignore */ }
 
   const petResult = await addPetExperience(userId, expEarned)
 
+  // Random item drop
+  const droppedItem = await rollItemDrop(userId, levelId)
+
+  // Success: increase pet happiness
+  try {
+    const pet = await getPet(userId)
+    if (pet) {
+      pet.happiness = Math.min(100, pet.happiness + 5)
+      pet.lastUpdated = new Date().toISOString()
+      await setPet(userId, pet)
+    }
+  } catch { /* ignore */ }
+
   return {
     success: true,
     message: `Level ${levelId} completed!`,
     rewards: { coins: coinsEarned, exp: expEarned },
     levelUp: petResult.leveledUp,
+    doubleXp,
+    droppedItem: droppedItem || undefined,
   }
+}
+
+// --------------- 槽位解锁 ---------------
+
+export function getSlotUnlockLevel(slot: string): number {
+  const unlocks: Record<string, number> = ADVENTURE_CONFIG.slotUnlock
+  return unlocks[slot] || 1
+}
+
+export async function getMaxEquippableSlots(userId: string): Promise<number> {
+  const petData = await getPetLevel(userId)
+  const allSlots = ['head', 'body', 'accessory', 'weapon', 'shield', 'foot']
+  return allSlots.filter(s => petData.level >= getSlotUnlockLevel(s)).length
+}
+
+// --------------- 每日闯关 ---------------
+
+function todayDateStr(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+async function isFirstDailyLevel(userId: string): Promise<boolean> {
+  const key = `adventure:daily:${userId}`
+  const data = await getJson(key)
+  return data !== todayDateStr()
+}
+
+async function markDailyLevel(userId: string): Promise<void> {
+  await setJson(`adventure:daily:${userId}`, todayDateStr())
+}
+
+// --------------- 装备掉落 ---------------
+
+const LEVEL_DROPS: Record<number, { itemId: string; chance: number }[]> = {
+  1: [{ itemId: 'bamboo-hat', chance: 0.15 }],
+  2: [{ itemId: 'red-scarf', chance: 0.15 }],
+  3: [{ itemId: 'lucky-charm', chance: 0.12 }],
+  4: [{ itemId: 'bamboo-sword', chance: 0.1 }],
+  5: [{ itemId: 'bamboo-shield', chance: 0.08 }, { itemId: 'bamboo-sandals', chance: 0.1 }],
+  6: [{ itemId: 'cool-glasses', chance: 0.08 }, { itemId: 'jade-necklace', chance: 0.06 }],
+  7: [{ itemId: 'bamboo-staff', chance: 0.05 }, { itemId: 'energy-belt', chance: 0.08 }],
+  8: [{ itemId: 'golden-crown', chance: 0.03 }, { itemId: 'running-shoes', chance: 0.08 }],
+}
+
+export async function rollItemDrop(userId: string, levelId: number): Promise<string | null> {
+  const drops = LEVEL_DROPS[levelId]
+  if (!drops) return null
+
+  const owned = await getOwnedItems(userId)
+
+  for (const drop of drops) {
+    if (owned.includes(drop.itemId)) continue
+    if (Math.random() < drop.chance) {
+      const ownedKey = `adventure:items:${userId}`
+      const ownedData = await getJson(ownedKey)
+      const list: string[] = (ownedData && Array.isArray(ownedData)) ? ownedData as string[] : []
+      list.push(drop.itemId)
+      await setJson(ownedKey, list)
+      return drop.itemId
+    }
+  }
+  return null
+}
+
+// --------------- 快乐值影响 ---------------
+
+export async function reportLevelFailure(userId: string): Promise<void> {
+  try {
+    const pet = await getPet(userId)
+    if (pet) {
+      pet.happiness = Math.max(0, pet.happiness - 3)
+      pet.lastUpdated = new Date().toISOString()
+      await setPet(userId, pet)
+    }
+  } catch { /* ignore */ }
+}
+
+// --------------- 等级里程碑 ---------------
+
+export interface LevelMilestone {
+  level: number
+  type: 'slot' | 'item' | 'feature'
+  description: string
+  icon: string
+}
+
+export function getLevelMilestones(): LevelMilestone[] {
+  return [
+    { level: 3, type: 'slot', description: 'Unlock Weapon slot', icon: '🗡️' },
+    { level: 5, type: 'slot', description: 'Unlock Shield slot', icon: '🛡️' },
+    { level: 7, type: 'slot', description: 'Unlock Foot slot', icon: '👟' },
+    { level: 10, type: 'feature', description: 'New adventure theme unlocked', icon: '🗺️' },
+    { level: 15, type: 'feature', description: 'Double energy regeneration', icon: '⚡' },
+    { level: 20, type: 'item', description: 'Can equip rare equipment', icon: '💎' },
+    { level: 30, type: 'feature', description: 'Triple luck bonus', icon: '🍀' },
+    { level: 50, type: 'feature', description: 'MAX level - Panda Master!', icon: '👑' },
+  ]
+}
+
+export function getNextMilestones(currentLevel: number): LevelMilestone[] {
+  return getLevelMilestones().filter(m => m.level > currentLevel).slice(0, 3)
 }
 
 // --------------- 装备系统 ---------------
@@ -580,6 +739,14 @@ export async function equipItem(userId: string, itemId: string, shouldEquip: boo
     const shop = getEquipmentShop()
     const item = shop.find(i => i.id === itemId)
     if (item) {
+      // Check slot unlock
+      const minLevel = getSlotUnlockLevel(item.slot)
+      if (minLevel > 1) {
+        const petData = await getPetLevel(userId)
+        if (petData.level < minLevel) {
+          return { success: false, message: `Requires pet level ${minLevel} to unlock ${item.slot} slot` }
+        }
+      }
       const filtered = equipped.filter(id => {
         const other = shop.find(i => i.id === id)
         return other?.slot !== item.slot

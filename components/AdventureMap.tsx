@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import type { AdventureLevel } from '@/lib/adventure'
+import type { AdventureLevel, LevelMilestone } from '@/lib/adventure'
+import { getNextMilestones } from '@/lib/adventure'
 import EnergyBar from './EnergyBar'
 import EquipmentPanel from './EquipmentPanel'
 
@@ -271,6 +272,24 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
           </div>
         </div>
       </div>
+
+      {/* Next Milestones */}
+      {petLevel < 50 && (
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <h3 className="font-bold text-gray-700 mb-3 flex items-center gap-2 text-sm">
+            <span>🏆</span> Next Milestones
+          </h3>
+          <div className="flex flex-wrap gap-3">
+            {getNextMilestones(petLevel).map((m: LevelMilestone, i: number) => (
+              <div key={i} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-xl text-sm">
+                <span>{m.icon}</span>
+                <span className="text-gray-700">Lv.{m.level}</span>
+                <span className="text-gray-500">- {m.description}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

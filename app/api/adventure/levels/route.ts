@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAdventureLevels, getLevelById, getUnlockedLevels, getCompletedLevelIds, startLevel, completeLevel } from '@/lib/adventure'
+import { getAdventureLevels, getLevelById, getUnlockedLevels, getCompletedLevelIds, startLevel, completeLevel, reportLevelFailure } from '@/lib/adventure'
+import { getCoins, spendCoins } from '@/lib/redis'
 import { getUserIdFromRequest } from '@/lib/auth'
 
 // GET - 获取关卡列表
@@ -85,7 +86,30 @@ export async function POST(request: NextRequest) {
         success: true,
         rewards: result.rewards,
         levelUp: result.levelUp,
+        doubleXp: result.doubleXp,
+        droppedItem: result.droppedItem,
         message: `Completed ${level.name}!`
+      })
+    }
+
+    if (action === 'level_failure') {
+      await reportLevelFailure(userId)
+      return NextResponse.json({ success: true, message: 'Failure recorded' })
+    }
+
+    if (action === 'revive') {
+      const balance = await getCoins(userId)
+      if (balance < 50) {
+        return NextResponse.json({ error: 'Not enough coins for revive', requires: { coins: 50 - balance } }, { status: 400 })
+      }
+      const spendResult = await spendCoins(userId, 50)
+      if (!spendResult.success) {
+        return NextResponse.json({ error: 'Revive failed' }, { status: 400 })
+      }
+      return NextResponse.json({
+        success: true,
+        balance: spendResult.balance,
+        message: 'Revived!'
       })
     }
 

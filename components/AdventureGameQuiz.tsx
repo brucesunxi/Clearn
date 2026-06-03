@@ -33,95 +33,112 @@ interface AdventureGameQuizProps {
   level: AdventureLevel
 }
 
+const REVIVE_COST = 50
+
 export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
   const router = useRouter()
-  const { add } = useCoins()
+  const { add, balance } = useCoins()
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentQ, setCurrentQ] = useState(0)
-  const [score, setScore] = useState(0)
   const [combo, setCombo] = useState(0)
   const [maxCombo, setMaxCombo] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
+  const [allQuestions, setAllQuestions] = useState<Question[]>([])
   const [gameState, setGameState] = useState<'ready' | 'playing' | 'completed' | 'failed'>('ready')
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [bossHp, setBossHp] = useState(3)
   const [maxBossHp, setMaxBossHp] = useState(3)
+  const [playerHp, setPlayerHp] = useState(3)
+  const [maxPlayerHp, setMaxPlayerHp] = useState(3)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [starting, setStarting] = useState(false)
   const [rewards, setRewards] = useState<{ coins: number; exp: number } | null>(null)
   const [levelUp, setLevelUp] = useState(false)
+  const [doubleXp, setDoubleXp] = useState(false)
+  const [droppedItem, setDroppedItem] = useState<{ name: string; emoji: string } | null>(null)
 
   // Player stats from equipment
   const [playerStats, setPlayerStats] = useState({ power: 0, defense: 0, luck: 0 })
 
-  // Calculate damage per hit based on power stat
+  // Calculate damage based on stats
   const damagePerHit = Math.max(1, 1 + Math.floor(playerStats.power / 15))
 
-  // Calculate luck bonus percentage
+  // Defense reduces damage taken (min 1)
+  const damageTaken = Math.max(1, 2 - Math.floor(playerStats.defense / 10))
+
+  // Luck bonus for coins
   const luckBonus = Math.floor(playerStats.luck / 3)
 
-  // Defense gives a shield that absorbs wrong answers
-  const shieldCharges = Math.floor(playerStats.defense / 10)
+  // Total questions answered (including from shuffled deck)
+  const [answeredCount, setAnsweredCount] = useState(0)
 
   useEffect(() => {
     const initialize = async () => {
       try {
-        // Fetch equipment stats
         const equipRes = await fetch('/api/adventure/equipment')
         const equipData = await equipRes.json()
         if (equipData.stats) {
           setPlayerStats(equipData.stats)
         }
-
-        // Generate questions
         generateQuestions()
       } catch {
         generateQuestions()
       }
     }
-
     initialize()
   }, [level])
 
   function generateQuestions() {
+    let wordList: any[] = []
     try {
       const stored = localStorage.getItem('chineselearn-words')
-      const wordProgress = stored ? JSON.parse(stored) : []
-      const wordList = wordProgress.slice(0, 30)
+      wordList = stored ? JSON.parse(stored) : []
+    } catch {}
 
-      if (wordList.length < 4) {
-        throw new Error('Not enough words')
-      }
-
-      const shuffled = [...wordList].sort(() => Math.random() - 0.5)
-      const selected = shuffled.slice(0, level.totalQuestions || 5)
-      const generated: Question[] = selected.map((w: { word: string; pinyin: string; meaning: string }) => {
-        const others = wordList
-          .filter((o: { word: string }) => o.word !== w.word)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
-        const allOptions = [w, ...others].sort(() => Math.random() - 0.5)
-        const correctIndex = allOptions.findIndex((o: { word: string }) => o.word === w.word)
-        return {
-          word: w.word,
-          pinyin: w.pinyin,
-          meaning: w.meaning,
-          options: allOptions.map((o: { word: string; meaning: string }) => o.meaning || o.word),
-          correctIndex,
-        }
-      })
-
-      setQuestions(generated.length > 0 ? generated : getFallbackQuestions())
-    } catch {
-      setQuestions(getFallbackQuestions())
+    if (wordList.length < 4) {
+      wordList = []
     }
+
+    const allQ = wordList.length > 0 ? buildQuestions(wordList) : getFallbackQuestions()
+    setAllQuestions(allQ)
+    drawQuestions(allQ)
 
     const baseHp = 3 + level.difficulty
     setBossHp(baseHp)
     setMaxBossHp(baseHp)
+    setPlayerHp(3)
+    setMaxPlayerHp(3)
     setLoading(false)
+  }
+
+  function buildQuestions(wordList: any[]): Question[] {
+    const shuffled = [...wordList].sort(() => Math.random() - 0.5)
+    const pool = shuffled.slice(0, 30)
+    return pool.map((w: { word: string; pinyin: string; meaning: string }, i: number) => {
+      const others = pool
+        .filter((o: { word: string }) => o.word !== w.word)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3)
+      const allOptions = [w, ...others].sort(() => Math.random() - 0.5)
+      const correctIndex = allOptions.findIndex((o: { word: string }) => o.word === w.word)
+      return {
+        word: w.word,
+        pinyin: w.pinyin,
+        meaning: w.meaning,
+        options: allOptions.map((o: { word: string; meaning: string }) => o.meaning || o.word),
+        correctIndex,
+      }
+    })
+  }
+
+  function drawQuestions(pool: Question[]) {
+    const count = Math.min(level.totalQuestions || 5, pool.length)
+    const drawn = [...pool].sort(() => Math.random() - 0.5).slice(0, count)
+    setQuestions(drawn)
+    setCurrentQ(0)
+    setAnsweredCount(0)
   }
 
   function getFallbackQuestions(): Question[] {
@@ -142,32 +159,58 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
   const handleAnswer = (index: number) => {
     if (selectedAnswer !== null) return
     setSelectedAnswer(index)
+    setAnsweredCount(prev => prev + 1)
 
     const correct = index === questions[currentQ]?.correctIndex
     setIsCorrect(correct)
 
     if (correct) {
       const newCombo = combo + 1
-      setScore(score + 1)
       setCombo(newCombo)
       if (newCombo > maxCombo) setMaxCombo(newCombo)
-      setCorrectCount(correctCount + 1)
+      setCorrectCount(prev => prev + 1)
       setBossHp(prev => Math.max(0, prev - damagePerHit))
     } else {
       setCombo(0)
+      // Player takes damage on wrong answer
+      setPlayerHp(prev => Math.max(0, prev - damageTaken))
     }
 
     setTimeout(() => {
       const newBossHp = correct ? Math.max(0, bossHp - damagePerHit) : bossHp
+      const newPlayerHp = correct ? playerHp : Math.max(0, playerHp - damageTaken)
 
       if (correct && newBossHp <= 0) {
-        // Level complete!
         completeLevel()
-      } else if (currentQ >= questions.length - 1) {
-        // Ran out of questions without defeating boss
+      } else if (!correct && newPlayerHp <= 0) {
+        // Player defeated! Notify server
         setGameState('failed')
+        fetch('/api/adventure/levels', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ levelId: level.id, action: 'level_failure' })
+        }).catch(() => {})
+      } else if (currentQ >= questions.length - 1) {
+        // Out of questions - check if we can draw more
+        const remaining = allQuestions.filter(q => !questions.includes(q))
+        if (remaining.length > 0 && newBossHp > 0) {
+          // Draw more questions
+          const extra = remaining.sort(() => Math.random() - 0.5).slice(0, level.totalQuestions || 5)
+          setQuestions(extra)
+          setCurrentQ(0)
+          setSelectedAnswer(null)
+          setIsCorrect(null)
+        } else {
+          // Truly out of questions
+          setGameState('failed')
+          fetch('/api/adventure/levels', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ levelId: level.id, action: 'level_failure' })
+          }).catch(() => {})
+        }
       } else {
-        setCurrentQ(currentQ + 1)
+        setCurrentQ(prev => prev + 1)
         setSelectedAnswer(null)
         setIsCorrect(null)
       }
@@ -177,30 +220,75 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
   const completeLevel = async () => {
     setGameState('completed')
 
-    // Base coins + luck bonus
     const baseCoins = level.rewards.coins.min +
       Math.floor(Math.random() * (level.rewards.coins.max - level.rewards.coins.min))
     const luckCoins = Math.floor(baseCoins * luckBonus / 100)
     const totalCoins = baseCoins + luckCoins
-    const expEarned = level.rewards.exp + Math.floor(10 * correctCount / Math.max(1, questions.length))
+    const expEarned = level.rewards.exp + Math.floor(10 * correctCount / Math.max(1, answeredCount || 1))
 
     setRewards({ coins: totalCoins, exp: expEarned })
     add(totalCoins)
 
-    fetch('/api/adventure/levels', {
+    const res = await fetch('/api/adventure/levels', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         levelId: level.id,
         action: 'complete',
-        score,
+        score: correctCount,
         correctCount,
-        totalCount: questions.length
+        totalCount: answeredCount || questions.length
       })
-    }).then(async res => {
-      const data = await res.json()
-      if (data.levelUp) setLevelUp(true)
     })
+    const data = await res.json()
+    if (data.levelUp) setLevelUp(true)
+    if (data.doubleXp) setDoubleXp(true)
+    if (data.droppedItem) {
+      const shop = await fetch('/api/adventure/equipment').then(r => r.json())
+      const item = shop.shop?.find((i: { id: string }) => i.id === data.droppedItem)
+      if (item) setDroppedItem({ name: item.name, emoji: item.emoji })
+    }
+  }
+
+  const handleRevive = async () => {
+    const res = await fetch('/api/adventure/levels', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ levelId: level.id, action: 'revive' })
+    })
+    const data = await res.json()
+    if (data.success) {
+      // Restore state: half boss HP, full player HP, fresh questions
+      setBossHp(Math.max(1, Math.floor(maxBossHp / 2)))
+      setPlayerHp(maxPlayerHp)
+      setCombo(0)
+      setSelectedAnswer(null)
+      setIsCorrect(null)
+      setGameState('playing')
+
+      // Generate fresh questions
+      const stored = localStorage.getItem('chineselearn-words')
+      const wordList = stored ? JSON.parse(stored) : []
+      const pool = wordList.length > 0
+        ? (() => {
+            const shuffled = [...wordList].sort(() => Math.random() - 0.5)
+            return shuffled.slice(0, 30).map((w: { word: string; pinyin: string; meaning: string }) => {
+              const others = shuffled.filter((o: { word: string }) => o.word !== w.word).sort(() => Math.random() - 0.5).slice(0, 3)
+              const allOptions = [w, ...others].sort(() => Math.random() - 0.5)
+              const correctIndex = allOptions.findIndex((o: { word: string }) => o.word === w.word)
+              return {
+                word: w.word, pinyin: w.pinyin, meaning: w.meaning,
+                options: allOptions.map((o: { word: string; meaning: string }) => o.meaning || o.word),
+                correctIndex,
+              }
+            })
+          })()
+        : getFallbackQuestions()
+      const drawn = pool.sort(() => Math.random() - 0.5).slice(0, level.totalQuestions || 5)
+      setQuestions(drawn)
+      setCurrentQ(0)
+      setAllQuestions(pool)
+    }
   }
 
   const handleStart = async () => {
@@ -224,19 +312,24 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
   }
 
   const retry = () => {
-    setCurrentQ(0)
-    setScore(0)
-    setCombo(0)
-    setMaxCombo(0)
-    setCorrectCount(0)
-    setSelectedAnswer(null)
-    setIsCorrect(null)
     const baseHp = 3 + level.difficulty
     setBossHp(baseHp)
     setMaxBossHp(baseHp)
+    setPlayerHp(3)
+    setMaxPlayerHp(3)
+    setCombo(0)
+    setMaxCombo(0)
+    setCorrectCount(0)
+    setAnsweredCount(0)
+    setSelectedAnswer(null)
+    setIsCorrect(null)
     setGameState('ready')
     setRewards(null)
+    setLevelUp(false)
+    setDoubleXp(false)
+    setDroppedItem(null)
     setError(null)
+    generateQuestions()
   }
 
   if (loading) {
@@ -256,18 +349,8 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
         <div className="text-6xl mb-6">😴</div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{error}</h2>
         <div className="flex gap-3 justify-center mt-6">
-          <button
-            onClick={retry}
-            className="px-6 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600"
-          >
-            Try Again
-          </button>
-          <button
-            onClick={() => router.push('/adventure')}
-            className="px-6 py-2 rounded-xl bg-gray-500 text-white hover:bg-gray-600"
-          >
-            Back to Map
-          </button>
+          <button onClick={retry} className="px-6 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600">Try Again</button>
+          <button onClick={() => router.push('/adventure')} className="px-6 py-2 rounded-xl bg-gray-500 text-white hover:bg-gray-600">Back to Map</button>
         </div>
       </div>
     )
@@ -282,7 +365,6 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
         <p className="text-gray-500 mb-2">{level.nameEn}</p>
         <p className="text-gray-600 mb-6">{level.description}</p>
 
-        {/* Stats preview */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
@@ -302,19 +384,14 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
               <div className="text-sm text-gray-600">{level.rewards.coins.min}-{level.rewards.coins.max} coins</div>
             </div>
           </div>
-          {luckBonus > 0 && (
-            <div className="mt-3 text-sm text-green-600">🍀 Luck bonus: +{luckBonus}% coins</div>
-          )}
-          {shieldCharges > 0 && (
-            <div className="text-sm text-blue-600">🛡️ Shield: absorbs first {shieldCharges} wrong answer(s)</div>
-          )}
+          {luckBonus > 0 && <div className="mt-3 text-sm text-green-600">🍀 Luck bonus: +{luckBonus}% coins</div>}
+          {damageTaken < 2 && <div className="text-sm text-blue-600">🛡️ Damage reduced to {damageTaken} per wrong answer</div>}
         </div>
 
-        {/* Stat Display */}
         <div className="flex justify-center gap-6 mb-6 text-sm">
-          <span>⚔️ Power {playerStats.power}</span>
-          <span>🛡️ Defense {playerStats.defense}</span>
-          <span>🍀 Luck {playerStats.luck}</span>
+          <span>⚔️ Power {playerStats.power} (DMG {damagePerHit})</span>
+          <span>🛡️ Defense {playerStats.defense} (DMG taken {damageTaken})</span>
+          <span>🍀 Luck {playerStats.luck} (+{luckBonus}% coins)</span>
         </div>
 
         <button
@@ -346,38 +423,32 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
               <div className="text-sm text-gray-500">XP gained</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-green-600">{correctCount}/{questions.length}</div>
+              <div className="text-3xl font-bold text-green-600">{correctCount}/{answeredCount || questions.length}</div>
               <div className="text-sm text-gray-500">Correct</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-600">{Math.round(correctCount / questions.length * 100)}%</div>
+              <div className="text-3xl font-bold text-orange-600">{Math.round(correctCount / Math.max(1, answeredCount || questions.length) * 100)}%</div>
               <div className="text-sm text-gray-500">Accuracy</div>
             </div>
           </div>
-          {luckBonus > 0 && (
-            <div className="mt-2 text-xs text-green-600">
-              🍀 Luck bonus added +{luckBonus}% extra coins
+          {doubleXp && (
+            <div className="mt-3 p-2 bg-yellow-100 rounded-xl text-yellow-700 font-bold text-sm">✨ DOUBLE XP - First daily level!</div>
+          )}
+          {droppedItem && (
+            <div className="mt-2 p-2 bg-green-100 rounded-xl text-green-700 font-medium text-sm">
+              🎁 Item dropped: {droppedItem.emoji} {droppedItem.name}!
             </div>
           )}
+          {luckBonus > 0 && (
+            <div className="mt-1 text-xs text-green-600">🍀 Luck bonus +{luckBonus}% extra coins</div>
+          )}
           {levelUp && (
-            <div className="mt-4 p-3 bg-purple-100 rounded-xl text-purple-700 font-bold">
-              🎊 Level Up!
-            </div>
+            <div className="mt-3 p-3 bg-purple-100 rounded-xl text-purple-700 font-bold">🎊 Level Up!</div>
           )}
         </div>
         <div className="flex gap-3 justify-center">
-          <button
-            onClick={retry}
-            className="px-6 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600"
-          >
-            Play Again
-          </button>
-          <button
-            onClick={() => router.push('/adventure')}
-            className="px-6 py-2 rounded-xl bg-gray-500 text-white hover:bg-gray-600"
-          >
-            Back to Map
-          </button>
+          <button onClick={retry} className="px-6 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600">Play Again</button>
+          <button onClick={() => router.push('/adventure')} className="px-6 py-2 rounded-xl bg-gray-500 text-white hover:bg-gray-600">Back to Map</button>
         </div>
       </div>
     )
@@ -393,7 +464,7 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
-              <div className="text-3xl font-bold text-green-600">{correctCount}/{questions.length}</div>
+              <div className="text-3xl font-bold text-green-600">{correctCount}/{answeredCount || questions.length}</div>
               <div className="text-sm text-gray-500">Correct</div>
             </div>
             <div>
@@ -409,20 +480,27 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
               <div className="text-sm text-gray-500">Equip better gear!</div>
             </div>
           </div>
+          {/* Revive button */}
+          <button
+            onClick={handleRevive}
+            disabled={balance < REVIVE_COST}
+            className="mt-4 w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold hover:from-purple-600 hover:to-pink-600 disabled:from-gray-300 disabled:to-gray-300 transition-all shadow-lg"
+          >
+            {balance >= REVIVE_COST
+              ? `💀 Revive (${REVIVE_COST} coins) - Continue fighting!`
+              : `Not enough coins for revive (need ${REVIVE_COST})`
+            }
+          </button>
         </div>
         <div className="flex gap-3 justify-center">
-          <button onClick={retry} className="px-6 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600">
-            🔄 Try Again
-          </button>
-          <button onClick={() => router.push('/adventure/shop')} className="px-6 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600">
-            🛍️ Buy Equipment
-          </button>
+          <button onClick={retry} className="px-6 py-2 rounded-xl bg-amber-500 text-white hover:bg-amber-600">🔄 Try Again</button>
+          <button onClick={() => router.push('/adventure/shop')} className="px-6 py-2 rounded-xl bg-blue-500 text-white hover:bg-blue-600">🛍️ Buy Equipment</button>
         </div>
       </div>
     )
   }
 
-  // Playing - the quiz
+  // Playing
   const question = questions[currentQ]
   if (!question) return null
 
@@ -444,22 +522,28 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
         {/* Boss HP Bar */}
         <div className="mb-2">
           <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-red-500 font-medium">💀 Boss HP</span>
+            <span className="text-red-500 font-medium">💀 Boss</span>
             <span className="text-gray-600">{bossHp}/{maxBossHp}</span>
           </div>
           <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-red-400 to-red-600 transition-all duration-500"
-              style={{ width: `${(bossHp / maxBossHp) * 100}%` }}
-            />
+            <div className="h-full bg-gradient-to-r from-red-400 to-red-600 transition-all duration-500" style={{ width: `${(bossHp / maxBossHp) * 100}%` }} />
           </div>
         </div>
 
-        {/* Combo counter */}
-        {combo > 1 && (
-          <div className="text-center text-orange-500 font-bold text-sm animate-pulse">
-            🔥 {combo}x Combo!
+        {/* Player HP Bar */}
+        <div className="mb-2">
+          <div className="flex items-center justify-between text-sm mb-1">
+            <span className="text-blue-500 font-medium">🐼 Panda</span>
+            <span className="text-gray-600">{playerHp}/{maxPlayerHp}</span>
           </div>
+          <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500" style={{ width: `${(playerHp / maxPlayerHp) * 100}%` }} />
+          </div>
+        </div>
+
+        {/* Combo */}
+        {combo > 1 && (
+          <div className="text-center text-orange-500 font-bold text-sm animate-pulse">🔥 {combo}x Combo!</div>
         )}
       </div>
 
@@ -475,15 +559,10 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
         {question.options.map((option, index) => {
           let btnClass = 'border-gray-200 hover:border-amber-400 bg-white'
           if (selectedAnswer !== null) {
-            if (index === question.correctIndex) {
-              btnClass = 'border-green-500 bg-green-50'
-            } else if (index === selectedAnswer && !isCorrect) {
-              btnClass = 'border-red-500 bg-red-50'
-            } else {
-              btnClass = 'border-gray-100 bg-gray-50 opacity-60'
-            }
+            if (index === question.correctIndex) btnClass = 'border-green-500 bg-green-50'
+            else if (index === selectedAnswer && !isCorrect) btnClass = 'border-red-500 bg-red-50'
+            else btnClass = 'border-gray-100 bg-gray-50 opacity-60'
           }
-
           return (
             <button
               key={index}
@@ -491,9 +570,7 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
               disabled={selectedAnswer !== null}
               className={`p-5 rounded-xl border-2 text-left transition-all ${btnClass}`}
             >
-              <span className="text-base text-gray-800 font-medium">
-                {option}
-              </span>
+              <span className="text-base text-gray-800 font-medium">{option}</span>
             </button>
           )
         })}
@@ -501,14 +578,13 @@ export default function AdventureGameQuiz({ level }: AdventureGameQuizProps) {
 
       {/* Feedback */}
       {selectedAnswer !== null && (
-        <div className={`mt-6 p-4 rounded-xl text-center font-bold ${
-          isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-        }`}>
-          {isCorrect ? `🎉 Correct! -${damagePerHit} HP` : '❌ Wrong!'}
+        <div className={`mt-6 p-4 rounded-xl text-center font-bold ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {isCorrect
+            ? `🎉 Correct! -${damagePerHit} HP to boss!`
+            : `❌ Wrong! Panda takes ${damageTaken} damage!`
+          }
           {!isCorrect && (
-            <div className="text-sm font-normal mt-1 text-gray-600">
-              Correct: {question.meaning}
-            </div>
+            <div className="text-sm font-normal mt-1 text-gray-600">Correct: {question.meaning}</div>
           )}
         </div>
       )}
