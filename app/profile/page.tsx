@@ -87,6 +87,18 @@ export default function ProfilePage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null)
 
+  // Stats tab data
+  interface UserStats {
+    coins: { earned: number; spent: number; totalTransactions: number }
+    activities: { total: number; breakdown: Record<string, number> }
+    words: { total: number }
+    streak: { current: number; longest: number } | null
+    pet: { level: number; exp: number; expToNext: number; happiness: number; fullness: number } | null
+    adventure: { levelsPlayed: number; levelsCompleted: number; coinsEarned: number; expEarned: number } | null
+  }
+  const [userStats, setUserStats] = useState<UserStats | null>(null)
+  const [statsLoading, setStatsLoading] = useState(false)
+
   useEffect(() => {
     if (!user) return
     const fetchHistory = async () => {
@@ -104,6 +116,23 @@ export default function ProfilePage() {
     fetchHistory()
     refresh()
   }, [user, refresh])
+
+  useEffect(() => {
+    if (!user || activeTab !== 'stats') return
+    const fetchStats = async () => {
+      setStatsLoading(true)
+      try {
+        const res = await fetch('/api/stats', { credentials: 'include' })
+        if (res.ok) {
+          const data = await res.json()
+          setUserStats(data.stats)
+        }
+      } catch {} finally {
+        setStatsLoading(false)
+      }
+    }
+    fetchStats()
+  }, [user, activeTab])
 
   const filteredEntries = useMemo(() => {
     let result = entries
@@ -398,12 +427,159 @@ export default function ProfilePage() {
 
         {/* 学习统计 Tab */}
         {activeTab === 'stats' && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm text-center">
-            <div className="text-4xl mb-4">📊</div>
-            <div className="text-gray-500">
-              {locale === 'zh' ? '学习统计功能即将上线' : 'Learning stats coming soon'}
-            </div>
-          </div>
+          <>
+            {statsLoading ? (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm text-center">
+                <div className="text-gray-400">{locale === 'zh' ? '加载中...' : 'Loading...'}</div>
+              </div>
+            ) : !userStats ? (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm text-center">
+                <div className="text-4xl mb-4">📭</div>
+                <div className="text-gray-500">{locale === 'zh' ? '暂无数据' : 'No data yet'}</div>
+              </div>
+            ) : (
+              <>
+                {/* Overview cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                    <p className="text-2xl font-bold text-blue-600">{userStats.activities.total}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{locale === 'zh' ? '学习活动' : 'Activities'}</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                    <p className="text-2xl font-bold text-emerald-600">{userStats.words.total}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{locale === 'zh' ? '已学词汇' : 'Words'}</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                    <p className="text-2xl font-bold text-amber-600">{userStats.coins.earned}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{locale === 'zh' ? '金币收入' : 'Coins Earned'}</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm text-center">
+                    <p className="text-2xl font-bold text-violet-600">{userStats.streak?.current || 0}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{locale === 'zh' ? '连续签到' : 'Streak'}</p>
+                  </div>
+                </div>
+
+                {/* Activity breakdown */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm mb-6">
+                  <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
+                    📋 {locale === 'zh' ? '活动类型分布' : 'Activity Breakdown'}
+                  </h2>
+                  {Object.keys(userStats.activities.breakdown).length === 0 ? (
+                    <p className="text-xs text-gray-400 text-center py-4">
+                      {locale === 'zh' ? '开始学习后，这里会显示你的活动数据' : 'Start learning to see your activity data'}
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {Object.entries(userStats.activities.breakdown)
+                        .sort(([, a], [, b]) => b - a)
+                        .map(([reason, count]) => {
+                          const info = getReasonInfo(reason, locale)
+                          const maxCount = Math.max(...Object.values(userStats.activities.breakdown))
+                          const pct = maxCount > 0 ? (count / maxCount) * 100 : 0
+                          const colors = ['bg-blue-400', 'bg-emerald-400', 'bg-amber-400', 'bg-violet-400', 'bg-rose-400', 'bg-cyan-400', 'bg-orange-400', 'bg-teal-400']
+                          const colorIdx = Object.keys(userStats.activities.breakdown).indexOf(reason) % colors.length
+                          return (
+                            <div key={reason} className="flex items-center gap-2 text-xs">
+                              <span className="w-6 text-center">{info.icon}</span>
+                              <span className="w-20 text-gray-600 dark:text-gray-300 truncate">{info.label}</span>
+                              <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-4">
+                                <div className={`h-4 rounded-full transition-all ${colors[colorIdx]}`} style={{ width: `${pct}%` }} />
+                              </div>
+                              <span className="w-8 text-right text-gray-600 dark:text-gray-300 font-medium">{count}</span>
+                            </div>
+                          )
+                        })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Pet & Adventure stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {userStats.pet && (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                      <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
+                        🐼 {locale === 'zh' ? '熊猫宠物' : 'Panda Pet'}
+                      </h2>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-500">{locale === 'zh' ? '等级' : 'Level'}</span>
+                          <span className="font-bold text-gray-800 dark:text-gray-200">{userStats.pet.level}</span>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>{locale === 'zh' ? '经验' : 'EXP'}</span>
+                            <span>{userStats.pet.exp} / {userStats.pet.expToNext}</span>
+                          </div>
+                          <div className="bg-gray-100 dark:bg-gray-700 rounded-full h-2">
+                            <div className="bg-emerald-400 h-2 rounded-full transition-all" style={{ width: `${Math.min(100, (userStats.pet.exp / userStats.pet.expToNext) * 100)}%` }} />
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-500">😊 {locale === 'zh' ? '快乐' : 'Happiness'}</span>
+                          <span className={`font-medium ${userStats.pet.happiness > 60 ? 'text-green-600' : userStats.pet.happiness > 30 ? 'text-amber-600' : 'text-red-500'}`}>
+                            {userStats.pet.happiness}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-500">🍚 {locale === 'zh' ? '饱食' : 'Fullness'}</span>
+                          <span className={`font-medium ${userStats.pet.fullness > 60 ? 'text-green-600' : userStats.pet.fullness > 30 ? 'text-amber-600' : 'text-red-500'}`}>
+                            {userStats.pet.fullness}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {userStats.adventure && (
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                      <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
+                        🗺️ {locale === 'zh' ? '冒险进度' : 'Adventure'}
+                      </h2>
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-500">{locale === 'zh' ? '挑战次数' : 'Played'}</span>
+                          <span className="font-bold text-gray-800 dark:text-gray-200">{userStats.adventure.levelsPlayed}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-500">{locale === 'zh' ? '通关次数' : 'Completed'}</span>
+                          <span className="font-bold text-emerald-600">{userStats.adventure.levelsCompleted}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-500">{locale === 'zh' ? '获取金币' : 'Coins Earned'}</span>
+                          <span className="font-bold text-yellow-600">{userStats.adventure.coinsEarned}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-500">{locale === 'zh' ? '获取经验' : 'EXP Earned'}</span>
+                          <span className="font-bold text-violet-600">{userStats.adventure.expEarned}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Streak info */}
+                {userStats.streak && (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                    <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
+                      🔥 {locale === 'zh' ? '签到统计' : 'Check-in Stats'}
+                    </h2>
+                    <div className="flex gap-6 text-sm">
+                      <div>
+                        <span className="text-gray-500">{locale === 'zh' ? '当前连续' : 'Current Streak'}: </span>
+                        <span className="font-bold text-orange-500 text-lg">{userStats.streak.current}</span>
+                        <span className="text-gray-400 text-xs ml-1">{locale === 'zh' ? '天' : 'days'}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">{locale === 'zh' ? '最长连续' : 'Longest'}: </span>
+                        <span className="font-bold text-orange-500 text-lg">{userStats.streak.longest}</span>
+                        <span className="text-gray-400 text-xs ml-1">{locale === 'zh' ? '天' : 'days'}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </>
         )}
       </main>
     </div>
