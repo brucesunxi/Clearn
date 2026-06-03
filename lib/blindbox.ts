@@ -5,7 +5,7 @@ export interface BundleItem {
 }
 
 export interface PrizeDef {
-  type: 'food' | 'accessory' | 'coins' | 'junk' | 'bundle'
+  type: 'food' | 'accessory' | 'coins' | 'junk' | 'bundle' | 'equipment'
   nameZh: string
   nameEn: string
   emoji: string
@@ -48,6 +48,14 @@ const PRIZE_POOL: PrizeDef[] = [
   { type: 'junk', nameZh: '一个空瓶', nameEn: 'Empty Bottle', emoji: '🧃', weight: 4 },
   { type: 'junk', nameZh: '旧袜子', nameEn: 'Old Sock', emoji: '🧦', weight: 3 },
   { type: 'junk', nameZh: '一颗石头', nameEn: 'A Rock', emoji: '🪨', weight: 3 },
+
+  // Adventure equipment — rare drops from blind boxes
+  { type: 'equipment', nameZh: '幸运符', nameEn: 'Lucky Charm', emoji: '🍀', weight: 4, itemId: 'lucky-charm' },
+  { type: 'equipment', nameZh: '竹剑', nameEn: 'Bamboo Sword', emoji: '🗡️', weight: 3, itemId: 'bamboo-sword' },
+  { type: 'equipment', nameZh: '竹盾', nameEn: 'Bamboo Shield', emoji: '🛡️', weight: 3, itemId: 'bamboo-shield' },
+  { type: 'equipment', nameZh: '能量腰带', nameEn: 'Energy Belt', emoji: '⚡', weight: 3, itemId: 'energy-belt' },
+  { type: 'equipment', nameZh: '竹法杖', nameEn: 'Bamboo Staff', emoji: '🔮', weight: 2, itemId: 'bamboo-staff' },
+  { type: 'equipment', nameZh: '金皇冠', nameEn: 'Golden Crown', emoji: '👑', weight: 1, itemId: 'golden-crown' },
 
   // 🎉 Grand prize bundles — rare
   {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getEquipmentShop, buyEquipment, equipItem, getEquippedItems, getOwnedItems, calculateTotalStats } from '@/lib/adventure'
+import { getEquipmentShop, buyEquipment, equipItem, getEquippedItems, getOwnedItems, calculateTotalStats, grantItem } from '@/lib/adventure'
 import { getUserIdFromRequest } from '@/lib/auth'
 
 // GET - 获取装备商店和已装备物品
@@ -57,6 +57,18 @@ export async function POST(request: NextRequest) {
         item: result.item,
         coinsLeft: result.coinsLeft,
         message: `Purchased ${result.item?.name}`
+      })
+    }
+
+    if (action === 'grant') {
+      const result = await grantItem(userId, itemId)
+      if (!result.success) {
+        return NextResponse.json({ error: result.message }, { status: 400 })
+      }
+      return NextResponse.json({
+        success: true,
+        item: result.item,
+        message: result.message
       })
     }
 

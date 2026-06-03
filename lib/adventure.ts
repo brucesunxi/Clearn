@@ -400,7 +400,17 @@ export async function calculateNaturalRegen(userId: string): Promise<number> {
   const last = new Date(energy.lastRegen).getTime()
   const now = Date.now()
   const hoursPassed = (now - last) / (1000 * 60 * 60)
-  const regained = Math.floor(hoursPassed * ADVENTURE_CONFIG.energy.regenPerHour)
+  let regained = Math.floor(hoursPassed * ADVENTURE_CONFIG.energy.regenPerHour)
+
+  // Pet hunger affects energy regen rate
+  try {
+    const pet = await getPet(userId)
+    if (pet) {
+      if (pet.hunger >= 80) regained = Math.floor(regained * 2)
+      else if (pet.hunger >= 50) regained = Math.floor(regained * 1.5)
+      else if (pet.hunger < 30) regained = Math.floor(regained * 0.5)
+    }
+  } catch { /* ignore */ }
 
   if (regained > 0) {
     const newCurrent = Math.min(energy.max, energy.current + regained)
@@ -677,6 +687,16 @@ export async function calculateTotalStats(userId: string): Promise<{
     }
   }
 
+  // Pet happiness affects luck stat
+  try {
+    const pet = await getPet(userId)
+    if (pet) {
+      if (pet.happiness >= 80) stats.luck += 5
+      else if (pet.happiness >= 50) stats.luck += 3
+      else if (pet.happiness < 30) stats.luck -= 2
+    }
+  } catch { /* ignore */ }
+
   return stats
 }
 
@@ -717,6 +737,32 @@ export async function buyEquipment(userId: string, itemId: string): Promise<{
   } catch {
     return { success: false, message: 'Transaction failed' }
   }
+}
+
+/**
+ * Grant an item to a user for free (no coin cost). Used by blind box drops and level rewards.
+ */
+export async function grantItem(userId: string, itemId: string): Promise<{
+  success: boolean
+  message: string
+  item?: EquipmentItem
+}> {
+  const shop = getEquipmentShop()
+  const item = shop.find(i => i.id === itemId)
+  if (!item) return { success: false, message: 'Item not found' }
+
+  const owned = await getOwnedItems(userId)
+  if (owned.includes(itemId)) {
+    return { success: false, message: 'Already owned' }
+  }
+
+  const ownedKey = `adventure:items:${userId}`
+  const ownedData = await getJson(ownedKey)
+  const list: string[] = (ownedData && Array.isArray(ownedData)) ? ownedData as string[] : []
+  list.push(itemId)
+  await setJson(ownedKey, list)
+
+  return { success: true, message: `Received ${item.name}`, item }
 }
 
 export async function equipItem(userId: string, itemId: string, shouldEquip: boolean): Promise<{

@@ -136,6 +136,15 @@ export default function BlindBoxClient() {
       return
     }
 
+    // Equipment → grant to adventure inventory
+    if (prize.type === 'equipment' && prize.itemId) {
+      await fetch('/api/adventure/equipment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: prize.itemId, action: 'grant' })
+      })
+    }
+
     // Food / accessory / bundle
     processPrize(prize)
     setCoins((prev: number) => {
