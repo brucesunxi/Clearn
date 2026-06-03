@@ -153,6 +153,7 @@ export default function Header() {
           <Link href="/reading" className="text-gray-600 hover:text-orange-500 dark:text-gray-300 dark:hover:text-orange-400 font-medium transition-colors text-sm">📖 {locale === 'zh' ? '读' : 'Read'}</Link>
           <Link href="/import" className="text-gray-600 hover:text-indigo-500 dark:text-gray-300 dark:hover:text-indigo-400 font-medium transition-colors text-sm">📥 {locale === 'zh' ? '导入' : 'Import'}</Link>
           <Link href="/stats" className="text-gray-600 hover:text-cyan-500 dark:text-gray-300 dark:hover:text-cyan-400 font-medium transition-colors text-sm">📊 {locale === 'zh' ? '统计' : 'Stats'}</Link>
+          <Link href="/adventure" className="text-gray-600 hover:text-emerald-500 dark:text-gray-300 dark:hover:text-emerald-400 font-medium transition-colors text-sm">🗺️ {locale === 'zh' ? '冒险' : 'Adventure'}</Link>
           <Link href="/blindbox" className="text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 font-medium transition-colors text-sm">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
           <Link href="/pet" className="text-gray-600 hover:text-green-500 dark:text-gray-300 dark:hover:text-green-400 font-medium transition-colors text-sm">🐼</Link>
         </div>
@@ -257,6 +258,7 @@ export default function Header() {
           <Link href="/import" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">📥 {locale === 'zh' ? '导入' : 'Import'}</Link>
           <Link href="/stats" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">📊 {locale === 'zh' ? '统计' : 'Stats'}</Link>
           <Link href="/blindbox" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
+          <Link href="/adventure" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🗺️ {locale === 'zh' ? '冒险' : 'Adventure'}</Link>
           <Link href="/pet" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🐼 {locale === 'zh' ? '宠物' : 'Pet'}</Link>
         </div>
       )}
