@@ -1,0 +1,62 @@
+{
+  "name": "熊猫汉语 - 海外华裔儿童中文学习平台",
+  "short_name": "熊猫汉语",
+  "description": "为海外华裔儿童打造的中文分级阅读平台，包含分级阅读、单词记忆、听力口语练习等模块。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFBF5",
+  "theme_color": "#FFFBF5",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "zh-CN",
+  "categories": ["education", "kids"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-reading.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "分级阅读界面"
+    },
+    {
+      "src": "/images/screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "移动端学习界面"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "阅读",
+      "short_name": "阅读",
+      "description": "开始中文分级阅读",
+      "url": "/reading",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "单词学习",
+      "short_name": "单词",
+      "description": "开始单词记忆学习",
+      "url": "/learn",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "听力练习",
+      "short_name": "听力",
+      "description": "开始听力练习",
+      "url": "/listen",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    }
+  ]
+}

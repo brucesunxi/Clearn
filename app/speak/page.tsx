@@ -4,11 +4,21 @@ import { getLevels, getAllArticles } from '@/lib/content'
 import SpeakPageClient from '@/components/SpeakPageClient'
 
 export const metadata: Metadata = {
-  title: '口语 Speaking',
-  description: '中文口语练习，看中文开口说，提升中文发音和口语表达能力。Chinese speaking practice with pronunciation feedback.',
+  title: 'Speaking 口语 - Chinese Speaking Practice',
+  description: 'Practice Chinese speaking with pronunciation feedback. Read Chinese aloud and improve your speaking skills! 中文口语练习，看中文开口说，提升中文发音和口语表达能力。',
+  alternates: {
+    canonical: 'https://pandahan.xyz/speak',
+    languages: {
+      'en-US': 'https://pandahan.xyz/speak',
+      'zh-CN': 'https://pandahan.xyz/speak',
+    },
+  },
+  keywords: ['Chinese speaking', 'speaking practice', 'pronunciation', 'learn Chinese', '中文口语', '口语练习'],
   openGraph: {
-    title: '口语 - 熊猫汉语',
-    description: '中文口语练习，看中文开口说，提升中文发音和口语表达能力。',
+    title: 'Speaking 口语 - Panda Chinese',
+    description: 'Practice Chinese speaking with pronunciation feedback. 中文口语练习，看中文开口说。',
+    locale: 'zh_CN',
+    alternateLocale: 'en_US',
   },
 }
 

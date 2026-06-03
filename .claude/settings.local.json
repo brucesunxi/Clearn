@@ -17,7 +17,11 @@
       "Bash(vercel deploy *)",
       "Bash(vercel env *)",
       "Bash(git checkout *)",
-      "Bash(vercel logs *)"
+      "Bash(vercel logs *)",
+      "Bash(git rm *)",
+      "Bash(vercel --prod --logs)",
+      "Bash(python3 -c \"import json,sys; msgs=json.load\\(sys.stdin\\); [print\\(f'To: {m[\\\\\"to_email\\\\\"]} - Subject: {m[\\\\\"subject\\\\\"]} - Status: {m.get\\(\\\\\"state\\\\\",\\\\\"?\\\\\"\\)}'\\) for m in msgs[:5]]\")",
+      "Bash(npx tsc *)"
     ]
   }
 }

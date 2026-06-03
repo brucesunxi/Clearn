@@ -6,33 +6,79 @@ import { I18nProvider } from '@/lib/i18n/context'
 import TranslationUpdater from '@/components/TranslationUpdater'
 import { AuthProvider } from '@/lib/auth-context'
 import { ThemeProvider } from '@/lib/theme-context'
+import { WebsiteJsonLd, EducationalOrganizationJsonLd } from '@/components/JsonLd'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | 熊猫汉语 Panda Chinese',
-    default: '熊猫汉语 - 海外华裔儿童中文学习',
+    template: '%s | Panda Chinese 熊猫汉语',
+    default: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
   },
   description:
-    '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。A leveled Chinese reading platform for overseas children.',
+    'A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading, vocabulary drills, and listening practice. 为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
+  keywords: [
+    'Chinese learning', 'learn Chinese', 'Chinese for kids', 'overseas Chinese', 'leveled reading',
+    '中文学习', '学中文', '海外华裔', '儿童中文', '分级阅读', '汉语学习', '华裔儿童',
+    'HSK', 'Chinese reading', 'mandarin learning', 'learn mandarin'
+  ],
   metadataBase: new URL('https://pandahan.xyz'),
-  // Note: alternates.canonical intentionally NOT set here
-  // to avoid inheriting the homepage canonical to all child routes.
-  // Each page should define its own canonical or rely on URL-based canonical.
+  authors: [{ name: 'Panda Chinese 熊猫汉语', url: 'https://pandahan.xyz' }],
+  creator: 'Panda Chinese 熊猫汉语',
+  publisher: 'Panda Chinese 熊猫汉语',
+  applicationName: 'Panda Chinese 熊猫汉语',
+  generator: 'Next.js',
   icons: {
     icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
+  manifest: '/manifest.json',
   openGraph: {
-    title: '熊猫汉语 - 海外华裔儿童中文学习',
-    description: '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
+    title: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
+    description: 'A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading! 为海外华裔儿童打造的中文分级阅读平台。',
     url: 'https://pandahan.xyz',
-    siteName: '熊猫汉语',
+    siteName: 'Panda Chinese 熊猫汉语',
     locale: 'zh_CN',
+    alternateLocale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: 'https://pandahan.xyz/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '熊猫汉语 - 海外华裔儿童中文学习',
-    description: '为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
+    title: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading',
+    description: 'A leveled Chinese reading platform for overseas children. 为海外华裔儿童打造的中文分级阅读平台。',
+    images: ['https://pandahan.xyz/images/og-image.png'],
+    creator: '@pandahanxyz',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'YOUR_GOOGLE_VERIFICATION_CODE',
+  },
+  category: 'education',
+  alternates: {
+    canonical: 'https://pandahan.xyz',
+    languages: {
+      'en-US': 'https://pandahan.xyz',
+      'zh-CN': 'https://pandahan.xyz',
+      'x-default': 'https://pandahan.xyz',
+    },
   },
 }
 
@@ -71,6 +117,8 @@ fetch('https://www.googletagmanager.com/gtag/js?id=AW-18197467032', {method:'HEA
         />
       </head>
       <body className="bg-[#FFFBF5] dark:bg-gray-900 dark:text-gray-100 transition-colors">
+        <WebsiteJsonLd />
+        <EducationalOrganizationJsonLd />
         <I18nProvider>
           <ThemeProvider>
           <AuthProvider>

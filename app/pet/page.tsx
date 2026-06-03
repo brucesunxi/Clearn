@@ -3,11 +3,21 @@ import { AdBanner } from '@/lib/adsense'
 import PetPageClient from '@/components/PetPageClient'
 
 export const metadata: Metadata = {
-  title: '熊猫伙伴 Panda Pet',
-  description: '在熊猫汉语中养一只可爱的熊猫伙伴，坚持学习就能让它成长！A cute panda pet companion to motivate Chinese learning.',
+  title: 'Panda Pet 熊猫伙伴 - Virtual Pet Companion',
+  description: 'Raise a cute panda companion in Panda Chinese. Consistent learning makes your pet grow! 在熊猫汉语中养一只可爱的熊猫伙伴，坚持学习就能让它成长！',
+  alternates: {
+    canonical: 'https://pandahan.xyz/pet',
+    languages: {
+      'en-US': 'https://pandahan.xyz/pet',
+      'zh-CN': 'https://pandahan.xyz/pet',
+    },
+  },
+  keywords: ['panda pet', 'virtual pet', 'learning companion', '熊猫伙伴', '虚拟宠物'],
   openGraph: {
-    title: '熊猫伙伴 - 熊猫汉语',
-    description: '在熊猫汉语中养一只可爱的熊猫伙伴，坚持学习就能让它成长！',
+    title: 'Panda Pet 熊猫伙伴 - Panda Chinese',
+    description: 'Raise a cute panda companion. Consistent learning makes your pet grow! 养一只可爱的熊猫伙伴，坚持学习就能让它成长！',
+    locale: 'zh_CN',
+    alternateLocale: 'en_US',
   },
 }
 

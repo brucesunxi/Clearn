@@ -4,11 +4,21 @@ import { getAllArticles } from '@/lib/content'
 import AiBattleGame from '@/components/AiBattleGame'
 
 export const metadata: Metadata = {
-  title: 'AI 单词对战 AI Word Battle',
-  description: '和 AI 比拼中文词汇，选择不同难度，看谁更厉害！Battle AI with Chinese vocabulary across different difficulty levels.',
+  title: 'AI Word Battle AI单词对战 - Vocabulary Game',
+  description: 'Battle AI with Chinese vocabulary across different difficulty levels. Fun way to learn Chinese words! 和 AI 比拼中文词汇，选择不同难度，在有趣的游戏中学习中文词汇。',
+  alternates: {
+    canonical: 'https://pandahan.xyz/ai-battle',
+    languages: {
+      'en-US': 'https://pandahan.xyz/ai-battle',
+      'zh-CN': 'https://pandahan.xyz/ai-battle',
+    },
+  },
+  keywords: ['AI battle', 'Chinese vocabulary game', 'word battle', 'learn Chinese', 'AI单词对战', '词汇游戏'],
   openGraph: {
-    title: 'AI 单词对战 - 熊猫汉语',
-    description: '和 AI 比拼中文词汇，选择不同难度，看谁更厉害！',
+    title: 'AI Word Battle AI单词对战 - Panda Chinese',
+    description: 'Battle AI with Chinese vocabulary across different difficulty levels. 和 AI 比拼中文词汇。',
+    locale: 'zh_CN',
+    alternateLocale: 'en_US',
   },
 }
 

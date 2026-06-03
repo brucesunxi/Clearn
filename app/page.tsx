@@ -1,20 +1,41 @@
 import type { Metadata } from 'next'
 import { getAllArticles } from '@/lib/content'
 import HomePageClient from '@/components/HomePageClient'
+import { WebPageJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 
 export const metadata: Metadata = {
-  title: '首页 Home',
+  title: 'Home 首页',
+  description: 'Panda Chinese - A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading, vocabulary drills, and listening practice. 熊猫汉语 - 为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
   alternates: {
     canonical: 'https://pandahan.xyz/',
+    languages: {
+      'en-US': 'https://pandahan.xyz/',
+      'zh-CN': 'https://pandahan.xyz/',
+    },
   },
-  description: '为海外华裔儿童打造的中文学习平台，包含分级阅读、单词记忆、听力口语练习。Chinese learning platform for overseas children with leveled reading, vocabulary drills, and listening & speaking practice.',
   openGraph: {
-    title: '熊猫汉语 - 海外华裔儿童中文学习平台',
-    description: '为海外华裔儿童打造的中文学习平台，包含分级阅读、单词记忆、听力口语练习。',
+    title: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
+    description: 'A leveled Chinese reading platform for overseas children. 为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
+    locale: 'zh_CN',
+    alternateLocale: 'en_US',
   },
 }
 
 export default function HomePage() {
   const allArticles = getAllArticles()
-  return <HomePageClient totalArticles={allArticles.length} />
+  return (
+    <>
+      <WebPageJsonLd
+        title="Panda Chinese 熊猫汉语 - Learn Chinese Through Reading"
+        description="A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading!"
+        url="https://pandahan.xyz/"
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: 'https://pandahan.xyz/' },
+        ]}
+      />
+      <HomePageClient totalArticles={allArticles.length} />
+    </>
+  )
 }

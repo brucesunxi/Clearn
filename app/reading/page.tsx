@@ -2,16 +2,24 @@ import type { Metadata } from 'next'
 import { getLevels, getLevel, getArticlesByLevel, getAllArticles } from '@/lib/content'
 import ReadingPageClient from '@/components/ReadingPageClient'
 import { AdBanner } from '@/lib/adsense'
+import { WebPageJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 
 export const metadata: Metadata = {
-  title: '阅读 Reading',
+  title: 'Reading 阅读 - Leveled Chinese Articles 分级阅读',
   alternates: {
     canonical: 'https://pandahan.xyz/reading',
+    languages: {
+      'en-US': 'https://pandahan.xyz/reading',
+      'zh-CN': 'https://pandahan.xyz/reading',
+    },
   },
-  description: '中文分级阅读文章，从启蒙到高级，适合不同年龄段的海外华裔儿童。Leveled Chinese reading articles for overseas children.',
+  description: 'Leveled Chinese reading articles from beginner to advanced. Perfect for overseas children learning Chinese. 中文分级阅读文章，从启蒙到高级，适合不同年龄段的海外华裔儿童。',
+  keywords: ['Chinese reading', 'leveled reading', 'learn Chinese', '中文阅读', '分级阅读', '学中文'],
   openGraph: {
-    title: '阅读 - 熊猫汉语',
-    description: '中文分级阅读文章，从启蒙到高级，适合不同年龄段的海外华裔儿童。',
+    title: 'Reading 阅读 - Panda Chinese 熊猫汉语',
+    description: 'Leveled Chinese reading articles from beginner to advanced. 中文分级阅读文章，从启蒙到高级。',
+    locale: 'zh_CN',
+    alternateLocale: 'en_US',
   },
 }
 
@@ -29,14 +37,27 @@ export default function ReadingPage({ searchParams }: ReadingPageProps) {
   const selectedLevel = selectedLevelId ? getLevel(selectedLevelId) : null
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <ReadingPageClient
-        levels={levels}
-        articles={articles}
-        selectedLevelId={selectedLevelId}
-        selectedLevel={selectedLevel || undefined}
+    <>
+      <WebPageJsonLd
+        title="Reading 阅读 - Leveled Chinese Articles"
+        description="Leveled Chinese reading articles from beginner to advanced. Perfect for overseas children learning Chinese."
+        url="https://pandahan.xyz/reading"
       />
-      <AdBanner />
-    </div>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: 'https://pandahan.xyz/' },
+          { name: 'Reading', url: 'https://pandahan.xyz/reading' },
+        ]}
+      />
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        <ReadingPageClient
+          levels={levels}
+          articles={articles}
+          selectedLevelId={selectedLevelId}
+          selectedLevel={selectedLevel || undefined}
+        />
+        <AdBanner />
+      </div>
+    </>
   )
 }
