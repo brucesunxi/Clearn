@@ -21,7 +21,11 @@
       "Bash(git rm *)",
       "Bash(vercel --prod --logs)",
       "Bash(python3 -c \"import json,sys; msgs=json.load\\(sys.stdin\\); [print\\(f'To: {m[\\\\\"to_email\\\\\"]} - Subject: {m[\\\\\"subject\\\\\"]} - Status: {m.get\\(\\\\\"state\\\\\",\\\\\"?\\\\\"\\)}'\\) for m in msgs[:5]]\")",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx vercel *)",
+      "Bash(sort -t: -k1,1 -k2,2)",
+      "Bash(awk -F: '{print $1}')",
+      "Bash(npx vercel@latest deploy --prod --yes)"
     ]
   }
 }

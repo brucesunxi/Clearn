@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/context'
@@ -8,15 +8,6 @@ import { useAuth } from '@/lib/auth-context'
 import { useTheme } from '@/lib/theme-context'
 import { initVoice } from '@/lib/tts'
 import SiteLogo from './SiteLogo'
-
-interface CoinHistoryEntry {
-  id: string
-  amount: number
-  reason: string
-  balance: number
-  createdAt: string
-  detail: string
-}
 
 function getUserId(): string {
   if (typeof window === 'undefined') return ''
@@ -35,10 +26,7 @@ export default function Header() {
   const pathname = usePathname()
   const isAdminPage = pathname?.startsWith('/admin')
   const [coins, setCoins] = useState(500)
-  const [showHistory, setShowHistory] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [history, setHistory] = useState<CoinHistoryEntry[]>([])
-  const [historyLoading, setHistoryLoading] = useState(false)
 
   // 获取金币余额 - 与 useCoins hook 保持一致的逻辑
   useEffect(() => {
@@ -48,7 +36,6 @@ export default function Header() {
       // 未登录时不显示金币
       if (!user) {
         setCoins(0)
-        setHistory([])
         return
       }
 
@@ -84,63 +71,6 @@ export default function Header() {
     return () => clearInterval(t)
   }, [user])
 
-  const fetchHistory = useCallback(async () => {
-    // 未登录不获取历史
-    if (!user) {
-      setHistory([])
-      return
-    }
-    setHistoryLoading(true)
-    try {
-      const res = await fetch('/api/coins/history', {
-        headers: { 'x-user-id': getUserId() },
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setHistory(data.entries || [])
-      }
-    } catch {} finally {
-      setHistoryLoading(false)
-    }
-  }, [user])
-
-  const handleToggleHistory = () => {
-    if (!showHistory) {
-      fetchHistory()
-    }
-    setShowHistory(!showHistory)
-  }
-
-  const reasonLabel = (reason: string): string => {
-    const map: Record<string, string> = {
-      study_complete: '📝 Study',
-      quiz_complete: '🎯 Quiz',
-      battle_complete: '⚔️ Battle',
-      listen_complete: '🎧 Listen',
-      speak_complete: '🗣️ Speak',
-      checkin: '✅ Check-in',
-      box_open: '🎁 Box',
-      box_prize: '🎁 Box Prize',
-      pet_feed: '🍙 Feed',
-      shop_purchase: '🛒 Purchase',
-      spend: '💸 Spend',
-      earn: '💰 Earn',
-    }
-    return map[reason] || reason
-  }
-
-  const formatDate = (iso: string) => {
-    const d = new Date(iso)
-    const now = new Date()
-    const diffMs = now.getTime() - d.getTime()
-    const diffMin = Math.floor(diffMs / 60000)
-    if (diffMin < 1) return 'just now'
-    if (diffMin < 60) return `${diffMin}m ago`
-    const diffHour = Math.floor(diffMin / 60)
-    if (diffHour < 24) return `${diffHour}h ago`
-    return d.toLocaleDateString(locale === 'zh' ? 'zh-CN' : 'en-US', { month: '2-digit', day: '2-digit' })
-  }
-
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50 dark:bg-gray-800 dark:shadow-gray-700/20 transition-colors">
       <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -169,45 +99,13 @@ export default function Header() {
         </div>
         {user && (
           <div className="relative">
-            <button
-              onClick={handleToggleHistory}
+            <Link
+              href="/coins"
               className="flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 px-2 py-1 rounded-full hover:bg-yellow-100 transition-colors cursor-pointer dark:bg-yellow-900/30 dark:border-yellow-700 dark:text-yellow-400 dark:hover:bg-yellow-900/50"
             >
               <span>🪙</span>
               <span className="font-semibold">{coins}</span>
-            </button>
-
-            {showHistory && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowHistory(false)} />
-                <div className="absolute right-0 mt-2 z-50 w-80 bg-white rounded-xl shadow-xl border border-gray-100 max-h-96 overflow-hidden dark:bg-gray-800 dark:border-gray-700">
-                  <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between dark:border-gray-700">
-                    <span className="text-sm font-bold text-gray-700 dark:text-gray-200">🪙 Coin History</span>
-                    <span className="text-xs text-gray-400 dark:text-gray-400">Balance: {coins}</span>
-                  </div>
-                  <div className="overflow-y-auto max-h-80">
-                    {historyLoading && (
-                      <div className="text-center py-8 text-xs text-gray-400">Loading...</div>
-                    )}
-                    {!historyLoading && history.length === 0 && (
-                      <div className="text-center py-8 text-xs text-gray-400">No records yet</div>
-                    )}
-                    {!historyLoading && history.map((entry) => (
-                      <div key={entry.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 border-b border-gray-50 last:border-0 dark:hover:bg-gray-700/50 dark:border-gray-700/50">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-gray-700 dark:text-gray-200">{reasonLabel(entry.reason)}</p>
-                          <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(entry.createdAt)}</p>
-                          {entry.detail && <p className="text-[10px] text-gray-400 mt-0.5 truncate">{entry.detail}</p>}
-                        </div>
-                        <div className={`text-sm font-bold ${entry.amount >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                          {entry.amount >= 0 ? '+' : ''}{entry.amount}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
+            </Link>
           </div>
         )}
           {!isAdminPage && !loading && (
