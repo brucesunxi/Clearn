@@ -125,9 +125,10 @@ export default function PwaInstallPrompt() {
                 </div>
                 <div>
                   <p className="font-semibold text-sm dark:text-white">将熊猫汉语添加到主屏幕</p>
-                  <ol className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 space-y-1 list-decimal list-inside">
-                    <li>点击底部分享按钮 <span className="inline-block px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">⎙</span></li>
-                    <li>向下滑动选择 <strong>添加到主屏幕</strong></li>
+                  <p className="text-[11px] text-amber-500 mt-1 mb-1.5">请在 Safari 浏览器中操作（Chrome 不支持安装到主屏幕）</p>
+                  <ol className="text-xs text-gray-500 dark:text-gray-400 space-y-1 list-decimal list-inside">
+                    <li>点击 Safari 地址栏的分享按钮 <span className="inline-block px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">⎙</span>（在地址栏左侧或底部）</li>
+                    <li>向下滑动并选择 <strong>添加到主屏幕</strong></li>
                     <li>点击右上角 <strong>添加</strong> 完成安装</li>
                   </ol>
                 </div>
