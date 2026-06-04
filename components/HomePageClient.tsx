@@ -138,8 +138,14 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
           🐼 {locale === 'zh' ? '熊猫汉语' : 'Panda Chinese'}
         </h1>
-        <p className="text-gray-500 text-base">
-          {locale === 'zh' ? '让海外孩子爱上中文' : 'Helping kids around the world learn Chinese'}
+        <p className="text-gray-500 text-base leading-relaxed">
+          {locale === 'zh'
+            ? '菲律宾、马来西亚华人免费中文自学工具，自主刷题练习，无真人课程'
+            : 'Free Chinese self-study tool for overseas children. Practice vocabulary, reading, and listening with gamified exercises.'}
+          <br />
+          <span className="text-xs text-gray-400 mt-1 inline-block">
+            {locale === 'zh' ? '📚 自学 · 练习 · 刷题 · 阅读 · 游戏化' : '📚 Self-study · Practice · Drills · Reading · Games'}
+          </span>
         {/* Email verification reminder */}
         {user && !user.emailVerified && (
           <div className="max-w-lg mx-auto mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-400">

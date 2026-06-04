@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
+import Link from 'next/link'
 import FeedbackWidget from '@/components/FeedbackWidget'
 import { I18nProvider } from '@/lib/i18n/context'
 import TranslationUpdater from '@/components/TranslationUpdater'
@@ -153,8 +154,26 @@ fetch('https://www.googletagmanager.com/gtag/js?id=AW-18197467032', {method:'HEA
           <main className="min-h-screen">{children}</main>
           <PwaInstallPrompt />
           <FeedbackWidget />
-          <footer className="bg-white border-t mt-16 py-8 text-center text-sm text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-500 transition-colors" id="site-footer">
-            🐼 熊猫汉语
+          <footer className="bg-white border-t mt-16 py-8 dark:bg-gray-800 dark:border-gray-700 transition-colors" id="site-footer">
+            <div className="max-w-5xl mx-auto px-4">
+              <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mb-4">
+                <Link href="/about" className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                  About 关于
+                </Link>
+                <Link href="/contact" className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                  Contact 联系
+                </Link>
+                <Link href="/privacy" className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                  Privacy 隐私
+                </Link>
+                <Link href="/terms" className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                  Terms 条款
+                </Link>
+              </div>
+              <p className="text-center text-sm text-gray-400 dark:text-gray-500">
+                🐼 熊猫汉语
+              </p>
+            </div>
           </footer>
         </AuthProvider>
         </ThemeProvider>

@@ -124,7 +124,7 @@ export function EducationalOrganizationJsonLd() {
     name: '熊猫汉语',
     alternateName: 'Panda Chinese',
     url: 'https://pandahan.xyz',
-    description: '为海外华裔儿童提供中文分级阅读学习的在线教育平台',
+    description: '为海外华裔儿童提供中文分级阅读学习的自学工具平台',
     areaServed: 'Worldwide',
     audience: {
       '@type': 'Audience',

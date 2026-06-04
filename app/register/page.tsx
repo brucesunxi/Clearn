@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [justRegistered, setJustRegistered] = useState(false)
@@ -42,6 +43,10 @@ export default function RegisterPage() {
     if (!email.trim()) { setError('Email is required'); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
     if (password !== confirm) { setError('Passwords do not match'); return }
+    if (!agreedToTerms) {
+      setError(locale === 'zh' ? '请同意隐私政策和用户协议' : 'Please agree to the Privacy Policy and Terms of Service')
+      return
+    }
 
     setLoading(true)
     const result = await register(email, password)
@@ -115,6 +120,29 @@ export default function RegisterPage() {
           {error && (
             <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
           )}
+
+          {/* Privacy & Terms agreement */}
+          <div className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              id="terms-agreement"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="terms-agreement" className="text-xs text-gray-500 leading-relaxed">
+              {locale === 'zh'
+                ? '我已阅读并同意 '
+                : 'I have read and agree to the '}
+              <Link href="/privacy" className="text-blue-500 hover:text-blue-600 underline">
+                {locale === 'zh' ? '隐私政策' : 'Privacy Policy'}
+              </Link>
+              {locale === 'zh' ? ' 和 ' : ' and '}
+              <Link href="/terms" className="text-blue-500 hover:text-blue-600 underline">
+                {locale === 'zh' ? '用户协议' : 'Terms of Service'}
+              </Link>
+            </label>
+          </div>
 
           <button
             type="submit"
