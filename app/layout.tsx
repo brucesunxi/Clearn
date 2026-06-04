@@ -7,6 +7,7 @@ import TranslationUpdater from '@/components/TranslationUpdater'
 import { AuthProvider } from '@/lib/auth-context'
 import { ThemeProvider } from '@/lib/theme-context'
 import { WebsiteJsonLd, EducationalOrganizationJsonLd } from '@/components/JsonLd'
+import PwaInstallPrompt from '@/components/PwaInstallPrompt'
 
 export const metadata: Metadata = {
   title: {
@@ -30,6 +31,15 @@ export const metadata: Metadata = {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
     apple: '/favicon.svg',
+    other: [
+      { rel: 'apple-touch-icon', url: '/icon-192x192.png', sizes: '192x192' },
+      { rel: 'apple-touch-icon', url: '/icon-512x512.png', sizes: '512x512' },
+    ],
+  },
+  appleWebApp: {
+    title: '熊猫汉语',
+    statusBarStyle: 'default',
+    capable: true,
   },
   manifest: '/manifest.json',
   openGraph: {
@@ -91,6 +101,22 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
         <meta name="google-adsense-account" content="ca-pub-9711589934416529" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="熊猫汉语" />
+        <link rel="apple-touch-startup-image" href="/icon-512x512.png" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+      console.log('SW registered:', reg.scope);
+    }, function(err) {
+      console.log('SW registration failed:', err);
+    });
+  });
+}`,
+          }}
+        />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9711589934416529" crossOrigin="anonymous" />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-9K8RD1K13S" />
         <script
@@ -125,6 +151,7 @@ fetch('https://www.googletagmanager.com/gtag/js?id=AW-18197467032', {method:'HEA
           <TranslationUpdater />
           <Header />
           <main className="min-h-screen">{children}</main>
+          <PwaInstallPrompt />
           <FeedbackWidget />
           <footer className="bg-white border-t mt-16 py-8 text-center text-sm text-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-500 transition-colors" id="site-footer">
             🐼 熊猫汉语

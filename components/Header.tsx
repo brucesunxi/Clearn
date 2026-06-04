@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/context'
@@ -27,6 +27,23 @@ export default function Header() {
   const isAdminPage = pathname?.startsWith('/admin')
   const [coins, setCoins] = useState(500)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isStandalone, setIsStandalone] = useState(false)
+  const [showInstallHint, setShowInstallHint] = useState(false)
+
+  useEffect(() => {
+    const standalone = window.matchMedia('(display-mode: standalone)').matches
+    const iosStandalone = (navigator as Navigator & { standalone?: boolean }).standalone === true
+    setIsStandalone(standalone || iosStandalone)
+  }, [])
+
+  const handleAppClick = useCallback(() => {
+    setShowInstallHint(true)
+    localStorage.removeItem('pwa-install-dismissed')
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('show-pwa-install'))
+    }, 500)
+  }, [])
 
   // 获取金币余额 - 与 useCoins hook 保持一致的逻辑
   useEffect(() => {
@@ -96,6 +113,9 @@ export default function Header() {
           <Link href="/adventure" className="text-gray-600 hover:text-emerald-500 dark:text-gray-300 dark:hover:text-emerald-400 font-medium transition-colors text-sm">🗺️ {locale === 'zh' ? '冒险' : 'Adventure'}</Link>
           <Link href="/blindbox" className="text-gray-600 hover:text-purple-500 dark:text-gray-300 dark:hover:text-purple-400 font-medium transition-colors text-sm">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
           <Link href="/pet" className="text-gray-600 hover:text-green-500 dark:text-gray-300 dark:hover:text-green-400 font-medium transition-colors text-sm">🐼</Link>
+          {!isStandalone && (
+            <button onClick={handleAppClick} className="text-gray-600 hover:text-amber-500 dark:text-gray-300 dark:hover:text-amber-400 font-medium transition-colors text-sm">📱 {locale === 'zh' ? 'App' : 'App'}</button>
+          )}
         </div>
         {user && (
           <div className="flex items-center gap-2">
@@ -171,6 +191,9 @@ export default function Header() {
           <Link href="/blindbox" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
           <Link href="/adventure" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🗺️ {locale === 'zh' ? '冒险' : 'Adventure'}</Link>
           <Link href="/pet" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🐼 {locale === 'zh' ? '宠物' : 'Pet'}</Link>
+          {!isStandalone && (
+            <button onClick={() => { setMenuOpen(false); handleAppClick(); }} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5 w-full text-left">📱 {locale === 'zh' ? '下载 App' : 'Get App'}</button>
+          )}
         </div>
       )}
     </header>
