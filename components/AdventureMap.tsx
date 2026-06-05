@@ -69,7 +69,7 @@ interface AdventureMapProps {
 }
 
 export default function AdventureMap({ levels }: AdventureMapProps) {
-  const { locale } = useTranslation()
+  const { locale, t } = useTranslation()
   const router = useRouter()
   const [energy, setEnergy] = useState({ current: 100, max: 100 })
   const [stats, setStats] = useState({ power: 0, defense: 0, luck: 0 })
@@ -142,15 +142,11 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
         <div className="max-w-2xl mx-auto text-center">
           <div className="text-8xl mb-6">🗺️</div>
           <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4 leading-tight">
-            Panda Adventure<br />
-            <span className="text-2xl text-gray-500">熊猫冒险闯关</span>
+            {t('adventure.title')}<br />
+            <span className="text-2xl text-gray-500">{t('adventure.subtitle')}</span>
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
-            Learn Chinese through exciting mini-games! Battle, puzzle, quiz, and maze —
-            all designed to make your Chinese learning journey an adventure.
-            <br /><br />
-            通过刺激的迷你游戏学习中文！对战、谜题、问答、迷宫——
-            让你的中文学习之旅变成一场冒险。
+            {t('adventure.description')}
           </p>
 
           {/* Game Type Previews */}
@@ -158,8 +154,8 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
             {GAME_TYPES.map((game) => (
               <div key={game.type} className={`${game.bgLight} rounded-2xl p-4 text-left`}>
                 <div className="text-2xl mb-2">{game.iconBig}</div>
-                <h3 className="font-bold text-gray-800 text-sm mb-1">{game.titleZh}</h3>
-                <p className="text-xs text-gray-500">{game.descZh}</p>
+                <h3 className="font-bold text-gray-800 text-sm mb-1">{locale === 'zh' ? game.titleZh : game.titleEn}</h3>
+                <p className="text-xs text-gray-500">{locale === 'zh' ? game.descZh : game.descEn}</p>
               </div>
             ))}
           </div>
@@ -175,13 +171,13 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
               href="/login"
               className="w-full py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-sm"
             >
-              {locale === 'zh' ? '已有账号？登录' : 'Already have an account? Log in'}
+              {t('adventure.login')}
             </Link>
             <Link
               href="/"
               className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
             >
-              ← {locale === 'zh' ? '返回首页' : 'Back to home'}
+              ← {t('adventure.backHome')}
             </Link>
           </div>
         </div>
@@ -197,24 +193,23 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
           <div className="text-5xl md:text-6xl">🎮</div>
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
-              Panda Adventure · 熊猫冒险
+              {t('adventure.hero.title')}
             </h1>
             <p className="text-emerald-100 text-sm md:text-base leading-relaxed max-w-2xl">
-              学习中文不只有课本！通过四种迷你游戏——对战、谜题、问答、迷宫，
-              在闯关中巩固词汇、练习语法、提升反应。每完成一个关卡，熊猫变强一点，你也变强一点。
+              {t('adventure.hero.description')}
             </p>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
               <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-xl px-3 py-1.5">
                 <span>🎯</span>
-                <span>{totalLevels} {locale === 'zh' ? '个关卡' : 'Levels'}</span>
+                <span>{totalLevels} {t('adventure.levels')}</span>
               </div>
               <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-xl px-3 py-1.5">
                 <span>🐼</span>
-                <span>{locale === 'zh' ? '熊猫等级 Lv.' : 'Pet Lv.'}{petLevel}</span>
+                <span>{t('adventure.petLevel')}{petLevel}</span>
               </div>
               <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-xl px-3 py-1.5">
                 <span>🪙</span>
-                <span>{adventureStats?.totalCoinsEarned || 0} {locale === 'zh' ? '金币' : 'Coins'}</span>
+                <span>{adventureStats?.totalCoinsEarned || 0} {t('adventure.coins')}</span>
               </div>
             </div>
           </div>
@@ -225,7 +220,7 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
       <div>
         <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
           <span>🎪</span>
-          {locale === 'zh' ? '迷你游戏合集 · 在学习中冒险' : 'Mini-Game Collection'}
+          {locale === 'zh' ? `${t('adventure.minigames.title')} · ${t('adventure.minigames.subtitle')}` : 'Mini-Game Collection'}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {GAME_TYPES.map((game) => (
@@ -249,10 +244,10 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
         </div>
       </div>
 
-      {/* ===== 状态栏 ===== */}
+          {/* ===== Status Bar ===== */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* 能量 */}
+          {/* Energy */}
           <div>
             <EnergyBar energy={energy} />
             <button
@@ -267,20 +262,20 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
               }}
               className="mt-1 text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 font-medium"
             >
-              ⚡ {locale === 'zh' ? '花30金币购买 +30 能量' : 'Buy +30 energy (30 coins)'}
+              ⚡ {t('adventure.buyEnergy')}
             </button>
           </div>
 
-          {/* 装备属性 */}
+          {/* Equipment Stats */}
           <EquipmentPanel stats={stats} compact />
 
-          {/* 熊猫等级 */}
+          {/* Pet Level */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🐼</span>
                 <span className="font-medium text-gray-700 dark:text-gray-200">
-                  {locale === 'zh' ? '熊猫等级' : 'Pet Level'}
+                  {t('adventure.petLevel').replace('Lv.', '')}
                 </span>
               </div>
               <span className="text-lg font-bold text-purple-600">Lv.{petLevel}</span>
@@ -297,19 +292,19 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
                 href="/adventure/shop"
                 className="px-4 py-1.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium text-sm"
               >
-                🛍️ {locale === 'zh' ? '商店' : 'Shop'}
+                🛍️ {t('adventure.shop')}
               </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ===== 进度条 ===== */}
+      {/* ===== Progress Bar ===== */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-bold text-gray-700 dark:text-gray-200 text-sm flex items-center gap-2">
             <span>🗺️</span>
-            {locale === 'zh' ? '冒险进度' : 'Adventure Progress'}
+            {t('adventure.progress')}
           </h3>
           <span className="text-sm text-gray-500">{completedCount}/{totalLevels} ({progressPct}%)</span>
         </div>
@@ -322,60 +317,60 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
         <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
           <div>
             <div className="text-xl font-bold text-green-600">{adventureStats?.totalLevelsCompleted || 0}</div>
-            <div className="text-gray-500 text-xs">{locale === 'zh' ? '通关次数' : 'Clears'}</div>
+            <div className="text-gray-500 text-xs">{t('adventure.clears')}</div>
           </div>
           <div>
             <div className="text-xl font-bold text-purple-600">Lv.{petLevel}</div>
-            <div className="text-gray-500 text-xs">{locale === 'zh' ? '熊猫等级' : 'Pet Level'}</div>
+            <div className="text-gray-500 text-xs">{t('adventure.petLevel').replace('Lv.', '')}</div>
           </div>
           <div>
             <div className="text-xl font-bold text-yellow-600">💰 {adventureStats?.totalCoinsEarned || 0}</div>
-            <div className="text-gray-500 text-xs">{locale === 'zh' ? '赚取金币' : 'Coins Earned'}</div>
+            <div className="text-gray-500 text-xs">{t('adventure.coinsEarned')}</div>
           </div>
           <div>
             <div className="text-xl font-bold text-amber-600">✨ {adventureStats?.totalExpEarned || 0}</div>
-            <div className="text-gray-500 text-xs">{locale === 'zh' ? '获得经验' : 'EXP Earned'}</div>
+            <div className="text-gray-500 text-xs">{t('adventure.expEarned')}</div>
           </div>
         </div>
       </div>
 
-      {/* ===== 全部通关庆祝 ===== */}
+      {/* ===== All Levels Complete Celebration ===== */}
       {completedCount >= totalLevels && (
         <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-300 dark:border-yellow-700 rounded-2xl p-6 text-center">
           <div className="text-5xl mb-3">👑</div>
           <h2 className="text-2xl font-bold text-orange-700 dark:text-orange-400 mb-1">
-            {locale === 'zh' ? '全部通关！' : 'All Levels Complete!'}
+            {t('adventure.allComplete')}
           </h2>
           <p className="text-orange-600 dark:text-orange-300 mb-3">
-            {locale === 'zh' ? '你征服了所有挑战！你是熊猫大师！' : "You've conquered every challenge! You are the Panda Master!"}
+            {t('adventure.allCompleteDesc')}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/adventure/shop" className="px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 font-medium text-sm">🛍️ {locale === 'zh' ? '逛逛商店' : 'Shop'}</Link>
-            <Link href="/blindbox" className="px-4 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600 font-medium text-sm">🎁 {locale === 'zh' ? '试试盲盒' : 'Blind Box'}</Link>
+            <Link href="/adventure/shop" className="px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 font-medium text-sm">🛍️ {t('adventure.shop')}</Link>
+            <Link href="/blindbox" className="px-4 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600 font-medium text-sm">🎁 {t('adventure.blindbox')}</Link>
           </div>
         </div>
       )}
 
-      {/* ===== 低能量提示 ===== */}
+      {/* ===== Low Energy Warning ===== */}
       {energy.current < 20 && (
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 text-center">
           <p className="text-amber-700 dark:text-amber-400 font-medium mb-2">
-            ⚡ {locale === 'zh' ? '能量不足！完成学习活动来恢复能量：' : 'Low energy! Complete learning activities to recharge:'}
+            ⚡ {t('adventure.lowEnergy')}
           </p>
           <div className="flex flex-wrap justify-center gap-2 text-sm">
-            <Link href="/reading" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">📖 {locale === 'zh' ? '阅读' : 'Read'}</Link>
-            <Link href="/learn" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">📝 {locale === 'zh' ? '测验' : 'Quiz'}</Link>
-            <Link href="/listen" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">🎧 {locale === 'zh' ? '听力' : 'Listen'}</Link>
-            <Link href="/speak" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">🗣️ {locale === 'zh' ? '口语' : 'Speak'}</Link>
+            <Link href="/reading" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">📖 {t('adventure.read')}</Link>
+            <Link href="/learn" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">📝 {t('adventure.quiz')}</Link>
+            <Link href="/listen" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">🎧 {t('adventure.listen')}</Link>
+            <Link href="/speak" className="px-3 py-1 bg-white dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-amber-700 text-amber-600 hover:bg-amber-50">🗣️ {t('adventure.speak')}</Link>
           </div>
         </div>
       )}
 
-      {/* ===== 关卡网格 ===== */}
+      {/* ===== Level Grid ===== */}
       <div>
         <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
           <span>🏔️</span>
-          {locale === 'zh' ? '选择关卡' : 'Select a Level'}
+          {t('adventure.selectLevel')}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {levels.map((level) => {
@@ -386,13 +381,13 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
             const meetsDefenseReq = !level.requirements.minDefense || stats.defense >= level.requirements.minDefense
             const isLocked = !prevCompleted || !meetsLevelReq || !meetsPowerReq || !meetsDefenseReq
             const lockReason = !meetsLevelReq
-              ? `${locale === 'zh' ? '需要熊猫等级' : 'Pet level'} ${level.requirements.minLevel}`
+              ? `${t('adventure.needPetLevel')} ${level.requirements.minLevel}`
               : !meetsPowerReq
-              ? `⚔️ ${locale === 'zh' ? '需要' : 'Need'} ${level.requirements.minPower} ${locale === 'zh' ? '攻击力' : 'power'} (${stats.power})`
+              ? `⚔️ ${t('adventure.needPower')} ${level.requirements.minPower} ${t('adventure.power')} (${stats.power})`
               : !meetsDefenseReq
-              ? `🛡️ ${locale === 'zh' ? '需要' : 'Need'} ${level.requirements.minDefense} ${locale === 'zh' ? '防御力' : 'defense'} (${stats.defense})`
+              ? `🛡️ ${t('adventure.needPower')} ${level.requirements.minDefense} ${t('adventure.defense')} (${stats.defense})`
               : !prevCompleted
-              ? `${locale === 'zh' ? '先完成上一关' : 'Complete previous level first'}`
+              ? `${t('adventure.completePrevious')}`
               : ''
             const hasEnergy = energy.current >= level.requiredEnergy
             const isPlayable = !isLocked && hasEnergy
@@ -449,7 +444,7 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
                 <div className="flex items-center gap-2 text-sm mb-3">
                   <span>⚡</span>
                   <span className={hasEnergy ? 'text-gray-700 dark:text-gray-300' : 'text-red-500 dark:text-red-400'}>
-                    {level.requiredEnergy} {locale === 'zh' ? '能量' : 'Energy'}
+                    {level.requiredEnergy} {t('adventure.energy')}
                   </span>
                 </div>
 
@@ -473,8 +468,8 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
                     }`}
                   >
                     {hasEnergy
-                      ? (locale === 'zh' ? '🔄 重玩' : '🔄 Replay')
-                      : (locale === 'zh' ? '😴 能量不足' : '😴 No Energy')}
+                      ? `🔄 ${t('adventure.replay')}`
+                      : `😴 ${t('adventure.noEnergy')}`}
                   </button>
                 )}
 
@@ -494,7 +489,7 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
                     <div className="text-center">
                       <div className="text-2xl mb-2">😴</div>
                       <p className="text-sm text-red-600 dark:text-red-300">
-                        {locale === 'zh' ? '能量不足' : 'Not enough energy'}
+                        {t('adventure.noEnergy')}
                       </p>
                     </div>
                   </div>
@@ -505,12 +500,12 @@ export default function AdventureMap({ levels }: AdventureMapProps) {
         </div>
       </div>
 
-      {/* ===== 里程碑 ===== */}
+      {/* ===== Milestones ===== */}
       {petLevel < 50 && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
           <h3 className="font-bold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2 text-sm">
             <span>🏆</span>
-            {locale === 'zh' ? '下一个里程碑' : 'Next Milestones'}
+            {t('adventure.nextMilestones')}
           </h3>
           <div className="flex flex-wrap gap-3">
             {getNextMilestones(petLevel).map((m: LevelMilestone, i: number) => (

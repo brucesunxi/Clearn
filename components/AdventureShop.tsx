@@ -112,8 +112,7 @@ export default function AdventureShop({ shop }: AdventureShopProps) {
         <div className="text-8xl mb-6">🛍️</div>
         <h1 className="text-3xl font-bold text-gray-800 mb-3">Equipment Shop</h1>
         <p className="text-gray-500 mb-6">
-          Sign in to browse and buy equipment!<br />
-          登录后即可浏览和购买装备！
+          Sign in to browse and buy equipment!
         </p>
         <div className="flex flex-col gap-3">
           <Link

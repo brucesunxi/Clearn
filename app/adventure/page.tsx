@@ -3,8 +3,8 @@ import AdventureMap from '@/components/AdventureMap'
 import { getAdventureLevels } from '@/lib/adventure'
 
 export const metadata: Metadata = {
-  title: 'Adventure 冒险 - Panda Quest',
-  description: 'Embark on adventures with your panda! Challenge levels, earn rewards, and become stronger. 带着你的熊猫去冒险！挑战关卡，赢取奖励。',
+  title: 'Adventure - Panda Quest',
+  description: 'Embark on adventures with your panda! Challenge levels, earn rewards, and become stronger.',
   alternates: {
     canonical: 'https://pandahan.xyz/adventure',
     languages: {
@@ -12,12 +12,12 @@ export const metadata: Metadata = {
       'zh-CN': 'https://pandahan.xyz/adventure',
     },
   },
-  keywords: ['adventure', 'panda quest', 'game', 'levels', '熊猫冒险', '闯关'],
+  keywords: ['adventure', 'panda quest', 'game', 'levels', 'chinese learning', '闯关'],
   openGraph: {
-    title: 'Adventure 冒险 - Panda Chinese',
-    description: 'Embark on adventures with your panda! 带着你的熊猫去冒险！',
-    locale: 'zh_CN',
-    alternateLocale: 'en_US',
+    title: 'Adventure - Panda Chinese',
+    description: 'Embark on adventures with your panda!',
+    locale: 'en_US',
+    alternateLocale: 'zh_CN',
   },
 }
 
