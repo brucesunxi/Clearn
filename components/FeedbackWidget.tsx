@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 
 export default function FeedbackWidget() {
@@ -11,6 +11,87 @@ export default function FeedbackWidget() {
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Drag state
+  const [position, setPosition] = useState({ y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartPos = useRef({ y: 0, initialY: 0 })
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  // Load saved position from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('feedback-button-position')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (typeof parsed.y === 'number') {
+          setPosition({ y: parsed.y })
+        }
+      } catch {}
+    }
+  }, [])
+
+  // Save position when changed
+  useEffect(() => {
+    if (!isDragging) {
+      localStorage.setItem('feedback-button-position', JSON.stringify(position))
+    }
+  }, [position, isDragging])
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    setIsDragging(true)
+    dragStartPos.current = {
+      y: e.clientY,
+      initialY: position.y,
+    }
+  }, [position.y])
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setIsDragging(true)
+    dragStartPos.current = {
+      y: e.touches[0].clientY,
+      initialY: position.y,
+    }
+  }, [position.y])
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return
+      const deltaY = e.clientY - dragStartPos.current.y
+      const newY = dragStartPos.current.initialY + deltaY
+      // Constrain to viewport bounds (keep some padding)
+      const maxY = window.innerHeight - 100
+      const minY = 80
+      setPosition({ y: Math.max(minY, Math.min(maxY, newY)) })
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return
+      const deltaY = e.touches[0].clientY - dragStartPos.current.y
+      const newY = dragStartPos.current.initialY + deltaY
+      const maxY = window.innerHeight - 100
+      const minY = 80
+      setPosition({ y: Math.max(minY, Math.min(maxY, newY)) })
+    }
+
+    const handleEnd = () => {
+      setIsDragging(false)
+    }
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleEnd)
+      document.addEventListener('touchmove', handleTouchMove)
+      document.addEventListener('touchend', handleEnd)
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleEnd)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleEnd)
+    }
+  }, [isDragging])
 
   useEffect(() => {
     if (isOpen) {
@@ -55,11 +136,23 @@ export default function FeedbackWidget() {
 
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button - draggable */}
       <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center"
+        ref={buttonRef}
+        onClick={() => !isDragging && setIsOpen(true)}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        style={{
+          position: 'fixed',
+          right: '24px',
+          bottom: position.y > 0 ? undefined : '24px',
+          top: position.y > 0 ? `${position.y}px` : undefined,
+          zIndex: 50,
+          cursor: isDragging ? 'grabbing' : 'grab',
+        }}
+        className={`w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center ${isDragging ? 'scale-110' : ''}`}
         aria-label="Feedback"
+        title={locale === 'zh' ? '拖拽可移动位置' : 'Drag to move'}
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
           <path fillRule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97-1.94.284-3.916.455-5.922.505a.39.39 0 00-.266.112L8.25 21.25V17.5a.75.75 0 00-.75-.75h-1.5a3.75 3.75 0 01-3.75-3.75V6.24c0-1.946 1.37-3.678 3.348-3.97z" clipRule="evenodd" />
