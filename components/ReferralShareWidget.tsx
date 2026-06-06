@@ -17,12 +17,13 @@ export default function ReferralShareWidget() {
   const [loading, setLoading] = useState(false)
   const [copyMsg, setCopyMsg] = useState('')
 
-  // Drag state
-  const [position, setPosition] = useState({ y: 0 })
+  // Drag state - use negative values to indicate offset from bottom
+  const [position, setPosition] = useState<{ y: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartPos = useRef({ y: 0, initialY: 0 })
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
-  // Load saved position
+  // Load saved position after mount to avoid hydration mismatch
   useEffect(() => {
     const saved = localStorage.getItem('referral-button-position')
     if (saved) {
@@ -31,50 +32,54 @@ export default function ReferralShareWidget() {
         if (typeof parsed.y === 'number') {
           setPosition({ y: parsed.y })
         }
-      } catch {}
+      } catch {
+        setPosition({ y: 0 })
+      }
+    } else {
+      setPosition({ y: 0 })
     }
   }, [])
 
   // Save position
   useEffect(() => {
-    if (!isDragging) {
+    if (!isDragging && position) {
       localStorage.setItem('referral-button-position', JSON.stringify(position))
     }
   }, [position, isDragging])
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
     setIsDragging(true)
     dragStartPos.current = {
       y: e.clientY,
-      initialY: position.y,
+      initialY: position?.y || 0,
     }
-  }, [position.y])
+  }, [position?.y])
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setIsDragging(true)
     dragStartPos.current = {
       y: e.touches[0].clientY,
-      initialY: position.y,
+      initialY: position?.y || 0,
     }
-  }, [position.y])
+  }, [position?.y])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return
       const deltaY = e.clientY - dragStartPos.current.y
       const newY = dragStartPos.current.initialY + deltaY
-      const maxY = window.innerHeight - 150
-      const minY = 80
-      setPosition({ y: Math.max(minY, Math.min(maxY, newY)) })
+      // Clamp to reasonable bounds (80px from top, 150px from bottom)
+      const clampedY = Math.max(80, Math.min(window.innerHeight - 150, newY))
+      setPosition({ y: clampedY })
     }
 
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging) return
       const deltaY = e.touches[0].clientY - dragStartPos.current.y
       const newY = dragStartPos.current.initialY + deltaY
-      const maxY = window.innerHeight - 150
-      const minY = 80
-      setPosition({ y: Math.max(minY, Math.min(maxY, newY)) })
+      const clampedY = Math.max(80, Math.min(window.innerHeight - 150, newY))
+      setPosition({ y: clampedY })
     }
 
     const handleEnd = () => {
@@ -82,9 +87,9 @@ export default function ReferralShareWidget() {
     }
 
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mousemove', handleMouseMove, { passive: false })
       document.addEventListener('mouseup', handleEnd)
-      document.addEventListener('touchmove', handleTouchMove)
+      document.addEventListener('touchmove', handleTouchMove, { passive: false })
       document.addEventListener('touchend', handleEnd)
     }
 
@@ -101,13 +106,34 @@ export default function ReferralShareWidget() {
     if (!isOpen || !user) return
     setLoading(true)
     fetch('/api/referral/stats', { credentials: 'include' })
-      .then(r => r.json())
+      .then(async r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
       .then(data => {
+        console.log('Referral API response:', data)
         if (data.stats) {
           setReferralData(data.stats)
+        } else {
+          // API returned but no stats - user might not have referral code yet
+          setReferralData({
+            referralCode: null,
+            totalReferrals: 0,
+            totalRewards: 0,
+            rewardAmount: 1000,
+          })
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Failed to fetch referral stats:', err)
+        // Set default data so UI doesn't stuck in loading
+        setReferralData({
+          referralCode: null,
+          totalReferrals: 0,
+          totalRewards: 0,
+          rewardAmount: 1000,
+        })
+      })
       .finally(() => setLoading(false))
   }, [isOpen, user])
 
@@ -126,24 +152,29 @@ export default function ReferralShareWidget() {
     }
   }, [isOpen])
 
-  if (!user) return null
+  if (!user || position === null) return null
+
+  // Calculate position - default is 100px from bottom
+  const buttonStyle: React.CSSProperties = position.y > 0
+    ? { top: `${position.y}px`, right: '24px' }
+    : { bottom: '100px', right: '24px' }
 
   return (
     <>
       {/* Floating invite button - draggable */}
       <button
+        ref={buttonRef}
         onClick={() => !isDragging && setIsOpen(true)}
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
         style={{
+          ...buttonStyle,
           position: 'fixed',
-          right: '24px',
-          bottom: position.y > 0 ? undefined : '100px',
-          top: position.y > 0 ? `${position.y}px` : undefined,
           zIndex: 50,
           cursor: isDragging ? 'grabbing' : 'grab',
+          touchAction: 'none',
         }}
-        className={`w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center ${isDragging ? 'scale-110' : ''}`}
+        className={`w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg hover:shadow-xl transition-transform flex items-center justify-center ${isDragging ? 'scale-110' : 'hover:scale-105'}`}
         aria-label="Invite Friends"
         title={locale === 'zh' ? '邀请好友赚金币 (拖拽可移动)' : 'Invite friends to earn coins (drag to move)'}
       >
@@ -181,7 +212,33 @@ export default function ReferralShareWidget() {
 
               {loading ? (
                 <div className="text-center py-8 text-gray-400">{locale === 'zh' ? '加载中...' : 'Loading...'}</div>
-              ) : referralData?.referralCode ? (
+              ) : !referralData?.referralCode ? (
+                <div className="space-y-5">
+                  {/* No referral code yet */}
+                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 text-center">
+                    <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                      {locale === 'zh'
+                        ? '你的邀请码正在生成中，请稍后再试'
+                        : 'Your referral code is being generated. Please try again later.'}
+                    </p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-medium hover:bg-amber-600 transition-colors"
+                    >
+                      {locale === 'zh' ? '刷新页面' : 'Refresh Page'}
+                    </button>
+                  </div>
+
+                  {/* Still show reward info */}
+                  <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 text-center">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                      {locale === 'zh'
+                        ? `每邀请一位好友注册并验证邮箱，你即可获得 ${referralData?.rewardAmount || 1000} 金币！`
+                        : `Earn ${referralData?.rewardAmount || 1000} coins for each friend who signs up and verifies their email!`}
+                    </p>
+                  </div>
+                </div>
+              ) : (
                 <div className="space-y-5">
                   {/* Reward info */}
                   <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 text-center">

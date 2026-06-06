@@ -12,13 +12,13 @@ export default function FeedbackWidget() {
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Drag state
-  const [position, setPosition] = useState({ y: 0 })
+  // Drag state - use null initially to avoid hydration mismatch
+  const [position, setPosition] = useState<{ y: number } | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartPos = useRef({ y: 0, initialY: 0 })
   const buttonRef = useRef<HTMLButtonElement>(null)
 
-  // Load saved position from localStorage
+  // Load saved position after mount
   useEffect(() => {
     const saved = localStorage.getItem('feedback-button-position')
     if (saved) {
@@ -27,32 +27,37 @@ export default function FeedbackWidget() {
         if (typeof parsed.y === 'number') {
           setPosition({ y: parsed.y })
         }
-      } catch {}
+      } catch {
+        setPosition({ y: 0 })
+      }
+    } else {
+      setPosition({ y: 0 })
     }
   }, [])
 
   // Save position when changed
   useEffect(() => {
-    if (!isDragging) {
+    if (!isDragging && position) {
       localStorage.setItem('feedback-button-position', JSON.stringify(position))
     }
   }, [position, isDragging])
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
     setIsDragging(true)
     dragStartPos.current = {
       y: e.clientY,
-      initialY: position.y,
+      initialY: position?.y || 0,
     }
-  }, [position.y])
+  }, [position?.y])
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     setIsDragging(true)
     dragStartPos.current = {
       y: e.touches[0].clientY,
-      initialY: position.y,
+      initialY: position?.y || 0,
     }
-  }, [position.y])
+  }, [position?.y])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
