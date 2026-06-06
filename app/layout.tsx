@@ -3,6 +3,7 @@ import './globals.css'
 import Header from '@/components/Header'
 import Link from 'next/link'
 import FeedbackWidget from '@/components/FeedbackWidget'
+import ReferralShareWidget from '@/components/ReferralShareWidget'
 import { I18nProvider } from '@/lib/i18n/context'
 import TranslationUpdater from '@/components/TranslationUpdater'
 import { AuthProvider } from '@/lib/auth-context'
@@ -154,6 +155,7 @@ fetch('https://www.googletagmanager.com/gtag/js?id=AW-18197467032', {method:'HEA
           <main className="min-h-screen">{children}</main>
           <PwaInstallPrompt />
           <FeedbackWidget />
+          <ReferralShareWidget />
           <footer className="bg-white border-t mt-16 py-8 dark:bg-gray-800 dark:border-gray-700 transition-colors" id="site-footer">
             <div className="max-w-5xl mx-auto px-4">
               <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 mb-4">
