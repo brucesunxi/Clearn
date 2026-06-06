@@ -348,10 +348,6 @@ export default function ReferralShareWidget() {
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  {locale === 'zh' ? '无法加载邀请信息' : 'Failed to load referral info'}
-                </div>
               )}
             </div>
           </div>

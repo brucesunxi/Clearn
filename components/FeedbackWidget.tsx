@@ -139,6 +139,8 @@ export default function FeedbackWidget() {
     setContact('')
   }
 
+  if (position === null) return null
+
   return (
     <>
       {/* Floating button - draggable */}
