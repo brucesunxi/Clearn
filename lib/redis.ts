@@ -887,8 +887,15 @@ export async function getReferralStats(userId: string): Promise<{
   rewardAmount: number
 }> {
   const redis = getRedis()
-  const user = await getUser(userId)
+  let user = await getUser(userId)
   const config = await getReferralConfig()
+
+  // Auto-generate referral code if user doesn't have one
+  if (user && !user.referralCode && redis) {
+    const code = await createReferralCode(userId)
+    user.referralCode = code
+    await redis.set(userKey(userId), JSON.stringify(user))
+  }
 
   // Count referrals by scanning users with invitedBy = userId
   let totalReferrals = 0
