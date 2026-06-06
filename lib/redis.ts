@@ -149,6 +149,9 @@ export interface UserRecord {
   createdAt: string
   emailVerified: boolean
   verificationToken: string | null
+  referralCode?: string
+  invitedBy?: string
+  referralRewards?: number
 }
 
 function userEmailKey(email: string): string {
@@ -167,6 +170,7 @@ export async function createUser(
   userId: string,
   email: string,
   passwordHash: string,
+  invitedBy?: string | null,
 ): Promise<boolean> {
   const redis = getRedis()
   if (!redis) return false
@@ -176,6 +180,9 @@ export async function createUser(
     const nxResult = await redis.set(emailLookup, userId, { nx: true })
     if (nxResult !== 'OK') return false // email already taken
 
+    // Generate referral code
+    const code = await createReferralCode(userId)
+
     await redis.set(userKey(userId), JSON.stringify({
       userId,
       email: email.toLowerCase().trim(),
@@ -183,6 +190,8 @@ export async function createUser(
       createdAt: new Date().toISOString(),
       emailVerified: false,
       verificationToken: null,
+      referralCode: code,
+      invitedBy: invitedBy || undefined,
     } satisfies UserRecord))
     return true
   } catch {
@@ -257,6 +266,16 @@ export async function getUsersPaginated(
   const start = (page - 1) * pageSize
   const end = start + pageSize
   return { users: allUsers.slice(start, end), total }
+}
+
+export async function getUserByVerificationToken(token: string): Promise<string | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    return await redis.get<string>(`verification:token:${token}`)
+  } catch {
+    return null
+  }
 }
 
 export async function markEmailVerified(token: string): Promise<boolean> {
@@ -744,4 +763,183 @@ export async function setDailyGoalData(userId: string, data: DailyGoalData): Pro
   const redis = getRedis()
   if (!redis) return
   await redis.set(dailyGoalKey(userId), JSON.stringify(data))
+}
+
+// ---- Referral System ----
+
+export interface ReferralConfig {
+  rewardAmount: number
+}
+
+const REFERRAL_CONFIG_KEY = 'config:referral'
+const DEFAULT_REWARD = 1000
+
+export async function getReferralConfig(): Promise<ReferralConfig> {
+  const redis = getRedis()
+  if (!redis) return { rewardAmount: DEFAULT_REWARD }
+  try {
+    const raw = await redis.get<any>(REFERRAL_CONFIG_KEY)
+    if (!raw) return { rewardAmount: DEFAULT_REWARD }
+    const config = typeof raw === 'string' ? JSON.parse(raw) : raw
+    return { rewardAmount: config.rewardAmount ?? DEFAULT_REWARD }
+  } catch {
+    return { rewardAmount: DEFAULT_REWARD }
+  }
+}
+
+export async function setReferralConfig(config: ReferralConfig): Promise<void> {
+  const redis = getRedis()
+  if (!redis) return
+  await redis.set(REFERRAL_CONFIG_KEY, JSON.stringify(config))
+}
+
+function referralCodeKey(code: string): string {
+  return `referral:code:${code.toUpperCase()}`
+}
+
+let referralCodeCounter = Date.now() % 10000
+
+export function generateReferralCode(): string {
+  referralCodeCounter++
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = ''
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)]
+  }
+  return code
+}
+
+export async function createReferralCode(userId: string): Promise<string> {
+  const redis = getRedis()
+  // Generate a unique code
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const code = generateReferralCode()
+    if (redis) {
+      const nxResult = await redis.set(referralCodeKey(code), userId, { nx: true })
+      if (nxResult === 'OK') return code
+    } else {
+      // No Redis: just return the code (no uniqueness guarantee)
+      return code
+    }
+  }
+  // Fallback
+  return `REF-${Date.now().toString(36).toUpperCase()}`
+}
+
+export async function getUserIdByReferralCode(code: string): Promise<string | null> {
+  const redis = getRedis()
+  if (!redis) return null
+  try {
+    return await redis.get<string>(referralCodeKey(code.toUpperCase()))
+  } catch {
+    return null
+  }
+}
+
+export async function updateUser(userId: string, updates: Partial<UserRecord>): Promise<boolean> {
+  const redis = getRedis()
+  if (!redis) return false
+  try {
+    const user = await getUser(userId)
+    if (!user) return false
+    Object.assign(user, updates)
+    await redis.set(userKey(userId), JSON.stringify(user))
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * When a user verifies their email, check if they were referred and reward the referrer.
+ */
+export async function rewardReferrerOnVerify(userId: string): Promise<{ rewarded: boolean; amount: number }> {
+  const redis = getRedis()
+  if (!redis) return { rewarded: false, amount: 0 }
+  try {
+    const user = await getUser(userId)
+    if (!user?.invitedBy) return { rewarded: false, amount: 0 }
+
+    const config = await getReferralConfig()
+    const rewardAmount = config.rewardAmount
+
+    // Reward the referrer
+    const newBalance = await addCoins(user.invitedBy, rewardAmount)
+    await addCoinHistory(user.invitedBy, rewardAmount, 'earn', newBalance, `Referral reward: ${user.email} verified email`)
+    await createActivity(user.invitedBy, 'referral_reward', `Earned ${rewardAmount} coins from referral ${user.email}`)
+
+    // Increment referrer's reward count
+    const referrer = await getUser(user.invitedBy)
+    if (referrer) {
+      await updateUser(user.invitedBy, { referralRewards: (referrer.referralRewards || 0) + 1 })
+    }
+
+    return { rewarded: true, amount: rewardAmount }
+  } catch {
+    return { rewarded: false, amount: 0 }
+  }
+}
+
+export async function getReferralStats(userId: string): Promise<{
+  referralCode: string | null
+  totalReferrals: number
+  totalRewards: number
+  rewardAmount: number
+}> {
+  const redis = getRedis()
+  const user = await getUser(userId)
+  const config = await getReferralConfig()
+
+  // Count referrals by scanning users with invitedBy = userId
+  let totalReferrals = 0
+  if (redis) {
+    try {
+      let cursor = 0
+      do {
+        const result = await redis.scan(cursor, { match: 'user:*', count: 100 })
+        cursor = parseInt(result[0], 10)
+        for (const key of result[1]) {
+          if (key.startsWith('user:email:')) continue
+          const raw = await redis.get<any>(key)
+          if (!raw) continue
+          const u = typeof raw === 'string' ? JSON.parse(raw) : raw
+          if (u.invitedBy === userId) totalReferrals++
+        }
+      } while (cursor !== 0)
+    } catch {}
+  }
+
+  return {
+    referralCode: user?.referralCode || null,
+    totalReferrals,
+    totalRewards: user?.referralRewards || 0,
+    rewardAmount: config.rewardAmount,
+  }
+}
+
+/** Batch generate referral codes for users who don't have one yet */
+export async function batchGenerateReferralCodes(): Promise<number> {
+  const redis = getRedis()
+  if (!redis) return 0
+  let generated = 0
+  try {
+    let cursor = 0
+    do {
+      const result = await redis.scan(cursor, { match: 'user:*', count: 100 })
+      cursor = parseInt(result[0], 10)
+      for (const key of result[1]) {
+        if (key.startsWith('user:email:')) continue
+        const raw = await redis.get<any>(key)
+        if (!raw) continue
+        const user = typeof raw === 'string' ? JSON.parse(raw) : raw as UserRecord
+        if (!user.referralCode) {
+          const code = await createReferralCode(user.userId)
+          user.referralCode = code
+          await redis.set(key, JSON.stringify(user))
+          generated++
+        }
+      }
+    } while (cursor !== 0)
+  } catch {}
+  return generated
 }

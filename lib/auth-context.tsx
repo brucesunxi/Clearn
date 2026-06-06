@@ -19,7 +19,7 @@ interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  register: (email: string, password: string) => Promise<RegisterResult>
+  register: (email: string, password: string, referralCode?: string) => Promise<RegisterResult>
   logout: () => Promise<void>
 }
 
@@ -89,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchUser])
 
-  const register = useCallback(async (email: string, password: string) => {
+  const register = useCallback(async (email: string, password: string, referralCode?: string) => {
     try {
       const anonId = typeof window !== 'undefined' ? localStorage.getItem('chineselearn-user-id') || '' : ''
       const res = await fetch('/api/auth/register', {
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
           'x-user-id': anonId,
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, referralCode }),
       })
       const data = await res.json()
       if (res.ok) {

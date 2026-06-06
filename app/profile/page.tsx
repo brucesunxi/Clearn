@@ -15,7 +15,7 @@ interface CoinHistoryEntry {
   detail: string
 }
 
-type TabKey = 'coins' | 'stats'
+type TabKey = 'coins' | 'stats' | 'referral'
 type TimeFilter = 'all' | 'today' | 'week' | 'month'
 type TypeFilter = 'all' | 'income' | 'expense'
 
@@ -87,6 +87,14 @@ export default function ProfilePage() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null)
 
+  // Referral tab data
+  const [referralData, setReferralData] = useState<{
+    stats: { referralCode: string | null; totalReferrals: number; totalRewards: number; rewardAmount: number }
+    email: string
+  } | null>(null)
+  const [referralLoading, setReferralLoading] = useState(false)
+  const [copyMsg, setCopyMsg] = useState('')
+
   // Stats tab data
   interface UserStats {
     coins: { earned: number; spent: number; totalTransactions: number }
@@ -116,6 +124,17 @@ export default function ProfilePage() {
     fetchHistory()
     refresh()
   }, [user, refresh])
+
+  // Fetch referral stats
+  useEffect(() => {
+    if (!user || activeTab !== 'referral') return
+    setReferralLoading(true)
+    fetch('/api/referral/stats', { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => setReferralData(data))
+      .catch(() => {})
+      .finally(() => setReferralLoading(false))
+  }, [user, activeTab])
 
   useEffect(() => {
     if (!user || activeTab !== 'stats') return
@@ -207,6 +226,7 @@ export default function ProfilePage() {
   const tabs: { key: TabKey; label: string; labelZh: string; icon: string }[] = [
     { key: 'coins', label: 'Coins', labelZh: '金币明细', icon: '🪙' },
     { key: 'stats', label: 'Stats', labelZh: '学习统计', icon: '📊' },
+    { key: 'referral', label: 'Referral', labelZh: '邀请好友', icon: '🎁' },
   ]
 
   return (
@@ -578,6 +598,162 @@ export default function ProfilePage() {
                   </div>
                 )}
               </>
+            )}
+          </>
+        )}
+
+        {/* 🔗 Referral Tab */}
+        {activeTab === 'referral' && (
+          <>
+            {referralLoading ? (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm text-center">
+                <div className="text-gray-400">{locale === 'zh' ? '加载中...' : 'Loading...'}</div>
+              </div>
+            ) : !referralData ? (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm text-center">
+                <div className="text-4xl mb-4">📭</div>
+                <div className="text-gray-500">{locale === 'zh' ? '暂无数据' : 'No data yet'}</div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Share Card */}
+                <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 shadow-lg text-white">
+                  <div className="text-4xl mb-3">🎁</div>
+                  <h2 className="text-xl font-bold mb-2">
+                    {locale === 'zh' ? '邀请好友，一起学中文！' : 'Invite Friends, Learn Together!'}
+                  </h2>
+                  <p className="text-sm text-white/80 mb-4">
+                    {locale === 'zh'
+                      ? `每邀请一位好友注册并验证邮箱，你即可获得 ${referralData.stats.rewardAmount} 金币奖励！`
+                      : `Earn ${referralData.stats.rewardAmount} coins for each friend who signs up and verifies their email!`}
+                  </p>
+
+                  {referralData.stats.referralCode ? (
+                    <div className="space-y-3">
+                      {/* Referral Link */}
+                      <div>
+                        <label className="text-xs text-white/60 block mb-1">
+                          {locale === 'zh' ? '你的邀请链接' : 'Your referral link'}
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            readOnly
+                            value={`${typeof window !== 'undefined' ? window.location.origin : 'https://pandahan.xyz'}/register?ref=${referralData.stats.referralCode}`}
+                            className="flex-1 bg-white/15 border border-white/20 rounded-xl px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none"
+                          />
+                          <button
+                            onClick={() => {
+                              const url = `${window.location.origin}/register?ref=${referralData.stats.referralCode}`
+                              navigator.clipboard.writeText(url).then(() => {
+                                setCopyMsg(locale === 'zh' ? '✅ 已复制！' : '✅ Copied!')
+                                setTimeout(() => setCopyMsg(''), 2000)
+                              })
+                            }}
+                            className="px-4 py-2 bg-white text-purple-600 rounded-xl font-medium text-sm hover:bg-purple-50 transition-colors"
+                          >
+                            {copyMsg || (locale === 'zh' ? '复制' : 'Copy')}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Referral Code */}
+                      <div>
+                        <label className="text-xs text-white/60 block mb-1">
+                          {locale === 'zh' ? '邀请码' : 'Referral code'}
+                        </label>
+                        <div
+                          onClick={() => {
+                            navigator.clipboard.writeText(referralData.stats.referralCode!).then(() => {
+                              setCopyMsg(locale === 'zh' ? '✅ 已复制！' : '✅ Copied!')
+                              setTimeout(() => setCopyMsg(''), 2000)
+                            })
+                          }}
+                          className="inline-block bg-white/15 border border-white/20 rounded-xl px-4 py-2 cursor-pointer hover:bg-white/20 transition-colors"
+                        >
+                          <span className="text-lg font-bold tracking-widest">{referralData.stats.referralCode}</span>
+                          <span className="text-xs text-white/60 ml-2">({locale === 'zh' ? '点击复制' : 'tap to copy'})</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-white/60">
+                      {locale === 'zh' ? '正在生成邀请码...' : 'Generating referral code...'}
+                    </p>
+                  )}
+                </div>
+
+                {/* Share buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(
+                      locale === 'zh'
+                        ? `跟我一起学中文！使用邀请码 ${referralData.stats.referralCode} 注册，我们一起赚金币 🎉`
+                        : `Learn Chinese with me! Use code ${referralData.stats.referralCode} to sign up and we both earn coins 🎉`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-500 text-white rounded-xl p-4 text-center font-medium text-sm hover:bg-green-600 transition-colors"
+                  >
+                    💬 WhatsApp
+                  </a>
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                      locale === 'zh'
+                        ? `我正在用熊猫汉语学中文！用邀请码 ${referralData.stats.referralCode} 注册，我们一起赚金币！`
+                        : `I'm learning Chinese with Panda Chinese! Use code ${referralData.stats.referralCode} to sign up and we both earn coins!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-black text-white rounded-xl p-4 text-center font-medium text-sm hover:bg-gray-800 transition-colors"
+                  >
+                    𝕏 Twitter
+                  </a>
+                </div>
+
+                {/* Stats card */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                  <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                    <span>📊</span>
+                    {locale === 'zh' ? '邀请统计' : 'Referral Stats'}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-purple-600">{referralData.stats.totalReferrals}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {locale === 'zh' ? '已邀请用户' : 'Referred Users'}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-yellow-600">{referralData.stats.totalRewards}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {locale === 'zh' ? '已获奖励(次)' : 'Rewards Earned'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <div className="text-lg font-bold text-emerald-600">
+                      🪙 +{referralData.stats.totalRewards * referralData.stats.rewardAmount}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {locale === 'zh' ? '通过邀请获得的总金币' : 'Total coins earned from referrals'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* How it works */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
+                  <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
+                    <span>📖</span>
+                    {locale === 'zh' ? '奖励规则' : 'How It Works'}
+                  </h3>
+                  <ol className="space-y-2 text-sm text-gray-600 dark:text-gray-400 list-decimal list-inside">
+                    <li>{locale === 'zh' ? '分享你的邀请链接或邀请码给朋友' : 'Share your referral link or code with friends'}</li>
+                    <li>{locale === 'zh' ? '朋友使用你的邀请链接注册账号' : 'Your friend signs up using your referral link'}</li>
+                    <li>{locale === 'zh' ? '朋友验证邮箱后，你将获得金币奖励' : 'You earn coins when your friend verifies their email'}</li>
+                    <li>{locale === 'zh' ? `每位成功邀请奖励 ${referralData.stats.rewardAmount} 金币，多邀多得！` : `Earn ${referralData.stats.rewardAmount} coins per successful referral — the more you invite, the more you earn!`}</li>
+                  </ol>
+                </div>
+              </div>
             )}
           </>
         )}

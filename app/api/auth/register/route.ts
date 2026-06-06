@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createUser, setVerificationToken, getCoins, addCoins, addCoinHistory } from '@/lib/redis'
+import { createUser, setVerificationToken, getCoins, addCoins, addCoinHistory, getUserIdByReferralCode } from '@/lib/redis'
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth'
 import { sendVerificationEmail } from '@/lib/mail'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const { email, password, referralCode } = await request.json()
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
@@ -22,8 +22,14 @@ export async function POST(request: NextRequest) {
     // 每个账号使用独立 userId，不复用旧的
     const userId = `user-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 
+    // Look up invitedBy from referral code (if provided)
+    let invitedBy: string | null = null
+    if (referralCode && typeof referralCode === 'string') {
+      invitedBy = await getUserIdByReferralCode(referralCode)
+    }
+
     const passwordHash = await hashPassword(password)
-    const created = await createUser(userId, normalizedEmail, passwordHash)
+    const created = await createUser(userId, normalizedEmail, passwordHash, invitedBy)
 
     if (!created) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 })

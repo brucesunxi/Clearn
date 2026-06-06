@@ -12,7 +12,7 @@ interface UserEntry {
   userId: string; email: string; createdAt: string; emailVerified: boolean
 }
 
-type AdminTab = 'feedback' | 'activity' | 'users'
+type AdminTab = 'feedback' | 'activity' | 'users' | 'referral'
 type FeedbackFilter = 'all' | 'unread'
 
 const ACTION_META: Record<string, { emoji: string; label: string }> = {
@@ -46,6 +46,13 @@ export default function AdminFeedbackClient() {
   const [fbFilter, setFbFilter] = useState<FeedbackFilter>('all')
   const [fbLoading, setFbLoading] = useState(false)
   const [fbError, setFbError] = useState('')
+
+  // Referral config state
+  const [referralRewardAmount, setReferralRewardAmount] = useState(1000)
+  const [referralConfigLoading, setReferralConfigLoading] = useState(false)
+  const [referralConfigSaving, setReferralConfigSaving] = useState(false)
+  const [referralConfigMsg, setReferralConfigMsg] = useState('')
+  const [batchGenLoading, setBatchGenLoading] = useState(false)
 
   // Activity state
   const [actEntries, setActEntries] = useState<ActivityEntry[]>([])
@@ -126,6 +133,21 @@ export default function AdminFeedbackClient() {
   useEffect(() => {
     if (step === 'authenticated' && adminKey && tab === 'users') fetchUsers(usersPage)
   }, [step, adminKey, tab, usersPage, fetchUsers])
+
+  // Fetch referral config
+  useEffect(() => {
+    if (step !== 'authenticated' || tab !== 'referral') return
+    setReferralConfigLoading(true)
+    fetch('/api/admin/referral-config', { headers: { 'x-admin-key': adminKey } })
+      .then(r => r.json())
+      .then(data => {
+        if (data.config?.rewardAmount !== undefined) {
+          setReferralRewardAmount(data.config.rewardAmount)
+        }
+      })
+      .catch(() => setReferralConfigMsg('Failed to load config'))
+      .finally(() => setReferralConfigLoading(false))
+  }, [step, adminKey, tab])
 
   // ---- Auth ----
   const handleAuth = async () => {
@@ -211,12 +233,12 @@ export default function AdminFeedbackClient() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Tab bar */}
         <div className="flex items-center gap-2 mb-6 flex-wrap">
-          {(['feedback', 'activity', 'users'] as AdminTab[]).map((t) => (
+          {(['feedback', 'activity', 'users', 'referral'] as AdminTab[]).map((t) => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 tab === t ? 'bg-blue-500 text-white shadow-sm' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
               }`}>
-              {t === 'feedback' ? '💬 Feedback' : t === 'activity' ? '📊 Activity' : '👥 Users'}
+              {t === 'feedback' ? '💬 Feedback' : t === 'activity' ? '📊 Activity' : t === 'users' ? '👥 Users' : '🎁 Referral'}
             </button>
           ))}
           <div className="flex-1" />
@@ -466,6 +488,103 @@ export default function AdminFeedbackClient() {
                 <button onClick={() => setUsersPage((p) => Math.min(usersTotalPages, p + 1))} disabled={usersPage >= usersTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">Next →</button>
               </div>
             )}
+          </>
+        )}
+
+        {/* referral tab */}
+        {tab === 'referral' && (
+          <>
+            <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+              <h2 className="text-lg font-bold text-gray-800 mb-4">🎁 Referral Reward Settings</h2>
+
+              {referralConfigLoading ? (
+                <div className="text-gray-400 text-sm py-4">Loading...</div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Reward Amount (coins)</label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        min={0}
+                        max={100000}
+                        value={referralRewardAmount}
+                        onChange={(e) => setReferralRewardAmount(parseInt(e.target.value) || 0)}
+                        className="w-40 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      />
+                      <button
+                        onClick={async () => {
+                          setReferralConfigSaving(true)
+                          setReferralConfigMsg('')
+                          try {
+                            const res = await fetch('/api/admin/referral-config', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+                              body: JSON.stringify({ rewardAmount: referralRewardAmount }),
+                            })
+                            if (res.ok) {
+                              setReferralConfigMsg('✅ Config saved')
+                            } else {
+                              setReferralConfigMsg('❌ Failed to save')
+                            }
+                          } catch {
+                            setReferralConfigMsg('❌ Network error')
+                          } finally {
+                            setReferralConfigSaving(false)
+                            setTimeout(() => setReferralConfigMsg(''), 3000)
+                          }
+                        }}
+                        disabled={referralConfigSaving}
+                        className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 transition-colors"
+                      >
+                        {referralConfigSaving ? 'Saving...' : 'Save'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Coins awarded to the referrer when an invited user verifies their email.
+                    </p>
+                  </div>
+                  {referralConfigMsg && (
+                    <p className="text-sm text-green-600 bg-green-50 rounded-lg px-3 py-2">{referralConfigMsg}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 p-6">
+              <h2 className="text-lg font-bold text-gray-800 mb-4">🔄 Batch Operations</h2>
+              <p className="text-sm text-gray-500 mb-3">
+                Generate referral codes for existing users who don't have one yet.
+              </p>
+              <button
+                onClick={async () => {
+                  if (!confirm('Generate referral codes for all existing users without one?')) return
+                  setBatchGenLoading(true)
+                  try {
+                    const res = await fetch('/api/admin/referral-config', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+                      body: JSON.stringify({ action: 'batch-generate-codes' }),
+                    })
+                    const data = await res.json()
+                    if (res.ok) {
+                      setReferralConfigMsg(`✅ Generated ${data.generated} codes`)
+                    } else {
+                      setReferralConfigMsg('❌ Failed')
+                    }
+                  } catch {
+                    setReferralConfigMsg('❌ Network error')
+                  } finally {
+                    setBatchGenLoading(false)
+                    setTimeout(() => setReferralConfigMsg(''), 3000)
+                  }
+                }}
+                disabled={batchGenLoading}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-amber-500 text-white hover:bg-amber-600 disabled:bg-gray-300 transition-colors"
+              >
+                {batchGenLoading ? 'Generating...' : 'Generate Codes for Existing Users'}
+              </button>
+            </div>
           </>
         )}
       </div>

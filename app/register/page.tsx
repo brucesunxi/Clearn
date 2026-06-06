@@ -1,16 +1,19 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { useTranslation } from '@/lib/i18n/context'
 import VerifyWall from '@/components/VerifyWall'
 
-export default function RegisterPage() {
+function RegisterForm() {
   const { user, register } = useAuth()
-  const { t, locale } = useTranslation()
+  const { locale } = useTranslation()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const refCode = searchParams.get('ref')
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -49,11 +52,10 @@ export default function RegisterPage() {
     }
 
     setLoading(true)
-    const result = await register(email, password)
+    const result = await register(email, password, refCode || undefined)
     setLoading(false)
 
     if (result.success) {
-      // 注册成功转化追踪
       try {
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'conversion', {
@@ -63,11 +65,9 @@ export default function RegisterPage() {
           })
         }
       } catch(e) {}
-      // 如果已验证（极少情况），直接跳转
       if (result.emailVerified) {
         router.push('/')
       } else {
-        // 标记为刚注册，显示 verify wall
         setJustRegistered(true)
       }
     } else {
@@ -80,6 +80,14 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">Create Account</h1>
         <p className="text-sm text-gray-400 text-center mb-8">Join 熊猫汉语 and start learning!</p>
+
+        {refCode && (
+          <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
+            <p className="text-sm text-emerald-700 font-medium">
+              🎉 {locale === 'zh' ? '邀请注册 · 你和邀请人都可获得奖励！' : 'Invited! Both you and your inviter get a reward!'}
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -159,5 +167,17 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <div className="text-gray-400">Loading...</div>
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   )
 }
