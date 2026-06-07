@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   keywords: ['article selection', 'AI battle', 'vocabulary game', '选择文章', '对战'],
   openGraph: {
-    title: 'Article Selection 选择文章 - Panda Chinese',
+    title: 'Article Selection 选择文章 - PandaHan',
     description: 'Choose an article to start AI word battle. 选择文章开始AI单词对战。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   keywords: ['mystery box', 'blind box', 'pet rewards', '神秘盲盒', '宠物奖励'],
   openGraph: {
-    title: 'Mystery Box 神秘盲盒 - Panda Chinese',
+    title: 'Mystery Box 神秘盲盒 - PandaHan',
     description: 'Spend coins on mystery boxes to win pet food and accessories! 花费金币抽取盲盒，赢取宠物食物和饰品！',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

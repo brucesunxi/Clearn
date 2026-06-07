@@ -19,8 +19,8 @@ export function WebsiteJsonLd() {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: '熊猫汉语',
-    alternateName: 'Panda Chinese',
+    name: 'PandaHan',
+    alternateName: 'PandaHan',
     url: 'https://pandahan.xyz',
     description: '为海外华裔儿童打造的中文分级阅读平台',
     inLanguage: ['zh-CN', 'en'],
@@ -58,7 +58,7 @@ export function WebPageJsonLd({
     inLanguage: 'zh-CN',
     isPartOf: {
       '@type': 'WebSite',
-      name: '熊猫汉语',
+      name: 'PandaHan',
       url: 'https://pandahan.xyz',
     },
     ...(lastReviewed && { lastReviewed }),
@@ -75,7 +75,7 @@ export function ArticleJsonLd({
   image,
   datePublished,
   dateModified,
-  author = '熊猫汉语',
+  author = 'PandaHan',
   keywords = [],
 }: {
   title: string
@@ -103,7 +103,7 @@ export function ArticleJsonLd({
     },
     publisher: {
       '@type': 'Organization',
-      name: '熊猫汉语',
+      name: 'PandaHan',
       logo: {
         '@type': 'ImageObject',
         url: 'https://pandahan.xyz/favicon.svg',
@@ -121,8 +121,8 @@ export function EducationalOrganizationJsonLd() {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
-    name: '熊猫汉语',
-    alternateName: 'Panda Chinese',
+    name: 'PandaHan',
+    alternateName: 'PandaHan',
     url: 'https://pandahan.xyz',
     description: '为海外华裔儿童提供中文分级阅读学习的自学工具平台',
     areaServed: 'Worldwide',

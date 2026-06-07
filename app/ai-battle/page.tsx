@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   keywords: ['AI battle', 'Chinese vocabulary game', 'word battle', 'learn Chinese', 'AI单词对战', '词汇游戏'],
   openGraph: {
-    title: 'AI Word Battle AI单词对战 - Panda Chinese',
+    title: 'AI Word Battle AI单词对战 - PandaHan',
     description: 'Battle AI with Chinese vocabulary across different difficulty levels. 和 AI 比拼中文词汇。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

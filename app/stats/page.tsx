@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
   keywords: ['learning stats', 'progress tracking', 'vocabulary mastery', '学习统计', '进度追踪'],
   openGraph: {
-    title: 'Learning Stats 学习统计 - Panda Chinese',
+    title: 'Learning Stats 学习统计 - PandaHan',
     description: 'Track your Chinese learning progress. 查看你的中文学习进度和统计数据。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

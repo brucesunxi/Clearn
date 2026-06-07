@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import LoginPageClient from '@/components/LoginPageClient'
 
 export const metadata: Metadata = {
-  title: 'Sign In 登录 - Panda Chinese Account',
-  description: 'Sign in to your Panda Chinese account to continue your Chinese learning journey. 登录熊猫汉语账号，继续你的中文学习之旅。',
+  title: 'Sign In 登录 - PandaHan Account',
+  description: 'Sign in to your PandaHan account to continue your Chinese learning journey. 登录PandaHan账号，继续你的中文学习之旅。',
   alternates: {
     canonical: 'https://pandahan.xyz/login',
     languages: {
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     follow: false,
   },
   openGraph: {
-    title: 'Sign In 登录 - Panda Chinese',
+    title: 'Sign In 登录 - PandaHan',
     description: 'Sign in to continue learning. 登录账号继续学习。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

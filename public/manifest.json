@@ -1,6 +1,6 @@
 {
-  "name": "熊猫汉语 - 海外华裔儿童中文学习平台",
-  "short_name": "熊猫汉语",
+  "name": "PandaHan - 海外华裔儿童中文学习平台",
+  "short_name": "PandaHan",
   "description": "为海外华裔儿童打造的中文分级阅读平台，包含分级阅读、单词记忆、听力口语练习等模块。",
   "start_url": "/",
   "display": "standalone",

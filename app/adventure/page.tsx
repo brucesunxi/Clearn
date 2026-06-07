@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   keywords: ['adventure', 'panda quest', 'game', 'levels', 'chinese learning', '闯关'],
   openGraph: {
-    title: 'Adventure - Panda Chinese',
+    title: 'Adventure - PandaHan',
     description: 'Embark on adventures with your panda!',
     locale: 'en_US',
     alternateLocale: 'zh_CN',

@@ -11,12 +11,12 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
 
   // Mailtrap Sending API - 发送真实邮件
   const payload = {
-    from: { email: FROM_EMAIL, name: '熊猫汉语' },
+    from: { email: FROM_EMAIL, name: 'PandaHan' },
     to: [{ email: to }],
-    subject: '验证您的邮箱 - 熊猫汉语',
+    subject: '验证您的邮箱 - PandaHan',
     html: `
       <div style="max-width:480px;margin:40px auto;font-family:Arial,sans-serif;text-align:center">
-        <h1 style="color:#333;font-size:24px">🐼 熊猫汉语</h1>
+        <h1 style="color:#333;font-size:24px">🐼 PandaHan</h1>
         <p style="color:#666;font-size:15px;line-height:1.5">感谢您的注册！请点击下方按钮验证您的邮箱：</p>
         <a href="${link}"
            style="display:inline-block;padding:14px 40px;margin:28px 0;
@@ -25,7 +25,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
           验证邮箱
         </a>
         <p style="color:#999;font-size:13px">或复制以下链接到浏览器：<br>${link}</p>
-        <p style="color:#999;font-size:12px;margin-top:32px;border-top:1px solid #eee;padding-top:20px">此链接24小时内有效。如果您没有注册熊猫汉语，请忽略此邮件。</p>
+        <p style="color:#999;font-size:12px;margin-top:32px;border-top:1px solid #eee;padding-top:20px">此链接24小时内有效。如果您没有注册PandaHan，请忽略此邮件。</p>
       </div>
     `,
   }

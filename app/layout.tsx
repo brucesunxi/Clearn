@@ -13,8 +13,8 @@ import PwaInstallPrompt from '@/components/PwaInstallPrompt'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Panda Chinese 熊猫汉语',
-    default: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
+    template: '%s | PandaHan',
+    default: 'PandaHan - Learn Chinese Through Reading 分级阅读学中文',
   },
   description:
     'A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading, vocabulary drills, and listening practice. 为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     'HSK', 'Chinese reading', 'mandarin learning', 'learn mandarin'
   ],
   metadataBase: new URL('https://pandahan.xyz'),
-  authors: [{ name: 'Panda Chinese 熊猫汉语', url: 'https://pandahan.xyz' }],
-  creator: 'Panda Chinese 熊猫汉语',
-  publisher: 'Panda Chinese 熊猫汉语',
-  applicationName: 'Panda Chinese 熊猫汉语',
+  authors: [{ name: 'PandaHan', url: 'https://pandahan.xyz' }],
+  creator: 'PandaHan',
+  publisher: 'PandaHan',
+  applicationName: 'PandaHan',
   generator: 'Next.js',
   icons: {
     icon: '/favicon.svg',
@@ -39,16 +39,16 @@ export const metadata: Metadata = {
     ],
   },
   appleWebApp: {
-    title: '熊猫汉语',
+    title: 'PandaHan',
     statusBarStyle: 'default',
     capable: true,
   },
   manifest: '/manifest.json',
   openGraph: {
-    title: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
+    title: 'PandaHan - Learn Chinese Through Reading 分级阅读学中文',
     description: 'A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading! 为海外华裔儿童打造的中文分级阅读平台。',
     url: 'https://pandahan.xyz',
-    siteName: 'Panda Chinese 熊猫汉语',
+    siteName: 'PandaHan',
     locale: 'zh_CN',
     alternateLocale: 'en_US',
     type: 'website',
@@ -57,13 +57,13 @@ export const metadata: Metadata = {
         url: 'https://pandahan.xyz/images/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
+        alt: 'PandaHan - Learn Chinese Through Reading 分级阅读学中文',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading',
+    title: 'PandaHan - Learn Chinese Through Reading',
     description: 'A leveled Chinese reading platform for overseas children. 为海外华裔儿童打造的中文分级阅读平台。',
     images: ['https://pandahan.xyz/images/og-image.png'],
     creator: '@pandahanxyz',
@@ -104,7 +104,7 @@ export default function RootLayout({
       <head>
         <meta name="google-adsense-account" content="ca-pub-9711589934416529" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="熊猫汉语" />
+        <meta name="apple-mobile-web-app-title" content="PandaHan" />
         <link rel="apple-touch-startup-image" href="/icon-512x512.png" />
         <script
           dangerouslySetInnerHTML={{
@@ -173,7 +173,7 @@ fetch('https://www.googletagmanager.com/gtag/js?id=AW-18197467032', {method:'HEA
                 </Link>
               </div>
               <p className="text-center text-sm text-gray-400 dark:text-gray-500">
-                🐼 熊猫汉语
+                🐼 PandaHan
               </p>
             </div>
           </footer>

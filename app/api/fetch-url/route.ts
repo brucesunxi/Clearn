@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; PandaChinese/1.0; +https://pandahan.xyz)',
+        'User-Agent': 'Mozilla/5.0 (compatible; PandaHan/1.0; +https://pandahan.xyz)',
       },
       signal: controller.signal,
     })

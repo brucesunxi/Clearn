@@ -5,7 +5,7 @@ import { WebPageJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 
 export const metadata: Metadata = {
   title: 'Home 首页',
-  description: 'Panda Chinese - A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading, vocabulary drills, and listening practice. 熊猫汉语 - 为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
+  description: 'PandaHan - A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading, vocabulary drills, and listening practice. PandaHan - 为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
   alternates: {
     canonical: 'https://pandahan.xyz/',
     languages: {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Panda Chinese 熊猫汉语 - Learn Chinese Through Reading 分级阅读学中文',
+    title: 'PandaHan - Learn Chinese Through Reading 分级阅读学中文',
     description: 'A leveled Chinese reading platform for overseas children. 为海外华裔儿童打造的中文分级阅读平台，让学习中文变得有趣又简单。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',
@@ -26,7 +26,7 @@ export default function HomePage() {
   return (
     <>
       <WebPageJsonLd
-        title="Panda Chinese 熊猫汉语 - Learn Chinese Through Reading"
+        title="PandaHan - Learn Chinese Through Reading"
         description="A leveled Chinese reading platform for overseas children. Learn Chinese through fun reading!"
         url="https://pandahan.xyz/"
       />

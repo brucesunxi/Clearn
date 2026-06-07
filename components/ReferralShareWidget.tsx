@@ -311,8 +311,8 @@ export default function ReferralShareWidget() {
                     <a
                       href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
                         locale === 'zh'
-                          ? `我正在用熊猫汉语学中文！用邀请码 ${referralData.referralCode} 注册，我们一起赚金币！🎉\nhttps://pandahan.xyz/register?ref=${referralData.referralCode}`
-                          : `I'm learning Chinese with Panda Chinese! Use code ${referralData.referralCode} to sign up and we both earn coins! 🎉\nhttps://pandahan.xyz/register?ref=${referralData.referralCode}`
+                          ? `我正在用PandaHan学中文！用邀请码 ${referralData.referralCode} 注册，我们一起赚金币！🎉\nhttps://pandahan.xyz/register?ref=${referralData.referralCode}`
+                          : `I'm learning Chinese with PandaHan! Use code ${referralData.referralCode} to sign up and we both earn coins! 🎉\nhttps://pandahan.xyz/register?ref=${referralData.referralCode}`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"

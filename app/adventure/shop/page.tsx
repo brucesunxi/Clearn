@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   },
   keywords: ['shop', 'equipment', 'upgrade', '商店', '装备'],
   openGraph: {
-    title: 'Equipment Shop 装备商店 - Panda Chinese',
+    title: 'Equipment Shop 装备商店 - PandaHan',
     description: 'Buy equipment to power up your panda! 购买装备强化你的熊猫！',
   },
 }

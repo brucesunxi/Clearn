@@ -3,13 +3,13 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Contact Us 联系我们',
   description:
-    'Get in touch with the Panda Chinese team. We welcome your feedback and suggestions! 联系熊猫汉语团队，欢迎您的反馈和建议。',
+    'Get in touch with the PandaHan team. We welcome your feedback and suggestions! 联系PandaHan团队，欢迎您的反馈和建议。',
   alternates: {
     canonical: 'https://pandahan.xyz/contact',
   },
   openGraph: {
-    title: 'Contact Us 联系我们 - Panda Chinese 熊猫汉语',
-    description: 'Contact the Panda Chinese team. 联系熊猫汉语团队。',
+    title: 'Contact Us 联系我们 - PandaHan',
+    description: 'Contact the PandaHan team. 联系PandaHan团队。',
   },
 }
 
@@ -43,7 +43,7 @@ export default function ContactPage() {
             📬 Address 地址
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            Panda Chinese
+            PandaHan
             <br />
             Unit 903, 9/F, Cityplaza One
             <br />

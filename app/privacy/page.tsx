@@ -3,13 +3,13 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Privacy Policy 隐私政策',
   description:
-    'Privacy Policy for Panda Chinese. Learn how we collect, use, and protect your data. 熊猫汉语隐私政策，了解我们如何收集、使用和保护您的数据。',
+    'Privacy Policy for PandaHan. Learn how we collect, use, and protect your data. PandaHan隐私政策，了解我们如何收集、使用和保护您的数据。',
   alternates: {
     canonical: 'https://pandahan.xyz/privacy',
   },
   openGraph: {
-    title: 'Privacy Policy 隐私政策 - Panda Chinese 熊猫汉语',
-    description: 'Panda Chinese Privacy Policy. 熊猫汉语隐私政策。',
+    title: 'Privacy Policy 隐私政策 - PandaHan',
+    description: 'PandaHan Privacy Policy. PandaHan隐私政策。',
   },
 }
 

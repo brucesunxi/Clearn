@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   keywords: ['import content', 'custom materials', 'Chinese text', '导入内容', '自制内容'],
   openGraph: {
-    title: 'Import Content 导入内容 - Panda Chinese',
+    title: 'Import Content 导入内容 - PandaHan',
     description: 'Import Chinese text to create learning materials. 上传中文内容，自动生成学习素材。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

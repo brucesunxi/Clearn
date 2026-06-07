@@ -31,7 +31,7 @@ export default function LoginPageClient() {
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">Sign In</h1>
-        <p className="text-sm text-gray-400 text-center mb-8">Welcome back to 熊猫汉语</p>
+        <p className="text-sm text-gray-400 text-center mb-8">Welcome back to PandaHan</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

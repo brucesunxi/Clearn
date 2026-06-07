@@ -28,7 +28,7 @@ function RegisterForm() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            📝 {locale === 'zh' ? '欢迎加入熊猫汉语' : 'Welcome to Panda Chinese'}
+            📝 {locale === 'zh' ? '欢迎加入 PandaHan' : 'Welcome to PandaHan'}
           </h1>
           <p className="text-sm text-gray-400">
             {locale === 'zh' ? '验证邮箱后开始学习' : 'Verify your email to start learning'}
@@ -79,7 +79,7 @@ function RegisterForm() {
     <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-bold text-gray-800 text-center mb-2">Create Account</h1>
-        <p className="text-sm text-gray-400 text-center mb-8">Join 熊猫汉语 and start learning!</p>
+        <p className="text-sm text-gray-400 text-center mb-8">Join PandaHan and start learning!</p>
 
         {refCode && (
           <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-center">

@@ -31,7 +31,7 @@ export default function SiteLogo() {
         <circle cx="51" cy="38" r="3" fill="#FFB5B5" opacity="0.6" />
       </svg>
       <span className="text-xl font-bold text-gray-800" suppressHydrationWarning>
-        {locale === 'zh' ? '熊猫汉语' : 'Panda Chinese'}
+        PandaHan
       </span>
     </span>
   )

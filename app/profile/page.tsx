@@ -699,8 +699,8 @@ export default function ProfilePage() {
                   <a
                     href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
                       locale === 'zh'
-                        ? `我正在用熊猫汉语学中文！用邀请码 ${referralData.stats.referralCode} 注册，我们一起赚金币！`
-                        : `I'm learning Chinese with Panda Chinese! Use code ${referralData.stats.referralCode} to sign up and we both earn coins!`
+                        ? `我正在用PandaHan学中文！用邀请码 ${referralData.stats.referralCode} 注册，我们一起赚金币！`
+                        : `I'm learning Chinese with PandaHan! Use code ${referralData.stats.referralCode} to sign up and we both earn coins!`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

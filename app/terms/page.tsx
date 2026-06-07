@@ -3,13 +3,13 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Terms of Service 用户协议',
   description:
-    'Terms of Service for Panda Chinese. Please read these terms before using our platform. 熊猫汉语用户协议，使用前请阅读。',
+    'Terms of Service for PandaHan. Please read these terms before using our platform. PandaHan用户协议，使用前请阅读。',
   alternates: {
     canonical: 'https://pandahan.xyz/terms',
   },
   openGraph: {
-    title: 'Terms of Service 用户协议 - Panda Chinese 熊猫汉语',
-    description: 'Panda Chinese Terms of Service. 熊猫汉语用户协议。',
+    title: 'Terms of Service 用户协议 - PandaHan',
+    description: 'PandaHan Terms of Service. PandaHan用户协议。',
   },
 }
 
@@ -27,7 +27,7 @@ export default function TermsPage() {
             1. Service Description 服务说明
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            Panda Chinese (pandahan.xyz) is a self-study tool for learning Chinese vocabulary,
+            PandaHan (pandahan.xyz) is a self-study tool for learning Chinese vocabulary,
             reading, and listening skills. It is a self-service platform only and does NOT
             provide any of the following:
           </p>
@@ -39,7 +39,7 @@ export default function TermsPage() {
             <li>Academic certification or degrees / 学历认证或学位</li>
           </ul>
           <p className="text-gray-600 leading-relaxed mt-3">
-            熊猫汉语（pandahan.xyz）是中文词汇、阅读和听力的自学工具。本平台仅为
+            PandaHan（pandahan.xyz）是中文词汇、阅读和听力的自学工具。本平台仅为
             自助练习工具，<strong>不提供</strong>课程、授课、辅导或任何形式的
             教学活动。
           </p>
@@ -50,7 +50,7 @@ export default function TermsPage() {
             2. Acceptance of Terms 接受条款
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            By accessing or using Panda Chinese, you agree to be bound by these Terms of Service.
+            By accessing or using PandaHan, you agree to be bound by these Terms of Service.
             If you do not agree, please do not use the platform.
           </p>
         </section>
@@ -87,8 +87,8 @@ export default function TermsPage() {
             5. Intellectual Property 知识产权
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            All content on Panda Chinese, including articles, flashcards, and software,
-            is the property of Panda Chinese unless otherwise attributed. User-generated
+            All content on PandaHan, including articles, flashcards, and software,
+            is the property of PandaHan unless otherwise attributed. User-generated
             content (such as imported articles) remains the property of the user.
           </p>
         </section>
@@ -98,7 +98,7 @@ export default function TermsPage() {
             6. Disclaimer of Warranties 免责声明
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            Panda Chinese is provided &quot;as is&quot; without any warranty, express or implied.
+            PandaHan is provided &quot;as is&quot; without any warranty, express or implied.
             We do not guarantee that the platform will meet your learning goals or be
             available without interruption.
           </p>
@@ -109,7 +109,7 @@ export default function TermsPage() {
             7. Limitation of Liability 责任限制
           </h2>
           <p className="text-gray-600 leading-relaxed">
-            Panda Chinese shall not be liable for any indirect, incidental, or consequential
+            PandaHan shall not be liable for any indirect, incidental, or consequential
             damages arising from the use or inability to use the platform.
           </p>
         </section>

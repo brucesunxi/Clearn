@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   keywords: ['Chinese vocabulary', 'flashcards', 'spaced repetition', 'learn Chinese words', '单词记忆', '闪卡', '艾宾浩斯'],
   openGraph: {
-    title: 'Word Memorization 单词记忆 - Panda Chinese',
+    title: 'Word Memorization 单词记忆 - PandaHan',
     description: 'Master Chinese vocabulary with spaced repetition flashcards. 使用艾宾浩斯遗忘曲线科学记单词。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

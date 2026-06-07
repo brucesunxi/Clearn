@@ -43,10 +43,10 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     description: `Read Chinese: ${article.titleEn}. Learn ${article.vocabulary.length} new words. Level ${article.level}. 阅读中文文章「${article.title}」，学习${article.vocabulary.length}个生词。${level?.name ? `适合${level.name}水平。` : ''}`,
     keywords: keywords.join(', '),
     openGraph: {
-      title: `${article.titleEn} ${article.title} - Panda Chinese`,
+      title: `${article.titleEn} ${article.title} - PandaHan`,
       description: `Read ${article.titleEn}. ${article.vocabulary.length} words to learn. Perfect for overseas children learning Chinese. 阅读「${article.title}」，适合海外华裔儿童的中文分级阅读。`,
       type: 'article',
-      authors: ['Panda Chinese 熊猫汉语'],
+      authors: ['PandaHan'],
       publishedTime: new Date().toISOString(),
       section: level?.name || 'Chinese Reading 中文阅读',
       tags: ['Chinese learning', 'leveled reading', 'overseas Chinese', '中文学习', '分级阅读', '海外华裔', ...article.vocabulary.slice(0, 5).map(v => v.word)],
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${article.titleEn} ${article.title} - Panda Chinese`,
+      title: `${article.titleEn} ${article.title} - PandaHan`,
       description: `Read ${article.titleEn}. Perfect for children learning Chinese. 阅读「${article.title}」，适合海外华裔儿童的中文分级阅读。`,
     },
   }

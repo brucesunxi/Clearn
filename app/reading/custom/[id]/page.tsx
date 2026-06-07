@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: CustomArticlePageProps): Prom
     },
     description: `阅读导入的中文文章「${article.title}」(${article.titleEn})，学习${article.vocabulary.length}个生词。Read imported Chinese: ${article.titleEn}.`,
     openGraph: {
-      title: `${article.title} - 熊猫汉语`,
+      title: `${article.title} - PandaHan`,
       description: `阅读导入文章「${article.title}」- ${article.titleEn}，适合海外华裔儿童的中文分级阅读。`,
     },
     robots: {

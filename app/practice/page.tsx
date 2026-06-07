@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   keywords: ['Chinese listening', 'Chinese speaking', 'practice', 'learn Chinese', '听力口语', '练习'],
   openGraph: {
-    title: 'Listening & Speaking 听力口语 - Panda Chinese',
+    title: 'Listening & Speaking 听力口语 - PandaHan',
     description: 'Combined Chinese listening and speaking practice. 中文听力口语综合练习。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',

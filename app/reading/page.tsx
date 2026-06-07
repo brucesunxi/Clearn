@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: 'Leveled Chinese reading articles from beginner to advanced. Perfect for overseas children learning Chinese. 中文分级阅读文章，从启蒙到高级，适合不同年龄段的海外华裔儿童。',
   keywords: ['Chinese reading', 'leveled reading', 'learn Chinese', '中文阅读', '分级阅读', '学中文'],
   openGraph: {
-    title: 'Reading 阅读 - Panda Chinese 熊猫汉语',
+    title: 'Reading 阅读 - PandaHan',
     description: 'Leveled Chinese reading articles from beginner to advanced. 中文分级阅读文章，从启蒙到高级。',
     locale: 'zh_CN',
     alternateLocale: 'en_US',
