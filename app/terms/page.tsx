@@ -132,7 +132,7 @@ export default function TermsPage() {
             For questions about these terms, please contact:
           </p>
           <p className="text-gray-600 mt-2">
-            Email: <a href="mailto:support@pandahan.xyz" className="text-blue-500 hover:text-blue-600 underline">support@pandahan.xyz</a>
+            Email: <a href="mailto:sunxi0302@gmail.com" className="text-blue-500 hover:text-blue-600 underline">sunxi0302@gmail.com</a>
           </p>
         </section>
       </div>
