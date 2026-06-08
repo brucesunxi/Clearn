@@ -190,7 +190,7 @@ export default function Header() {
           <Link href="/stats" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">📊 {locale === 'zh' ? '统计' : 'Stats'}</Link>
           <Link href="/blindbox" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🎁 {locale === 'zh' ? '盲盒' : 'Box'}</Link>
           <Link href="/adventure" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🗺️ {locale === 'zh' ? '冒险' : 'Adventure'}</Link>
-          <Link href="/pet" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🐼 {locale === 'zh' ? '宠物' : 'Pet'}</Link>
+          <Link href="/pet" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5">🐼 {locale === 'zh' ? '伙伴' : 'Buddy'}</Link>
           {!isStandalone && (
             <button onClick={() => { setMenuOpen(false); handleAppClick(); }} className="block text-sm text-gray-600 dark:text-gray-300 py-1.5 w-full text-left">📱 {locale === 'zh' ? '下载 App' : 'Get App'}</button>
           )}

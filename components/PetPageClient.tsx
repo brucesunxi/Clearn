@@ -148,7 +148,7 @@ export default function PetPageClient() {
       <h1 className="text-3xl font-bold text-gray-800 mb-2">
         🐼 {locale === 'zh' ? '我的熊猫' : 'My Panda'}
       </h1>
-      <p className="text-gray-400 mb-6">{locale === 'zh' ? '照顾你的熊猫朋友吧！' : 'Take care of your panda friend!'}</p>
+      <p className="text-gray-400 mb-6">{locale === 'zh' ? '和熊猫伙伴一起学习吧！' : 'Play with your panda buddy!'}</p>
 
       {/* Coins display */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2 mb-4 flex items-center gap-2 text-sm">
@@ -258,13 +258,13 @@ export default function PetPageClient() {
             </div>
             <p className="mt-4 text-lg font-medium text-gray-700">{statusText}</p>
             <p className="text-xs text-gray-400 mt-1 cursor-pointer hover:text-pink-500 transition-colors" onClick={handlePet}>
-              👋 {locale === 'zh' ? '摸摸头 +3 😊' : 'Pet me +3 😊'}
+              👋 {locale === 'zh' ? '击掌 +3 😊' : 'High five +3 😊'}
             </p>
 
             {/* Hunger bar */}
             <div className="mt-4 text-left">
               <div className="flex justify-between text-xs text-gray-400 mb-1">
-                <span>🍚 {locale === 'zh' ? '饱食度' : 'Hunger'}</span>
+                <span>🍚 {locale === 'zh' ? '能量' : 'Energy'}</span>
                 <span>{hungerPct}%</span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-3">
@@ -281,7 +281,7 @@ export default function PetPageClient() {
             {/* Happiness bar */}
             <div className="mt-3 text-left">
               <div className="flex justify-between text-xs text-gray-400 mb-1">
-                <span>😊 {locale === 'zh' ? '快乐值' : 'Happiness'}</span>
+                <span>😊 {locale === 'zh' ? '心情' : 'Mood'}</span>
                 <span>{happinessPct}%</span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-3">
@@ -299,7 +299,7 @@ export default function PetPageClient() {
           {/* Feed section */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 className="text-base font-bold text-gray-800 mb-3">
-              🍽️ {locale === 'zh' ? '喂食' : 'Feed Panda'}
+              🍽️ {locale === 'zh' ? '互动' : 'Play'}
             </h3>
             {feedMsg && (
               <p className="text-sm text-green-600 mb-3 bg-green-50 rounded-lg px-3 py-2">{feedMsg}</p>

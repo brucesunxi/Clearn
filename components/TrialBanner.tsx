@@ -43,8 +43,8 @@ export default function TrialBanner({ type, onClose }: TrialBannerProps) {
             </p>
             <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
               {locale === 'zh'
-                ? '注册后获得 500 金币，学习赚金币，养熊猫、抽盲盒！'
-                : 'Get 500 coins on signup, earn more by learning, feed your panda and open blind boxes!'}
+                ? '注册后获得 500 金币，学习赚金币，领熊猫、抽盲盒！'
+                : 'Get 500 coins on signup, earn more by learning, get your panda and open blind boxes!'}
             </p>
             <div className="flex gap-2 mt-3">
               <Link

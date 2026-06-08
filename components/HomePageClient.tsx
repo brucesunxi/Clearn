@@ -401,8 +401,8 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
             </h2>
             <p className="text-sm text-gray-500 mb-3">
               {locale === 'zh'
-                ? '花费 100 金币试试手气！有机会抽到宠物食物、饰品，还有概率获得大礼包！'
-                : 'Spend 100 coins to try your luck! Win pet food, accessories, or rare grand prizes!'}
+                ? '花费 100 金币试试手气！有机会抽到食物、装饰，还有概率获得大礼包！'
+                : 'Spend 100 coins to try your luck! Win treats, accessories, or rare grand prizes!'}
             </p>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs">
               <span className="px-3 py-1.5 rounded-full bg-purple-100 text-purple-600 font-medium">🎋🥟🍙 {locale === 'zh' ? '食物' : 'Food'}</span>

@@ -200,8 +200,8 @@ export default function BlindBoxClient() {
               {locale === 'zh' ? '📋 查看奖池概率' : '📋 Prize pool odds'}
             </summary>
             <div className="mt-3 bg-white rounded-xl border border-gray-100 p-4 text-xs text-gray-500 space-y-1">
-              <p>🎋🥟🍙🧋 {locale === 'zh' ? '宠物食物' : 'Pet Food'} — ~37%</p>
-              <p>🧣🎩🎀👓📿👑 {locale === 'zh' ? '宠物饰品' : 'Pet Accessories'} — ~22%</p>
+              <p>🎋🥟🍙🧋 {locale === 'zh' ? '食物' : 'Treats'} — ~37%</p>
+              <p>🧣🎩🎀👓📿👑 {locale === 'zh' ? '装饰' : 'Accessories'} — ~22%</p>
               <p>🪙 {locale === 'zh' ? '金币返还' : 'Coin Rewards'} — ~13%</p>
               <p>🎉🎉👑 {locale === 'zh' ? '大礼包' : 'Grand Prize'} — ~4%</p>
               <p>🍂💇🗑️🧃🧦🪨 {locale === 'zh' ? '小垃圾' : 'Junk'} — ~24%</p>

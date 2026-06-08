@@ -28,7 +28,7 @@ const REASON_MAP: Record<string, { icon: string; label: string; labelZh: string 
   checkin: { icon: '✅', label: 'Check-in', labelZh: '签到' },
   box_open: { icon: '🎁', label: 'Blind Box', labelZh: '开盲盒' },
   box_prize: { icon: '🎁', label: 'Box Prize', labelZh: '盲盒奖励' },
-  pet_feed: { icon: '🍙', label: 'Feed Pet', labelZh: '喂食' },
+  pet_feed: { icon: '🍙', label: 'Play', labelZh: '互动' },
   shop_purchase: { icon: '🛒', label: 'Purchase', labelZh: '购买' },
   spend: { icon: '💸', label: 'Spend', labelZh: '消费' },
   earn: { icon: '💰', label: 'Earn', labelZh: '获得' },
@@ -518,7 +518,7 @@ export default function ProfilePage() {
                   {userStats.pet && (
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm">
                       <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">
-                        🐼 {locale === 'zh' ? '熊猫宠物' : 'Panda Pet'}
+                        🐼 {locale === 'zh' ? '熊猫伙伴' : 'Panda Buddy'}
                       </h2>
                       <div className="space-y-3 text-sm">
                         <div className="flex justify-between items-center">

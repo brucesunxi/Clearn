@@ -27,9 +27,11 @@ export default function AboutPage() {
             Ownership 所有权
           </h2>
           <p className="text-gray-600 leading-relaxed">
+            PandaHan is an online Chinese leveled reading platform for overseas children.
             This website pandahan.xyz is independently owned and operated by Sun Xi.
           </p>
           <p className="text-gray-600 leading-relaxed mt-3">
+            PandaHan 是一个面向海外华裔儿童的中文分级阅读平台。
             本网站 pandahan.xyz 由孙溪（Sun Xi）独立所有和运营。
           </p>
         </section>

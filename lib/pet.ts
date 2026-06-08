@@ -262,7 +262,7 @@ export function feedPet(foodId: string): { pet: PetState; inventory: Inventory; 
   return {
     pet: updatedPet,
     inventory: updatedInv,
-    message: `${item.name} +${item.effect.hunger || 0} hunger, +${item.effect.happiness || 0} happiness!`,
+    message: `${item.name} +${item.effect.hunger || 0} energy, +${item.effect.happiness || 0} mood!`,
   }
 }
 
@@ -361,10 +361,10 @@ export async function migratePetToRedis(userId: string): Promise<void> {
 
 export function petStatsText(pet: PetState): string {
   const { hunger, happiness } = pet
-  if (hunger <= 0) return '😵 Starving! Feed me!'
-  if (hunger <= 30) return '😟 Hungry...'
+  if (hunger <= 0) return '😵 Need a break...'
+  if (hunger <= 30) return '😟 Feeling low...'
   if (hunger <= 60) return '🙂 Okay'
-  if (happiness <= 0) return '😢 Very unhappy'
+  if (happiness <= 0) return '😢 Very down'
   if (happiness <= 30) return '😐 A bit bored'
   if (hunger >= 80 && happiness >= 80) return '🥰 Happy panda!'
   return '😊 Content'

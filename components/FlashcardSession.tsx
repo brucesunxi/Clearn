@@ -287,7 +287,7 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
         <div className="flex flex-wrap gap-2">
           <a href="/pet"
             className="flex-1 min-w-[100px] px-3 py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium text-center transition-colors">
-            🐼 {locale === 'zh' ? (correctCount > 0 ? '喂熊猫 +快乐' : '看看熊猫') : (correctCount > 0 ? 'Feed panda +happy' : 'Visit panda')}
+            🐼 {locale === 'zh' ? (correctCount > 0 ? '看熊猫 +加油' : '看看熊猫') : (correctCount > 0 ? 'Visit panda +cheer' : 'Visit panda')}
           </a>
           <a href="/practice"
             className="flex-1 min-w-[100px] px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium text-center transition-colors">
