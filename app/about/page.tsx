@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'About Us 关于我们',
   description:
-    'PandaHan (pandahan.xyz) is independently owned and operated by Sun Xi. PandaHan（pandahan.xyz）由孙曦独立所有和运营。',
+    'PandaHan (pandahan.xyz) is independently owned and operated by Sun Xi. PandaHan（pandahan.xyz）由孙溪独立所有和运营。',
   alternates: {
     canonical: 'https://pandahan.xyz/about',
   },
@@ -30,7 +30,7 @@ export default function AboutPage() {
             This website pandahan.xyz is independently owned and operated by Sun Xi.
           </p>
           <p className="text-gray-600 leading-relaxed mt-3">
-            本网站 pandahan.xyz 由孙曦（Sun Xi）独立所有和运营。
+            本网站 pandahan.xyz 由孙溪（Sun Xi）独立所有和运营。
           </p>
         </section>
 
