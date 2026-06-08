@@ -419,6 +419,39 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
           </div>
         </div>
       </Link>
+
+      {/* Compliance Footer */}
+      <div className="mt-16 pt-8 border-t border-gray-100">
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm">
+          <Link
+            href="/privacy"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            {locale === 'zh' ? '隐私政策' : 'Privacy Policy'}
+          </Link>
+          <Link
+            href="/contact"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            {locale === 'zh' ? '联系我们' : 'Contact Us'}
+          </Link>
+          <Link
+            href="/about"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            {locale === 'zh' ? '关于我们' : 'About Us'}
+          </Link>
+          <Link
+            href="/terms"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            {locale === 'zh' ? '用户协议' : 'Terms of Service'}
+          </Link>
+        </div>
+        <p className="text-center text-xs text-gray-300 dark:text-gray-600 mt-3">
+          &copy; {new Date().getFullYear()} PandaHan. {locale === 'zh' ? '保留所有权利。' : 'All rights reserved.'}
+        </p>
+      </div>
     </div>
   )
 }
