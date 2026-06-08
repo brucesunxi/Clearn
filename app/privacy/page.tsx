@@ -57,7 +57,7 @@ export default function PrivacyPage() {
           <p className="text-gray-600 leading-relaxed">
             We retain your account information for as long as your account is active.
             You may request deletion of your account and associated data by contacting us at
-            support@pandahan.xyz.
+            sunxi0302@gmail.com.
           </p>
         </section>
 
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
           </h2>
           <p className="text-gray-600 leading-relaxed">
             You have the right to access, correct, or delete your personal data at any time.
-            To exercise these rights, please contact us at support@pandahan.xyz.
+            To exercise these rights, please contact us at sunxi0302@gmail.com.
           </p>
         </section>
 
@@ -132,7 +132,7 @@ export default function PrivacyPage() {
             If you have any questions about this Privacy Policy, please contact us at:
           </p>
           <p className="text-gray-600 mt-2">
-            Email: <a href="mailto:support@pandahan.xyz" className="text-blue-500 hover:text-blue-600 underline">support@pandahan.xyz</a>
+            Email: <a href="mailto:sunxi0302@gmail.com" className="text-blue-500 hover:text-blue-600 underline">sunxi0302@gmail.com</a>
           </p>
         </section>
       </div>
