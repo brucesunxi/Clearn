@@ -247,10 +247,15 @@ export async function getAllUsers(): Promise<UserRecord[]> {
       const keys = result[1]
       for (const key of keys) {
         if (key.startsWith('user:email:')) continue
-        const raw = await redis.get<any>(key)
-        if (!raw) continue
-        const user = typeof raw === 'string' ? JSON.parse(raw) : raw as UserRecord
-        if (user.email) users.push(user)
+        try {
+          const raw = await redis.get<any>(key)
+          if (!raw) continue
+          const user = typeof raw === 'string' ? JSON.parse(raw) : raw as UserRecord
+          if (user.email) users.push(user)
+        } catch {
+          // 跳过损坏的用户记录，不影响其他用户
+          continue
+        }
       }
     } while (cursor !== 0)
   } catch {}
@@ -907,10 +912,14 @@ export async function getReferralStats(userId: string): Promise<{
         cursor = parseInt(result[0], 10)
         for (const key of result[1]) {
           if (key.startsWith('user:email:')) continue
-          const raw = await redis.get<any>(key)
-          if (!raw) continue
-          const u = typeof raw === 'string' ? JSON.parse(raw) : raw
-          if (u.invitedBy === userId) totalReferrals++
+          try {
+            const raw = await redis.get<any>(key)
+            if (!raw) continue
+            const u = typeof raw === 'string' ? JSON.parse(raw) : raw
+            if (u.invitedBy === userId) totalReferrals++
+          } catch {
+            continue
+          }
         }
       } while (cursor !== 0)
     } catch {}
@@ -936,14 +945,18 @@ export async function batchGenerateReferralCodes(): Promise<number> {
       cursor = parseInt(result[0], 10)
       for (const key of result[1]) {
         if (key.startsWith('user:email:')) continue
-        const raw = await redis.get<any>(key)
-        if (!raw) continue
-        const user = typeof raw === 'string' ? JSON.parse(raw) : raw as UserRecord
-        if (!user.referralCode) {
-          const code = await createReferralCode(user.userId)
-          user.referralCode = code
-          await redis.set(key, JSON.stringify(user))
-          generated++
+        try {
+          const raw = await redis.get<any>(key)
+          if (!raw) continue
+          const user = typeof raw === 'string' ? JSON.parse(raw) : raw as UserRecord
+          if (!user.referralCode) {
+            const code = await createReferralCode(user.userId)
+            user.referralCode = code
+            await redis.set(key, JSON.stringify(user))
+            generated++
+          }
+        } catch {
+          continue
         }
       }
     } while (cursor !== 0)
