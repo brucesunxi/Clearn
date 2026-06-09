@@ -225,7 +225,7 @@ export default function AdminFeedbackClient() {
   }
 
   const fbTotalPages = Math.max(1, Math.ceil(fbTotal / pageSize))
-  const actTotalPages = Math.max(1, Math.ceil(actTotal / pageSize))
+  const rawActTotalPages = Math.max(1, Math.ceil(actTotal / pageSize))
   const usersTotalPages = Math.max(1, Math.ceil(usersTotal / pageSize))
 
   return (
@@ -316,7 +316,11 @@ export default function AdminFeedbackClient() {
               </div>
             )}
             <div className="flex items-center gap-3 mb-4">
-              <p className="text-sm text-gray-400">Total: {actTotal}</p>
+              <p className="text-sm text-gray-400">
+                {actFilter || actDateFilter === 'recent'
+                  ? `Showing ${actEntries.filter((e) => (!actFilter || e.action === actFilter) && (actDateFilter !== 'recent' || new Date(e.createdAt) >= new Date(Date.now() - 2 * 24 * 60 * 60 * 1000))).length} of ${actTotal}`
+                  : `Total: ${actTotal}`}
+              </p>
               <select value={actFilter} onChange={(e) => { setActFilter(e.target.value); setActPage(1) }}
                 className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
                 <option value="">All actions</option>
@@ -387,11 +391,11 @@ export default function AdminFeedbackClient() {
                 })}
               </div>
             )}
-            {actTotalPages > 1 && (
+            {!actFilter && actDateFilter === 'all' && rawActTotalPages > 1 && (
               <div className="flex items-center justify-center gap-3 mt-6">
                 <button onClick={() => setActPage((p) => Math.max(1, p - 1))} disabled={actPage <= 1} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">← Prev</button>
-                <span className="text-xs text-gray-400">{actPage} / {actTotalPages}</span>
-                <button onClick={() => setActPage((p) => Math.min(actTotalPages, p + 1))} disabled={actPage >= actTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">Next →</button>
+                <span className="text-xs text-gray-400">{actPage} / {rawActTotalPages}</span>
+                <button onClick={() => setActPage((p) => Math.min(rawActTotalPages, p + 1))} disabled={actPage >= rawActTotalPages} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30">Next →</button>
               </div>
             )}
           </>

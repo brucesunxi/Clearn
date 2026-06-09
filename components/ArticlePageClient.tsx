@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { incrementReadingCount, getReadingRewardStatus, ReadingRewardStatus } from '@/lib/reading-reward'
 import ReadingRewardToast from './ReadingRewardToast'
 import { AdBanner } from '@/lib/adsense'
@@ -25,9 +25,16 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
   const [status, setStatus] = useState<ReadingRewardStatus | null>(null)
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
   const isFullAccess = user && user.emailVerified
+  // 防止 user 引用变化导致重复上报（auth-context 在 visibilitychange 时重新 fetchUser）
+  const hasTrackedRef = useRef<string | null>(null)
+  const articleId = article.id
 
   useEffect(() => {
     if (!user) return
+    // 同一篇文章只上报一次
+    if (hasTrackedRef.current === articleId) return
+    hasTrackedRef.current = articleId
+
     // 增加阅读计数并获取状态
     incrementReadingCount()
     const currentStatus = getReadingRewardStatus()

@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createActivity } from '@/lib/redis'
+import { getUserIdFromRequest } from '@/lib/auth'
 
 const VALID_ACTIONS = [
   'study_complete', 'quiz_complete', 'battle_complete',
   'listen_complete', 'speak_complete', 'checkin',
   'box_open', 'pet_feed', 'shop_purchase',
-  'article_read', 'material_import',
+  'article_read', 'material_import', 'intensive_listen',
+  'adventure_level_complete',
 ]
-
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0].trim()
-  return request.headers.get('x-real-ip') || 'unknown'
-}
 
 export async function POST(request: NextRequest) {
   try {
+    const uid = await getUserIdFromRequest(request)
+    if (!uid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { action, detail } = await request.json()
 
     if (!action || typeof action !== 'string') {
@@ -25,11 +26,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
-    const ip = getClientIp(request)
-
-    // Try to persist to Redis; silently succeed if unavailable
     await createActivity(
-      ip.slice(0, 100),
+      uid,
       action,
       typeof detail === 'string' ? detail.slice(0, 1000) : '',
     )

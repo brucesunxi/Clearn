@@ -553,6 +553,8 @@ function activityKey(id: string): string {
   return `activity:${id}`
 }
 
+const ACTIVITY_INDEX_MAX = 20000
+
 export async function createActivity(
   userId: string,
   action: string,
@@ -570,9 +572,19 @@ export async function createActivity(
   if (redis) {
     try {
       await redis.set(activityKey(entry.id), JSON.stringify(entry), { ex: ACTIVITY_TTL_SEC })
-      await appendToArrayIndex(redis, ACTIVITY_IDS_KEY, entry.id)
+      // 改用 RPUSH 原子追加，修复并发写入丢数据的问题
+      await redis.rpush(ACTIVITY_IDS_KEY, entry.id)
+      // 防止索引无限增长，只保留最近 20000 条
+      await redis.ltrim(ACTIVITY_IDS_KEY, -ACTIVITY_INDEX_MAX, -1)
     } catch {
-      // Redis unavailable, fallback to memory
+      // RPUSH 失败可能是因为旧管道符格式，删除旧 key 重建
+      try {
+        await redis.del(ACTIVITY_IDS_KEY)
+        await redis.rpush(ACTIVITY_IDS_KEY, entry.id)
+        await redis.ltrim(ACTIVITY_IDS_KEY, -ACTIVITY_INDEX_MAX, -1)
+      } catch {
+        // Redis unavailable, fallback to memory
+      }
     }
   }
 
@@ -600,28 +612,51 @@ export async function getActivityEntries(
   let total = 0
 
   if (redis) {
+    let ids: string[] = []
+
     try {
-      const ids = await readArrayIndex(redis, ACTIVITY_IDS_KEY)
-      total = ids.length
-      // 先反转让最新的在前面，再分页
-      const reversedIds = [...ids].reverse()
-      const start = (page - 1) * pageSize
-      const end = start + pageSize
-      const pageIds = reversedIds.slice(start, end)
-      if (pageIds.length > 0) {
-        const rawEntries = await Promise.all(
-          pageIds.map((id: string) => redis.get<string>(activityKey(id))),
-        )
-        entries = rawEntries
-          .filter((e) => e !== null && e !== undefined)
-          .map((e) => {
-            if (typeof e === 'string') return JSON.parse(e) as ActivityEntry
-            return e as unknown as ActivityEntry
-          })
-        return { entries, total }
+      // 新格式：Redis LIST（LLEN + LRANGE，O(L) 分页读取）
+      total = await redis.llen(ACTIVITY_IDS_KEY)
+      if (total > 0) {
+        const listStart = Math.max(0, total - page * pageSize)
+        const listEnd = total - (page - 1) * pageSize - 1
+        if (listStart <= listEnd) {
+          ids = await redis.lrange(ACTIVITY_IDS_KEY, listStart, listEnd)
+          ids.reverse() // 最新在前
+        }
       }
     } catch {
-      // Redis error, fallback to memory
+      // 旧格式兼容：管道符分隔的字符串
+      try {
+        const raw = await redis.get<string>(ACTIVITY_IDS_KEY)
+        if (raw) {
+          const allIds = raw.split('|').filter(Boolean)
+          total = allIds.length
+          const reversedIds = [...allIds].reverse()
+          const s = (page - 1) * pageSize
+          const e = s + pageSize
+          ids = reversedIds.slice(s, e)
+        }
+      } catch {
+        // 都不是，走内存 fallback
+      }
+    }
+
+    if (ids.length > 0) {
+      const rawEntries = await Promise.all(
+        ids.map((id: string) => redis.get<string>(activityKey(id))),
+      )
+      entries = rawEntries
+        .filter((e) => e !== null && e !== undefined)
+        .map((e) => {
+          if (typeof e === 'string') return JSON.parse(e) as ActivityEntry
+          return e as unknown as ActivityEntry
+        })
+      return { entries, total }
+    }
+    if (total > 0) {
+      // 有总数但没有命中分页（不应发生，兜底）
+      return { entries: [], total }
     }
   }
 
