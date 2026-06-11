@@ -18,50 +18,47 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
   const { user, loading } = useAuth()
   const articles = useCustomArticles(baseArticles)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
-  const [started, setStarted] = useState(false)
+  const [startedArticle, setStartedArticle] = useState<Article | null>(null)
+  const [artPage, setArtPage] = useState(0)
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
-  // Display: level-filtered only
   const displayArticles = selectedLevelId !== null
     ? articles.filter((a) => a.level === selectedLevelId)
     : articles
-  // Session uses all articles from the selected level
-  const sessionArticles = displayArticles
-
-  // Reset started when level changes
-  useEffect(() => { setStarted(false) }, [selectedLevelId])
 
   // 加载中
   if (loading) {
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
   }
 
-  if (started) {
+  if (startedArticle) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8">
         <button
-          onClick={() => setStarted(false)}
+          onClick={() => setStartedArticle(null)}
           className="mb-4 text-sm text-gray-500 hover:text-gray-700 transition-colors"
         >
           ← {locale === 'zh' ? '返回选文' : 'Back to articles'}
         </button>
-        <ListenSession key={selectedLevelId ?? 'all'} articles={sessionArticles} />
+        <ListenSession key={startedArticle.id} articles={[startedArticle]} />
       </div>
     )
   }
+
+  const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-1">🎧 {locale === 'zh' ? '听力练习' : 'Listening Practice'}</h1>
-        <p className="text-gray-400 text-sm">{locale === 'zh' ? '选择文章范围，听中文选英文' : 'Select articles, listen and choose the meaning'}</p>
+        <p className="text-gray-400 text-sm">{locale === 'zh' ? '选择文章开始听力练习' : 'Pick an article to practice listening'}</p>
       </div>
 
       {/* Level tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
-          onClick={() => { setSelectedLevelId(null) }}
+          onClick={() => { setSelectedLevelId(null); setArtPage(0) }}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
             selectedLevelId === null
               ? 'bg-gray-800 text-white shadow-sm'
@@ -73,7 +70,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         {levels.map((l) => (
           <button
             key={l.id}
-            onClick={() => setSelectedLevelId(selectedLevelId === l.id ? null : l.id)}
+            onClick={() => { setSelectedLevelId(selectedLevelId === l.id ? null : l.id); setArtPage(0) }}
             className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
               selectedLevelId === l.id
                 ? 'text-white shadow-sm'
@@ -93,33 +90,58 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         </div>
       )}
 
-      {/* Stats */}
-      {displayArticles.length > 0 ? (
-        <div className="mb-6 flex items-center gap-4 text-sm text-gray-500 justify-center">
-          <span>📚 {displayArticles.length} {locale === 'zh' ? '篇文章' : 'articles'}</span>
-          <span className="text-gray-300">·</span>
-          <span>📝 {displayArticles.reduce((s, a) => s + a.vocabulary.length, 0)} {locale === 'zh' ? '个单词' : 'words'}</span>
-        </div>
-      ) : (
-        <div className="mb-6 text-center py-12 text-gray-400">
+      {/* Article cards */}
+      {displayArticles.length === 0 ? (
+        <div className="text-center py-20 text-gray-400">
           <p className="text-5xl mb-4">🎧</p>
           <p className="text-lg">{locale === 'zh' ? '该范围暂无文章' : 'No articles found'}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          {displayArticles.slice(artPage * 4, (artPage + 1) * 4).map((article) => (
+            <button
+              key={article.id}
+              onClick={() => setStartedArticle(article)}
+              className="group text-left bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-blue-300 hover:ring-2 hover:ring-blue-200 transition-all overflow-hidden"
+            >
+              <div className="h-1.5" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }} />
+              <div className="p-4">
+                <div className="flex items-start gap-3 mb-2">
+                  <span className="text-2xl shrink-0">{article.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-bold text-gray-800 leading-tight group-hover:text-blue-600 transition-colors">{article.title}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{article.titleEn}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }}>L{article.level}</span>
+                  <span className="text-xs text-gray-400">📝 {article.vocabulary.length}</span>
+                  <span className="text-xs ml-auto text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">{locale === 'zh' ? '开始 →' : 'Start →'}</span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {Math.ceil(displayArticles.length / 4) > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-4 mb-2">
+          <button onClick={() => setArtPage((p) => Math.max(0, p - 1))} disabled={artPage === 0}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            ← {locale === 'zh' ? '上一页' : 'Prev'}
+          </button>
+          <span className="text-xs text-gray-400">{artPage + 1} / {Math.ceil(displayArticles.length / 4)}</span>
+          <button onClick={() => setArtPage((p) => Math.min(Math.ceil(displayArticles.length / 4) - 1, p + 1))} disabled={artPage >= Math.ceil(displayArticles.length / 4) - 1}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+            {locale === 'zh' ? '下一页' : 'Next'} →
+          </button>
         </div>
       )}
 
       {bannerType && (
         <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
       )}
-
-      {/* Start button */}
-      <button
-        onClick={() => {
-          setStarted(true)
-        }}
-        className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all"
-      >
-        {locale === 'zh' ? `🎧 开始听力 (${sessionArticles.length}篇)` : `🎧 Start Listening (${sessionArticles.length} articles)`}
-      </button>
     </div>
   )
 }
