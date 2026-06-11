@@ -25,6 +25,7 @@ export default function ReadingPageClient({
   const [mastered, setMastered] = useState(0)
   const [totalWords, setTotalWords] = useState(0)
   const [customArticles, setCustomArticles] = useState<Article[]>([])
+  const [artPage, setArtPage] = useState(0)
 
   useEffect(() => {
     setMastered(getMasteredCount())
@@ -107,19 +108,34 @@ export default function ReadingPageClient({
           <p className="text-lg">{t('reading.noArticles')}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {articles.map((article, index) => (
-            <>
-              <ArticleCardClient key={article.id} article={article} locale={locale} t={t} />
-              {/* Insert ad every 4 articles */}
-              {(index + 1) % 4 === 0 && index !== articles.length - 1 && (
-                <div className="col-span-1 sm:col-span-2 my-4">
-                  <AdBanner />
-                </div>
-              )}
-            </>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {articles.slice(artPage * 4, (artPage + 1) * 4).map((article, index) => (
+              <>
+                <ArticleCardClient key={article.id} article={article} locale={locale} t={t} />
+                {/* Insert ad every 4 articles */}
+                {(index + 1) % 4 === 0 && index !== articles.length - 1 && (
+                  <div className="col-span-1 sm:col-span-2 my-4">
+                    <AdBanner />
+                  </div>
+                )}
+              </>
+            ))}
+          </div>
+          {Math.ceil(articles.length / 4) > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-6">
+              <button onClick={() => setArtPage((p) => Math.max(0, p - 1))} disabled={artPage === 0}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                ← {locale === 'zh' ? '上一页' : 'Prev'}
+              </button>
+              <span className="text-xs text-gray-400">{artPage + 1} / {Math.ceil(articles.length / 4)}</span>
+              <button onClick={() => setArtPage((p) => Math.min(Math.ceil(articles.length / 4) - 1, p + 1))} disabled={artPage >= Math.ceil(articles.length / 4) - 1}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                {locale === 'zh' ? '下一页' : 'Next'} →
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Custom articles from imports */}
