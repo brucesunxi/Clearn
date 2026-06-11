@@ -18,7 +18,6 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
   const { user, loading } = useAuth()
   const articles = useCustomArticles(baseArticles)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
-  const [artPage, setArtPage] = useState(0)
   const [started, setStarted] = useState(false)
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
@@ -62,7 +61,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       {/* Level tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
-          onClick={() => { setSelectedLevelId(null); setArtPage(0) }}
+          onClick={() => { setSelectedLevelId(null) }}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
             selectedLevelId === null
               ? 'bg-gray-800 text-white shadow-sm'
@@ -94,58 +93,17 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         </div>
       )}
 
-      {/* Article grid */}
-      {displayArticles.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
-          <p className="text-5xl mb-4">🎧</p>
-          <p className="text-lg">{locale === 'zh' ? '该范围暂无文章' : 'No articles found'}</p>
+      {/* Stats */}
+      {displayArticles.length > 0 ? (
+        <div className="mb-6 flex items-center gap-4 text-sm text-gray-500 justify-center">
+          <span>📚 {displayArticles.length} {locale === 'zh' ? '篇文章' : 'articles'}</span>
+          <span className="text-gray-300">·</span>
+          <span>📝 {displayArticles.reduce((s, a) => s + a.vocabulary.length, 0)} {locale === 'zh' ? '个单词' : 'words'}</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          {displayArticles.slice(artPage * 4, (artPage + 1) * 4).map((article) => {
-            const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
-            const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
-            return (
-              <div key={article.id}
-                className="block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="h-1.5" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }} />
-                <div className="p-4">
-                  <div className="flex items-start gap-3 mb-2">
-                    <span className="text-2xl shrink-0">{article.emoji}</span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-base font-bold text-gray-800 leading-tight">{article.title}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">{article.titleEn}</p>
-                    </div>
-                  </div>
-                  {preview && (
-                    <p className="text-xs text-gray-400 line-clamp-2 mb-2 leading-relaxed">
-                      {preview}{preview.length >= 60 && '...'}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }}>
-                      L{article.level}
-                    </span>
-                    <span className="text-xs text-gray-400">📝 {article.vocabulary.length}</span>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-{Math.ceil(displayArticles.length / 4) > 1 && (
-        <div className="flex items-center justify-center gap-3 mt-4 mb-2">
-          <button onClick={() => setArtPage((p) => Math.max(0, p - 1))} disabled={artPage === 0}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-            ← {locale === 'zh' ? '上一页' : 'Prev'}
-          </button>
-          <span className="text-xs text-gray-400">{artPage + 1} / {Math.ceil(displayArticles.length / 4)}</span>
-          <button onClick={() => setArtPage((p) => Math.min(Math.ceil(displayArticles.length / 4) - 1, p + 1))} disabled={artPage >= Math.ceil(displayArticles.length / 4) - 1}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-            {locale === 'zh' ? '下一页' : 'Next'} →
-          </button>
+        <div className="mb-6 text-center py-12 text-gray-400">
+          <p className="text-5xl mb-4">🎧</p>
+          <p className="text-lg">{locale === 'zh' ? '该范围暂无文章' : 'No articles found'}</p>
         </div>
       )}
 
