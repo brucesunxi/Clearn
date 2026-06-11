@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useMemo, useState, useCallback } from 'react'
 import { incrementReadingCount, getReadingRewardStatus, ReadingRewardStatus } from '@/lib/reading-reward'
 import ReadingRewardToast from './ReadingRewardToast'
 import { AdBanner } from '@/lib/adsense'
@@ -15,6 +15,8 @@ import { useTranslation } from '@/lib/i18n/context'
 import TrialBanner from './TrialBanner'
 import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
 import SignupModal from './SignupModal'
+import { speak, cancelSpeech, pauseSpeech, resumeSpeech } from '@/lib/tts'
+import ReadAlongBar from './ReadAlongBar'
 
 interface ArticlePageClientProps {
   article: Article
@@ -50,6 +52,71 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
     markSignupModalShown()
   }
 
+  // ---- 整课跟读 ----
+  // Flat list of all sentences with their paragraph/sentence indices
+  type SentenceItem = { paraIdx: number; sentIdx: number; text: string }
+  const sentenceQueue = useMemo<SentenceItem[]>(() => {
+    const queue: SentenceItem[] = []
+    const paras = isFullAccess ? article.paragraphs : article.paragraphs.slice(0, Math.max(2, Math.ceil(article.paragraphs.length / 2)))
+    paras.forEach((p, pi) => {
+      const sentences = p.text.split(/(?<=[。！？!?])/).filter(Boolean)
+      sentences.forEach((s, si) => queue.push({ paraIdx: pi, sentIdx: si, text: s }))
+    })
+    return queue
+  }, [article.paragraphs, isFullAccess])
+
+  const [playState, setPlayState] = useState<'stopped' | 'playing' | 'paused'>('stopped')
+  const [currentSentenceIdx, setCurrentSentenceIdx] = useState(0)
+  const [playSpeed, setPlaySpeed] = useState(1)
+  const sentinelRefForReadAlong = useRef<HTMLDivElement>(null)
+
+  const sentenceHighlight = playState !== 'stopped' && sentenceQueue[currentSentenceIdx]
+    ? { paraIdx: sentenceQueue[currentSentenceIdx].paraIdx, sentIdx: sentenceQueue[currentSentenceIdx].sentIdx }
+    : null
+
+  const playSentence = useCallback((idx: number) => {
+    if (idx >= sentenceQueue.length) {
+      setPlayState('stopped')
+      setCurrentSentenceIdx(0)
+      return
+    }
+    setCurrentSentenceIdx(idx)
+    setPlayState('playing')
+    speak(sentenceQueue[idx].text, {
+      rate: playSpeed,
+      onEnd: () => playSentence(idx + 1),
+    })
+  }, [sentenceQueue, playSpeed])
+
+  const handlePlay = () => {
+    if (playState === 'paused') {
+      resumeSpeech()
+      setPlayState('playing')
+    } else {
+      if (currentSentenceIdx >= sentenceQueue.length) setCurrentSentenceIdx(0)
+      playSentence(currentSentenceIdx)
+    }
+  }
+
+  const handlePause = () => {
+    pauseSpeech()
+    setPlayState('paused')
+  }
+
+  const handleStop = () => {
+    cancelSpeech()
+    setPlayState('stopped')
+    setCurrentSentenceIdx(0)
+  }
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaySpeed(speed)
+    if (playState === 'playing' && currentSentenceIdx < sentenceQueue.length) {
+      cancelSpeech()
+      playSentence(currentSentenceIdx)
+    }
+  }
+
   useEffect(() => {
     if (!user) return
     // 同一篇文章只上报一次
@@ -75,7 +142,7 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <><div className="max-w-5xl mx-auto px-4 py-8">
       <ArticleBreadcrumb level={level} articleLevel={article.level} />
 
       {/* Reading reward toast only for full access */}
@@ -84,7 +151,7 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
       )}
 
       {/* Main content — preview for guests, full for others */}
-      <ArticleContent article={article} previewMode={!isFullAccess} />
+      <ArticleContent article={article} previewMode={!isFullAccess} sentenceHighlight={sentenceHighlight} />
 
       {/* 阅读滚动锚点：访客滚动到此处时弹出注册引导 */}
       {!isFullAccess && <div ref={sentinelRef} className="h-2" />}
@@ -145,5 +212,19 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
         <SignupModal type="register" locale={locale} onClose={handleSignupClose} />
       )}
     </div>
+
+      {/* 整课跟读控制条 */}
+      <ReadAlongBar
+        playState={playState}
+        speed={playSpeed}
+        current={currentSentenceIdx}
+        total={sentenceQueue.length}
+        locale={locale}
+        onPlay={handlePlay}
+        onPause={handlePause}
+        onStop={handleStop}
+        onSpeedChange={handleSpeedChange}
+      />
+    </>
   )
 }

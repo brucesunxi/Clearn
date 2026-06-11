@@ -70,7 +70,7 @@ async function speakViaServer(text: string): Promise<boolean> {
 
 // ---- Browser SpeechSynthesis (with Chrome bug fix) ----
 
-function browserSpeak(text: string, options?: { onEnd?: () => void }) {
+function browserSpeak(text: string, options?: { onEnd?: () => void; rate?: number }) {
   if (typeof window === 'undefined' || !text) return
 
   if (!voicesLoaded) {
@@ -86,7 +86,7 @@ function browserSpeak(text: string, options?: { onEnd?: () => void }) {
 
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'zh-CN'
-  utterance.rate = 0.9
+  utterance.rate = options?.rate ?? 0.9
   utterance.pitch = 1.0
   if (preferredVoice) utterance.voice = preferredVoice
 
@@ -94,8 +94,7 @@ function browserSpeak(text: string, options?: { onEnd?: () => void }) {
     utterance.onend = options.onEnd
   }
 
-  // Chrome bug workaround: speechSynthesis sometimes stops after ~15 utterances.
-  // Resetting by calling pause/resume prevents the silent bug.
+  // Chrome bug workaround
   window.speechSynthesis.speak(utterance)
 
   // Chrome bug: speechSynthesis pauses after being idle for a while
@@ -111,7 +110,12 @@ function browserSpeak(text: string, options?: { onEnd?: () => void }) {
 
 // ---- Public API ----
 
-export async function speak(text: string, options?: { onEnd?: () => void }) {
+export interface SpeakOptions {
+  onEnd?: () => void
+  rate?: number
+}
+
+export async function speak(text: string, options?: SpeakOptions) {
   if (!text) return
 
   // Try server-side TTS first (produces consistent high-quality audio)
@@ -128,5 +132,17 @@ export async function speak(text: string, options?: { onEnd?: () => void }) {
 export function cancelSpeech() {
   if (typeof window !== 'undefined') {
     window.speechSynthesis.cancel()
+  }
+}
+
+export function pauseSpeech() {
+  if (typeof window !== 'undefined' && window.speechSynthesis.speaking) {
+    window.speechSynthesis.pause()
+  }
+}
+
+export function resumeSpeech() {
+  if (typeof window !== 'undefined' && window.speechSynthesis.paused) {
+    window.speechSynthesis.resume()
   }
 }

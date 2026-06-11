@@ -9,9 +9,11 @@ import WordCard from './WordCard'
 interface ArticleContentProps {
   article: Article
   previewMode?: boolean
+  /** (paragraphIndex, sentenceIndex) of the sentence currently being read, or null */
+  sentenceHighlight?: { paraIdx: number; sentIdx: number } | null
 }
 
-export default function ArticleContent({ article, previewMode }: ArticleContentProps) {
+export default function ArticleContent({ article, previewMode, sentenceHighlight }: ArticleContentProps) {
   const { t, locale } = useTranslation()
   const [selectedWord, setSelectedWord] = useState<VocabularyItem | null>(null)
   const [showTranslations, setShowTranslations] = useState(false)
@@ -29,6 +31,11 @@ export default function ArticleContent({ article, previewMode }: ArticleContentP
       ),
     [article.vocabulary]
   )
+
+  // 将段落按标点拆分为句子
+  function splitSentences(text: string): string[] {
+    return text.split(/(?<=[。！？!?])/).filter(Boolean)
+  }
 
   const highlightText = (text: string): (string | VocabularyItem)[] => {
     const parts: (string | VocabularyItem)[] = []
@@ -95,7 +102,10 @@ export default function ArticleContent({ article, previewMode }: ArticleContentP
 
       {/* Paragraphs with sentence-level audio */}
       <div className="space-y-8">
-        {displayParagraphs.map((p, i) => (
+        {displayParagraphs.map((p, i) => {
+          const sentences = splitSentences(p.text)
+          const isHighlightedPara = sentenceHighlight?.paraIdx === i
+          return (
           <div key={i} className="group flex gap-2 items-start">
             {/* Speaker button — appears on hover */}
             <button
@@ -105,27 +115,37 @@ export default function ArticleContent({ article, previewMode }: ArticleContentP
                   ? 'bg-orange-100 text-orange-500 opacity-100'
                   : 'bg-gray-100 text-gray-400 hover:bg-orange-100 hover:text-orange-500'
               }`}
-              title={locale === 'zh' ? '朗读本句' : 'Read this sentence'}
+              title={locale === 'zh' ? '朗读本段' : 'Read this paragraph'}
             >
               {playingPara === i ? '🔊' : '🔈'}
             </button>
 
             <div className="flex-1">
               <p className="text-xl md:text-2xl leading-[2.4] text-gray-800 font-serif tracking-wide">
-                {highlightText(p.text).map((part, j) =>
-                  typeof part === 'string' ? (
-                    <span key={j}>{part}</span>
-                  ) : (
-                    <button
-                      key={j}
-                      onClick={() => setSelectedWord(part)}
-                      className="word-highlight inline"
-                      title={`${part.word} (${part.pinyin})`}
+                {sentences.map((sentence, si) => {
+                  const isHighlighted = isHighlightedPara && sentenceHighlight?.sentIdx === si
+                  return (
+                    <span
+                      key={si}
+                      className={isHighlighted ? 'bg-amber-100 rounded px-0.5' : ''}
                     >
-                      {part.word}
-                    </button>
+                      {highlightText(sentence).map((part, j) =>
+                        typeof part === 'string' ? (
+                          <span key={j}>{part}</span>
+                        ) : (
+                          <button
+                            key={j}
+                            onClick={() => setSelectedWord(part)}
+                            className="word-highlight inline"
+                            title={`${part.word} (${part.pinyin})`}
+                          >
+                            {part.word}
+                          </button>
+                        )
+                      )}
+                    </span>
                   )
-                )}
+                })}
               </p>
 
               {/* Translation */}
@@ -136,7 +156,8 @@ export default function ArticleContent({ article, previewMode }: ArticleContentP
               )}
             </div>
           </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Word popup */}
