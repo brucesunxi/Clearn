@@ -23,17 +23,14 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
   const articles = useCustomArticles(baseArticles)
   const [tab, setTab] = useState<Tab>('listen')
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
-  const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
   const [artPage, setArtPage] = useState(0)
 
-  // Display: level-filtered only (always show all articles in the grid)
+  // Display: level-filtered only
   const displayArticles = selectedLevelId !== null
     ? articles.filter((a) => a.level === selectedLevelId)
     : articles
-  // Session: use selected articles, or all if none selected
-  const sessionArticles = selectedArticleIds.length > 0
-    ? articles.filter((a) => selectedArticleIds.includes(a.id))
-    : displayArticles
+  // Session uses all articles from the selected level (no individual selection)
+  const sessionArticles = displayArticles
 
   const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
 
@@ -58,9 +55,9 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
 
       {/* Level tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
-        <button onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]); setArtPage(0) }}
+        <button onClick={() => { setSelectedLevelId(null); setArtPage(0) }}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-            selectedLevelId === null && selectedArticleIds.length === 0
+            selectedLevelId === null
               ? 'bg-gray-800 text-white shadow-sm' : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
           }`}>
           🌐 {locale === 'zh' ? '全部文章' : 'All Articles'}
@@ -78,38 +75,23 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
 
       {/* Article cards grid (collapsible) */}
       <div className="mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto">
-          {displayArticles.slice(artPage * 4, (artPage + 1) * 4).map((article) => {
-            const selected = selectedArticleIds.includes(article.id)
-            return (
-              <button key={article.id} onClick={() => {
-                setSelectedArticleIds((prev) =>
-                  prev.includes(article.id) ? prev.filter((id) => id !== article.id) : prev.length >= 3 ? prev : [...prev, article.id]
-                )
-              }}
-                className={`group text-left bg-white rounded-xl border shadow-sm transition-all overflow-hidden ${
-                  selected ? 'border-blue-400 ring-2 ring-blue-200' : 'border-gray-100 hover:border-blue-200'
-                }`}>
-                <div className="h-1" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }} />
-                <div className="p-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg shrink-0">{article.emoji}</span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-gray-800 leading-tight truncate">{article.title}</p>
-                      <p className="text-[10px] text-gray-400 truncate">{article.titleEn}</p>
-                    </div>
-                    <span className="text-xs">{selected ? '✅' : '☐'}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {displayArticles.slice(artPage * 4, (artPage + 1) * 4).map((article) => (
+            <div key={article.id}
+              className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="h-1" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }} />
+              <div className="p-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg shrink-0">{article.emoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-gray-800 leading-tight truncate">{article.title}</p>
+                    <p className="text-[10px] text-gray-400 truncate">{article.titleEn}</p>
                   </div>
                 </div>
-              </button>
-            )
-          })}
+              </div>
+            </div>
+          ))}
         </div>
-        {selectedArticleIds.length > 0 && (
-          <p className="mt-2 text-xs text-blue-600 font-medium">
-            {locale === 'zh' ? `已选 ${selectedArticleIds.length}/3 篇` : `${selectedArticleIds.length}/3 selected`}
-          </p>
-        )}
       </div>
 
 {Math.ceil(displayArticles.length / 4) > 1 && (
@@ -155,11 +137,11 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
 
       {/* Content */}
       {tab === 'listen' ? (
-        <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />
+        <ListenSession key={selectedLevelId ?? 'all'} articles={sessionArticles} />
       ) : tab === 'intensive' ? (
-        <IntensiveListening articles={sessionArticles} />
+        <IntensiveListening key={selectedLevelId ?? 'all'} articles={sessionArticles} />
       ) : (
-        <SpeakSession articles={sessionArticles} />
+        <SpeakSession key={selectedLevelId ?? 'all'} articles={sessionArticles} />
       )}
     </div>
   )

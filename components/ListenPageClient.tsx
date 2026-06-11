@@ -18,22 +18,19 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
   const { user, loading } = useAuth()
   const articles = useCustomArticles(baseArticles)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
-  const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
   const [artPage, setArtPage] = useState(0)
   const [started, setStarted] = useState(false)
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
-  // Display: level-filtered only (always show all articles in the grid)
+  // Display: level-filtered only
   const displayArticles = selectedLevelId !== null
     ? articles.filter((a) => a.level === selectedLevelId)
     : articles
-  // Session: use selected articles, or all if none selected
-  const sessionArticles = selectedArticleIds.length > 0
-    ? articles.filter((a) => selectedArticleIds.includes(a.id))
-    : displayArticles
+  // Session uses all articles from the selected level
+  const sessionArticles = displayArticles
 
-  // Reset started when selection changes
-  useEffect(() => { setStarted(false) }, [selectedLevelId, selectedArticleIds])
+  // Reset started when level changes
+  useEffect(() => { setStarted(false) }, [selectedLevelId])
 
   // 加载中
   if (loading) {
@@ -49,7 +46,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         >
           ← {locale === 'zh' ? '返回选文' : 'Back to articles'}
         </button>
-        <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />
+        <ListenSession key={selectedLevelId ?? 'all'} articles={sessionArticles} />
       </div>
     )
   }
@@ -65,9 +62,9 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       {/* Level tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
-          onClick={() => { setSelectedLevelId(null); setSelectedArticleIds([]); setArtPage(0) }}
+          onClick={() => { setSelectedLevelId(null); setArtPage(0) }}
           className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-            selectedLevelId === null && selectedArticleIds.length === 0
+            selectedLevelId === null
               ? 'bg-gray-800 text-white shadow-sm'
               : 'bg-white text-gray-500 hover:bg-gray-100 border border-gray-200'
           }`}
@@ -106,25 +103,11 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {displayArticles.slice(artPage * 4, (artPage + 1) * 4).map((article) => {
-            const selected = selectedArticleIds.includes(article.id)
             const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
             const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
             return (
-              <button
-                key={article.id}
-                onClick={() => {
-                  setSelectedArticleIds((prev) =>
-                    prev.includes(article.id)
-                      ? prev.filter((id) => id !== article.id)
-                      : prev.length >= 3 ? prev : [...prev, article.id]
-                  )
-                }}
-                className={`group block text-left bg-white rounded-xl border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden ${
-                  selected
-                    ? 'border-blue-400 ring-2 ring-blue-200'
-                    : 'border-gray-100 hover:border-blue-200'
-                }`}
-              >
+              <div key={article.id}
+                className="block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="h-1.5" style={{ backgroundColor: article.level ? lvlColors[article.level - 1] : '#999' }} />
                 <div className="p-4">
                   <div className="flex items-start gap-3 mb-2">
@@ -144,19 +127,12 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
                       L{article.level}
                     </span>
                     <span className="text-xs text-gray-400">📝 {article.vocabulary.length}</span>
-                    <span className="text-xs ml-auto">{selected ? '✅' : '☐'}</span>
                   </div>
                 </div>
-              </button>
+              </div>
             )
           })}
         </div>
-      )}
-
-      {selectedArticleIds.length > 0 && (
-        <p className="mb-3 text-xs text-blue-600 font-medium text-center">
-          {locale === 'zh' ? `已选 ${selectedArticleIds.length}/3 篇` : `${selectedArticleIds.length}/3 selected`}
-        </p>
       )}
 
 {Math.ceil(displayArticles.length / 4) > 1 && (
@@ -184,9 +160,7 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
         }}
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all"
       >
-        {selectedArticleIds.length > 0
-          ? (locale === 'zh' ? `🎧 开始听力 (${sessionArticles.length}篇)` : `🎧 Start Listening (${sessionArticles.length} articles)`)
-          : (locale === 'zh' ? '🎧 开始听力' : '🎧 Start Listening')}
+        {locale === 'zh' ? `🎧 开始听力 (${sessionArticles.length}篇)` : `🎧 Start Listening (${sessionArticles.length} articles)`}
       </button>
     </div>
   )
