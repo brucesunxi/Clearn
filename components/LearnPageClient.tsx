@@ -81,7 +81,16 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
   const [showCalendar, setShowCalendar] = useState(false)
   const [selectedLevelId, setSelectedLevelId] = useState<number | null>(null)
   const [selectedArticleIds, setSelectedArticleIds] = useState<string[]>([])
+  const [directStudy, setDirectStudy] = useState(false)
   const [artPage, setArtPage] = useState(0)
+
+  useEffect(() => {
+    const aid = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('articleId') : null
+    if (aid) {
+      setSelectedArticleIds([aid])
+      setDirectStudy(true)
+    }
+  }, [])
 
   const refreshStats = useCallback(() => {
     setGoalState(getDailyGoal())
@@ -239,7 +248,7 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
       <AdBanner />
 
       {/* Article level selector (like Reading) */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
+      {!directStudy && (<div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6">
         <h3 className="text-sm font-semibold text-gray-600 mb-3">
           📖 {locale === 'zh' ? '选择文章范围' : 'Select Articles'}
         </h3>
@@ -333,8 +342,9 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
           </div>
         )}
       </div>
+      )}
 
-{Math.ceil(levelFiltered.length / 4) > 1 && (
+{!directStudy && Math.ceil(levelFiltered.length / 4) > 1 && (
         <div className="flex items-center justify-center gap-3 mt-4 mb-2">
           <button onClick={() => setArtPage((p) => Math.max(0, p - 1))} disabled={artPage === 0}
             className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
@@ -349,11 +359,12 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
       )}
 
             {/* Article word count */}
-      <div className="mb-4 text-xs text-gray-400">
+      {!directStudy && (<div className="mb-4 text-xs text-gray-400">
         {locale === 'zh'
           ? `共 ${filteredArticles.reduce((s, a) => s + a.vocabulary.length, 0)} 个单词`
           : `${filteredArticles.reduce((s, a) => s + a.vocabulary.length, 0)} words total`}
       </div>
+      )}
 
       {/* Collapsible Check-in Calendar */}
       <div className="mb-6">
@@ -398,7 +409,7 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
 
       {/* Learning session */}
       {mode === 'flashcard' ? (
-        <FlashcardSession key={sessionKey} articles={filteredArticles} onComplete={handleSessionComplete} />
+        <FlashcardSession key={sessionKey} articles={filteredArticles} onComplete={handleSessionComplete} startImmediately={directStudy} />
       ) : (
         <QuizSession articles={filteredArticles} />
       )}

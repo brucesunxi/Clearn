@@ -115,7 +115,7 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
         <>
           <WordList vocabulary={article.vocabulary} articleId={article.id} />
           <div className="mt-8 text-center">
-            <ArticleStudyButton />
+            <ArticleStudyButton articleId={article.id} />
           </div>
         </>
       ) : user ? (
@@ -125,7 +125,7 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
             <WordList vocabulary={article.vocabulary} articleId={article.id} />
           </div>
           <div className="mt-8 text-center" onClick={() => setBannerType('verify')}>
-            <ArticleStudyButton />
+            <ArticleStudyButton articleId={article.id} />
           </div>
         </>
       ) : (
@@ -135,7 +135,7 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
             <WordList vocabulary={article.vocabulary} articleId={article.id} />
           </div>
           <div className="mt-8 text-center" onClick={() => setSignupShown(true)}>
-            <ArticleStudyButton />
+            <ArticleStudyButton articleId={article.id} />
           </div>
         </>
       )}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import Flashcard from './Flashcard'
 import type { Article, VocabularyItem } from '@/lib/types'
@@ -15,6 +15,7 @@ import SignupModal from './SignupModal'
 interface FlashcardSessionProps {
   articles: Article[]
   onComplete?: () => void
+  startImmediately?: boolean
 }
 
 interface SessionCard {
@@ -30,7 +31,7 @@ interface SessionCard {
 const EBBINGHAUS_INTERVALS = [0, 1, 2, 4, 7, 15, 30, 90]
 const MAX_ATTEMPTS = 3
 
-export default function FlashcardSession({ articles, onComplete }: FlashcardSessionProps) {
+export default function FlashcardSession({ articles, onComplete, startImmediately }: FlashcardSessionProps) {
   const { t, locale } = useTranslation()
   const { user } = useAuth()
   const [step, setStep] = useState<'config' | 'learning' | 'summary'>('config')
@@ -44,6 +45,35 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
   const [signupBlocked, setSignupBlocked] = useState(false)
 
   const wordDb = useMemo(() => buildWordDatabase(articles), [articles])
+
+  // 文章详情页点击学习时，跳过配置直接开始
+  useEffect(() => {
+    if (!startImmediately || wordDb.size === 0 || step !== 'config') return
+    const allCards: SessionCard[] = []
+    wordDb.forEach((v) => {
+      allCards.push({
+        id: v.word.word + '-' + v.articleId,
+        word: v.word,
+        articleId: v.articleId,
+        level: v.level || 1,
+        type: 'new' as const,
+        correct: null,
+        wrongCount: 0,
+      })
+    })
+    allCards.sort(() => Math.random() - 0.5)
+
+    if (allCards.length === 0) {
+      setStep('summary')
+      return
+    }
+
+    setCards(allCards)
+    setCurrentIndex(0)
+    setResults([])
+    setTotalStarted(allCards.length)
+    setStep('learning')
+  }, [startImmediately, wordDb, step])
 
   const startSession = useCallback(() => {
     const news = getNewWords(wordDb, newCount).map((w) => ({
