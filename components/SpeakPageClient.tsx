@@ -155,8 +155,6 @@ export default function SpeakPageClient({ levels, articles: baseArticles }: Spea
       )}
 
             <button onClick={() => {
-          if (!user) { setBannerType('register'); return }
-          if (!user.emailVerified) { setBannerType('verify'); return }
           setStarted(true)
         }}
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 shadow-sm transition-all">

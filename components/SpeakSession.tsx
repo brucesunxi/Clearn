@@ -5,6 +5,9 @@ import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
 import { addCoins, syncCoinsToApi } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
+import { useAuth } from '@/lib/auth-context'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
+import SignupModal from './SignupModal'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -28,6 +31,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function SpeakSession({ articles }: SpeakSessionProps) {
   const { t, locale } = useTranslation()
+  const { user } = useAuth()
   const [step, setStep] = useState<'config' | 'playing' | 'result'>('config')
   const [count, setCount] = useState(5)
   const [cards, setCards] = useState<SpeakCard[]>([])
@@ -37,6 +41,8 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
   const [result, setResult] = useState<boolean | null>(null)
   const [correct, setCorrect] = useState(0)
   const [coinsEarned, setCoinsEarned] = useState(0)
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
   const recognitionRef = useRef<any>(null)
   const resultsRef = useRef<{ card: SpeakCard; correct: boolean }[]>([])
 
@@ -49,13 +55,17 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
   }, [wordDb])
 
   const start = useCallback(() => {
+    if (!user && hasSignupModalBeenShown()) {
+      setSignupBlocked(true)
+      return
+    }
     const c = buildCards(count)
     if (!c.length) return
     setCards(c); setIdx(0); setCorrect(0); setCoinsEarned(0)
     resultsRef.current = []
     setStatus('idle'); setHeard(''); setResult(null)
     setStep('playing')
-  }, [buildCards, count])
+  }, [buildCards, count, user])
 
   const playWord = () => { if (cards[idx]) speak(cards[idx].word) }
 
@@ -101,12 +111,32 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
   }
 
   const next = () => {
+    // 访客完成 3 轮后弹出注册引导
+    if (idx === 2 && !user) {
+      if (hasSignupModalBeenShown()) {
+        setSignupBlocked(true)
+        return
+      }
+      setSignupShown(true)
+      return
+    }
     if (idx + 1 < cards.length) {
       setIdx((i) => i + 1); setHeard(''); setResult(null); setStatus('idle')
     } else {
       const earned = correct * 15 + 30
       addCoins(earned); syncCoinsToApi(earned, 'speak_complete', correct + '/' + cards.length + ' correct'); trackActivity('speak_complete', { correct, total: cards.length, coins: earned }); fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'speak_complete' }) }).catch(() => {}); setCoinsEarned(earned); setStep('result')
     }
+  }
+
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+    setIdx((i) => i + 1); setHeard(''); setResult(null); setStatus('idle')
+  }
+
+  // 访客弹窗覆盖（全局标记已设置，无法关闭）
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
   }
 
   if (step === 'config') {
@@ -133,7 +163,9 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
   if (step === 'playing') {
     const card = cards[idx]
     return (
-      <div>
+      <>
+        {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+        <div>
         <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
           <span>{idx + 1} / {cards.length}</span>
           <span>✅ {correct}</span>
@@ -198,6 +230,7 @@ export default function SpeakSession({ articles }: SpeakSessionProps) {
           )}
         </div>
       </div>
+      </>
     )
   }
 

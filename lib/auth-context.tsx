@@ -1,6 +1,8 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
+import { resetTrials } from './use-trial'
+import { clearSignupGuard } from './signup-guard'
 
 interface AuthUser {
   email: string
@@ -78,6 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await res.json()
       if (res.ok) {
         await fetchUser()
+        clearSignupGuard()
+        resetTrials()
         if (data.userId && typeof window !== 'undefined') {
           localStorage.setItem('chineselearn-user-id', data.userId)
         }
@@ -103,6 +107,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await res.json()
       if (res.ok) {
         await fetchUser()
+        clearSignupGuard()
+        resetTrials()
         if (data.userId && typeof window !== 'undefined') {
           localStorage.setItem('chineselearn-user-id', data.userId)
         }

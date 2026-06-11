@@ -5,6 +5,9 @@ import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
 import { addCoins, syncCoinsToApi } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
+import { useAuth } from '@/lib/auth-context'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
+import SignupModal from './SignupModal'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -29,6 +32,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function ListenSession({ articles }: ListenSessionProps) {
   const { t, locale } = useTranslation()
+  const { user } = useAuth()
   const [step, setStep] = useState<'config' | 'playing' | 'result'>('config')
   const [count, setCount] = useState(5)
   const [questions, setQuestions] = useState<ListenQuestion[]>([])
@@ -38,6 +42,8 @@ export default function ListenSession({ articles }: ListenSessionProps) {
   const [correct, setCorrect] = useState(0)
   const [coinsEarned, setCoinsEarned] = useState(0)
   const [answers, setAnswers] = useState<{ q: ListenQuestion; chosen: string; ok: boolean }[]>([])
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
   const hasPlayed = useRef(false)
 
   const wordDb = useMemo(() => buildWordDatabase(articles), [articles])
@@ -55,12 +61,17 @@ export default function ListenSession({ articles }: ListenSessionProps) {
   }, [wordDb])
 
   const start = useCallback(() => {
+    // 访客已弹过一次注册提示 → 直接封锁
+    if (!user && hasSignupModalBeenShown()) {
+      setSignupBlocked(true)
+      return
+    }
     const qs = buildQuestions(count)
     if (!qs.length) return
     setQuestions(qs); setIdx(0); setSelected(null); setRevealed(false)
     setCorrect(0); setCoinsEarned(0); setAnswers([]); setStep('playing')
     hasPlayed.current = false
-  }, [buildQuestions, count])
+  }, [buildQuestions, count, user])
 
   // Auto-play audio when question changes
   useEffect(() => {
@@ -86,12 +97,33 @@ export default function ListenSession({ articles }: ListenSessionProps) {
   }
 
   const next = () => {
+    // 访客答完 3 题后弹出注册引导
+    if (idx === 2 && !user) {
+      if (hasSignupModalBeenShown()) {
+        setSignupBlocked(true)
+        return
+      }
+      setSignupShown(true)
+      return
+    }
     if (idx + 1 < questions.length) {
       setIdx((i) => i + 1); setSelected(null); setRevealed(false)
     } else {
       const earned = correct * 10 + 20
       addCoins(earned); syncCoinsToApi(earned, 'listen_complete', correct + '/' + questions.length + ' correct'); trackActivity('listen_complete', { correct, total: questions.length, coins: earned }); fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'listen_complete' }) }).catch(() => {}); setCoinsEarned(earned); setStep('result')
     }
+  }
+
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+    // 关闭后可继续完成当前 session
+    setIdx((i) => i + 1); setSelected(null); setRevealed(false)
+  }
+
+  // 访客弹窗覆盖（全局标记已设置，无法关闭）
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
   }
 
   if (step === 'config') {
@@ -118,44 +150,47 @@ export default function ListenSession({ articles }: ListenSessionProps) {
   if (step === 'playing') {
     const q = questions[idx]
     return (
-      <div>
-        <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
-          <span>{idx + 1} / {questions.length}</span>
-          <span>✅ {correct}</span>
-        </div>
-        <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
-          <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${(idx / questions.length) * 100}%` }} />
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
-          <button onClick={replay} className="text-5xl mb-4 hover:scale-110 transition-transform cursor-pointer" title={locale === 'zh' ? '再听一次' : 'Listen again'}>
-            🔊
-          </button>
-          <p className="text-sm text-gray-400 mb-6">{locale === 'zh' ? '点击喇叭听发音，选择正确的意思' : 'Tap the speaker, then pick the correct meaning'}</p>
-
-          <div className="space-y-3">
-            {q.options.map((opt, i) => {
-              let cls = 'w-full py-3.5 rounded-xl text-base font-medium border-2 transition-all '
-              if (!revealed) cls += 'border-gray-100 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50'
-              else if (opt === q.meaning) cls += 'border-green-500 bg-green-50 text-green-700'
-              else if (opt === selected) cls += 'border-red-400 bg-red-50 text-red-600'
-              else cls += 'border-gray-100 bg-gray-50 text-gray-400'
-              return (
-                <button key={i} onClick={() => handleSelect(opt)} disabled={revealed} className={cls}>
-                  {opt}{revealed && opt === q.meaning && ' ✅'}{revealed && opt === selected && opt !== q.meaning && ' ❌'}
-                </button>
-              )
-            })}
+      <>
+        {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+        <div>
+          <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
+            <span>{idx + 1} / {questions.length}</span>
+            <span>✅ {correct}</span>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+            <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${(idx / questions.length) * 100}%` }} />
           </div>
 
-          {revealed && (
-            <button onClick={next}
-              className="mt-6 w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-base font-medium transition-colors">
-              {idx + 1 < questions.length ? (locale === 'zh' ? '下一题 →' : 'Next →') : (locale === 'zh' ? '查看成绩 📊' : 'See Results 📊')}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+            <button onClick={replay} className="text-5xl mb-4 hover:scale-110 transition-transform cursor-pointer" title={locale === 'zh' ? '再听一次' : 'Listen again'}>
+              🔊
             </button>
-          )}
+            <p className="text-sm text-gray-400 mb-6">{locale === 'zh' ? '点击喇叭听发音，选择正确的意思' : 'Tap the speaker, then pick the correct meaning'}</p>
+
+            <div className="space-y-3">
+              {q.options.map((opt, i) => {
+                let cls = 'w-full py-3.5 rounded-xl text-base font-medium border-2 transition-all '
+                if (!revealed) cls += 'border-gray-100 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50'
+                else if (opt === q.meaning) cls += 'border-green-500 bg-green-50 text-green-700'
+                else if (opt === selected) cls += 'border-red-400 bg-red-50 text-red-600'
+                else cls += 'border-gray-100 bg-gray-50 text-gray-400'
+                return (
+                  <button key={i} onClick={() => handleSelect(opt)} disabled={revealed} className={cls}>
+                    {opt}{revealed && opt === q.meaning && ' ✅'}{revealed && opt === selected && opt !== q.meaning && ' ❌'}
+                  </button>
+                )
+              })}
+            </div>
+
+            {revealed && (
+              <button onClick={next}
+                className="mt-6 w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-base font-medium transition-colors">
+                {idx + 1 < questions.length ? (locale === 'zh' ? '下一题 →' : 'Next →') : (locale === 'zh' ? '查看成绩 📊' : 'See Results 📊')}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 

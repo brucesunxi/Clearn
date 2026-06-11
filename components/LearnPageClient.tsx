@@ -397,16 +397,7 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
       )}
 
       {/* Learning session */}
-      {!user ? (
-        <div className="text-center py-8">
-          <p className="text-gray-400 mb-4 text-sm">
-            {locale === 'zh' ? '注册后即可开始闪卡学习和单词测验' : 'Sign up to start flashcards and quizzes'}
-          </p>
-          <TrialBanner type="register" />
-        </div>
-      ) : !user.emailVerified ? (
-        <TrialBanner type="verify" />
-      ) : mode === 'flashcard' ? (
+      {mode === 'flashcard' ? (
         <FlashcardSession key={sessionKey} articles={filteredArticles} onComplete={handleSessionComplete} />
       ) : (
         <QuizSession articles={filteredArticles} />

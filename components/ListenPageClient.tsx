@@ -180,8 +180,6 @@ export default function ListenPageClient({ levels, articles: baseArticles }: Lis
       {/* Start button */}
       <button
         onClick={() => {
-          if (!user) { setBannerType('register'); return }
-          if (!user.emailVerified) { setBannerType('verify'); return }
           setStarted(true)
         }}
         className="w-full py-3 rounded-xl text-base font-bold bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all"

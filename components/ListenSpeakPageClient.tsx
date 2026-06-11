@@ -154,11 +154,7 @@ export default function ListenSpeakPageClient({ levels, articles: baseArticles }
       )}
 
       {/* Content */}
-      {!user ? (
-        <TrialBanner type="register" />
-      ) : !user.emailVerified ? (
-        <TrialBanner type="verify" />
-      ) : tab === 'listen' ? (
+      {tab === 'listen' ? (
         <ListenSession key={selectedArticleIds.join(',') || 'all'} articles={sessionArticles} />
       ) : tab === 'intensive' ? (
         <IntensiveListening articles={sessionArticles} />

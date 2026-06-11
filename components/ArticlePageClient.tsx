@@ -13,6 +13,8 @@ import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
 import { useTranslation } from '@/lib/i18n/context'
 import TrialBanner from './TrialBanner'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
+import SignupModal from './SignupModal'
 
 interface ArticlePageClientProps {
   article: Article
@@ -28,6 +30,25 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
   // 防止 user 引用变化导致重复上报（auth-context 在 visibilitychange 时重新 fetchUser）
   const hasTrackedRef = useRef<string | null>(null)
   const articleId = article.id
+  const [signupShown, setSignupShown] = useState(false)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  // 阅读滚动监听：访客滚动到预览末尾时弹出注册引导
+  useEffect(() => {
+    if (isFullAccess || !sentinelRef.current) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !hasSignupModalBeenShown()) {
+        setSignupShown(true)
+      }
+    }, { threshold: 0.3 })
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [isFullAccess])
+
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+  }
 
   useEffect(() => {
     if (!user) return
@@ -65,6 +86,9 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
       {/* Main content — preview for guests, full for others */}
       <ArticleContent article={article} previewMode={!isFullAccess} />
 
+      {/* 阅读滚动锚点：访客滚动到此处时弹出注册引导 */}
+      {!isFullAccess && <div ref={sentinelRef} className="h-2" />}
+
       <AdBanner />
 
       {/* For guests: show register banner after content preview */}
@@ -86,14 +110,39 @@ export default function ArticlePageClient({ article, level }: ArticlePageClientP
         <TrialBanner type={bannerType} onClose={() => setBannerType(null)} />
       )}
 
-      {/* Vocabulary list and study button — full access only */}
-      {isFullAccess && (
+      {/* Vocabulary list and study button — 访客可见但点击弹窗 */}
+      {user && user.emailVerified ? (
         <>
           <WordList vocabulary={article.vocabulary} articleId={article.id} />
           <div className="mt-8 text-center">
             <ArticleStudyButton />
           </div>
         </>
+      ) : user ? (
+        // 已登录未验证 → 点学习按钮弹验证提示
+        <>
+          <div className="mt-8" onClick={() => setBannerType('verify')}>
+            <WordList vocabulary={article.vocabulary} articleId={article.id} />
+          </div>
+          <div className="mt-8 text-center" onClick={() => setBannerType('verify')}>
+            <ArticleStudyButton />
+          </div>
+        </>
+      ) : (
+        // 未登录访客 → 点学习按钮弹注册引导
+        <>
+          <div className="mt-8" onClick={() => setSignupShown(true)}>
+            <WordList vocabulary={article.vocabulary} articleId={article.id} />
+          </div>
+          <div className="mt-8 text-center" onClick={() => setSignupShown(true)}>
+            <ArticleStudyButton />
+          </div>
+        </>
+      )}
+
+      {/* 注册引导弹窗 */}
+      {signupShown && (
+        <SignupModal type="register" locale={locale} onClose={handleSignupClose} />
       )}
     </div>
   )
