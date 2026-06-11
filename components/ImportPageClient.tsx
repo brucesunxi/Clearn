@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/context'
 import type { Level, Article, Paragraph, VocabularyItem } from '@/lib/types'
@@ -11,7 +11,9 @@ import { getImportLimitStatus, incrementImportCount, IMPORT_CONFIG } from '@/lib
 import { useCoins } from '@/lib/use-coins'
 import ImportLimitModal from './ImportLimitModal'
 import { useAuth } from '@/lib/auth-context'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
 import TrialBanner from './TrialBanner'
+import SignupModal from './SignupModal'
 
 interface ImportPageClientProps {
   levels: Level[]
@@ -49,6 +51,8 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [limitStatus, setLimitStatus] = useState(getImportLimitStatus())
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
 
   const dict = useMemo(() => buildVocabDict(articles), [articles])
 
@@ -256,7 +260,14 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
   }
 
   const handleSaveClick = () => {
-    if (!user) { setBannerType('register'); return }
+    if (!user) {
+      if (hasSignupModalBeenShown()) {
+        setSignupBlocked(true)
+      } else {
+        setSignupShown(true)
+      }
+      return
+    }
     if (!user.emailVerified) { setBannerType('verify'); return }
     // 检查导入限制
     const status = getImportLimitStatus()
@@ -305,6 +316,11 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
     router.push(`/reading/custom/${id}`)
   }
 
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+  }
+
   const updateParagraph = (idx: number, field: 'text' | 'translation', value: string) => {
     setParagraphs((prev) => {
       const next = [...prev]
@@ -342,11 +358,17 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
     return <div className="max-w-3xl mx-auto px-4 py-8">Loading...</div>
   }
 
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
+  }
+
   // User and email verification are gated on save via banner
 
   if (step === 'input') {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <>
+        {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+        <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-1">
             📥 {locale === 'zh' ? '导入内容' : 'Import Content'}
@@ -564,15 +586,18 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
           <p className="mt-4 text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{error}</p>
         )}
       </div>
+      </>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <button
-          onClick={() => setStep('input')}
-          className="text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
+    <>
+      {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <button
+            onClick={() => setStep('input')}
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors mb-2"
         >
           ← {locale === 'zh' ? '返回编辑' : 'Back to edit'}
         </button>
@@ -846,5 +871,6 @@ export default function ImportPageClient({ levels, articles }: ImportPageClientP
         onEarnCoins={() => router.push('/learn')}
       />
     </div>
+    </>
   )
 }

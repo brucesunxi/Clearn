@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from '@/lib/i18n/context'
 import {
   getPet, getInventory, feedPet, buyFood, buyAccessory, toggleEquip,
@@ -9,7 +9,9 @@ import {
 import type { PetState, Inventory } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
 import TrialBanner from './TrialBanner'
+import SignupModal from './SignupModal'
 
 const ACCESSORY_POSITIONS: Record<string, { top: string; left: string; size: string }> = {
   red_scarf: { top: '62%', left: '40%', size: '28px' },
@@ -29,6 +31,9 @@ export default function PetPageClient() {
   const [feedMsg, setFeedMsg] = useState('')
   const [shopMsg, setShopMsg] = useState('')
   const [petHearts, setPetHearts] = useState<{ id: number; x: number }[]>([])
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
+  const hasInteracted = useRef(false)
 
   // Periodically recalculate decay for display (without saving, so accumulated decay isn't lost)
   useEffect(() => {
@@ -86,8 +91,13 @@ export default function PetPageClient() {
   }
 
   const handleFeed = (foodId: string) => {
-    if (!user) { setBannerType('register'); return }
-    if (!user.emailVerified) { setBannerType('verify'); return }
+    if (!user) {
+      if (hasInteracted.current) {
+        if (hasSignupModalBeenShown()) { setSignupBlocked(true); return }
+        setSignupShown(true); return
+      }
+      hasInteracted.current = true
+    } else if (!user.emailVerified) { setBannerType('verify'); return }
     const result = feedPet(foodId)
     setPet(result.pet)
     setInv(result.inventory)
@@ -97,8 +107,13 @@ export default function PetPageClient() {
   }
 
   const handleBuyFood = (foodId: string) => {
-    if (!user) { setBannerType('register'); return }
-    if (!user.emailVerified) { setBannerType('verify'); return }
+    if (!user) {
+      if (hasInteracted.current) {
+        if (hasSignupModalBeenShown()) { setSignupBlocked(true); return }
+        setSignupShown(true); return
+      }
+      hasInteracted.current = true
+    } else if (!user.emailVerified) { setBannerType('verify'); return }
     const ok = buyFood(foodId, 1)
     if (ok) {
       setInv(getInventory())
@@ -113,8 +128,13 @@ export default function PetPageClient() {
   }
 
   const handleBuyAccessory = (accId: string) => {
-    if (!user) { setBannerType('register'); return }
-    if (!user.emailVerified) { setBannerType('verify'); return }
+    if (!user) {
+      if (hasInteracted.current) {
+        if (hasSignupModalBeenShown()) { setSignupBlocked(true); return }
+        setSignupShown(true); return
+      }
+      hasInteracted.current = true
+    } else if (!user.emailVerified) { setBannerType('verify'); return }
     const ok = buyAccessory(accId)
     if (ok) {
       setInv(getInventory())
@@ -136,6 +156,12 @@ export default function PetPageClient() {
   const statusText = petStatsText(pet)
   const hungerPct = pet.hunger
   const happinessPct = pet.happiness
+
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+  }
+
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
 
   // 登录检查
@@ -143,12 +169,18 @@ export default function PetPageClient() {
     return <div className="max-w-lg mx-auto px-4 py-8">Loading...</div>
   }
 
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
+  }
+
   return (
-    <div className="max-w-lg mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">
-        🐼 {locale === 'zh' ? '我的熊猫' : 'My Panda'}
-      </h1>
-      <p className="text-gray-400 mb-6">{locale === 'zh' ? '和熊猫伙伴一起学习吧！' : 'Play with your panda buddy!'}</p>
+    <>
+      {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+      <div className="max-w-lg mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          🐼 {locale === 'zh' ? '我的熊猫' : 'My Panda'}
+        </h1>
+        <p className="text-gray-400 mb-6">{locale === 'zh' ? '和熊猫伙伴一起学习吧！' : 'Play with your panda buddy!'}</p>
 
       {/* Coins display */}
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2 mb-4 flex items-center gap-2 text-sm">
@@ -436,5 +468,6 @@ export default function PetPageClient() {
         </>
       )}
     </div>
+    </>
   )
 }

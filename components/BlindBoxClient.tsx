@@ -7,7 +7,9 @@ import type { DrawnPrize } from '@/lib/blindbox'
 import { trackActivity } from '@/lib/activity'
 import { useAuth } from '@/lib/auth-context'
 import { useCoins } from '@/lib/use-coins'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
 import TrialBanner from './TrialBanner'
+import SignupModal from './SignupModal'
 
 const BOX_COST = 100
 
@@ -61,9 +63,14 @@ export default function BlindBoxClient() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [message, setMessage] = useState('')
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
 
   const handleBuyBoxes = async () => {
-    if (!user) { setBannerType('register'); return }
+    if (!user) {
+      if (hasSignupModalBeenShown()) { setSignupBlocked(true); return }
+      setSignupShown(true); return
+    }
     if (!user.emailVerified) { setBannerType('verify'); return }
     if (coins < BOX_COST) {
       setMessage(locale === 'zh' ? '金币不足！去学习或完成练习赚取金币吧' : 'Not enough coins! Study or complete exercises to earn coins.')
@@ -136,6 +143,14 @@ export default function BlindBoxClient() {
     await syncPetToApi()
     trackActivity('box_open', { prizeType: prize.type, prizeId: prize.itemId || '', coinsCost: BOX_COST })
     setMessage(locale === 'zh' ? `恭喜获得 ${prize.emoji} ${prize.nameZh}！` : `You got ${prize.emoji} ${prize.nameEn}!`)
+    if (!user && !hasSignupModalBeenShown()) {
+      setSignupShown(true)
+    }
+  }
+
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
   }
 
   const handleTryAgain = () => {
@@ -149,8 +164,13 @@ export default function BlindBoxClient() {
     return <div className="max-w-lg mx-auto px-4 py-8">Loading...</div>
   }
 
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
+  }
+
   return (
     <div className="max-w-lg mx-auto px-4 py-8">
+      {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
       {/* Header */}
       <div className="text-center mb-8">
         <p className="text-5xl mb-3">🎁</p>

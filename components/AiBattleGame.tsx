@@ -9,7 +9,9 @@ import { useCoins } from '@/lib/use-coins'
 import { spendCoins, addCoins, syncCoinsToApi } from '@/lib/pet'
 import { AdInterstitial } from '@/lib/adsense'
 import { useAuth } from '@/lib/auth-context'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
 import TrialBanner from './TrialBanner'
+import SignupModal from './SignupModal'
 
 type AiLevel = 'easy' | 'medium' | 'hard' | 'hell'
 
@@ -162,10 +164,16 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   const [userTime, setUserTime] = useState(0)
   const [aiTime, setAiTime] = useState(0)
   const [bannerType, setBannerType] = useState<'register' | 'verify' | null>(null)
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
 
   // 登录检查
   if (loading) {
     return <div className="max-w-2xl mx-auto px-4 py-8">Loading...</div>
+  }
+
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
   }
 
   const roundStartRef = useRef(0)
@@ -183,7 +191,14 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   }, [])
 
   const startBattle = async () => {
-    if (!user) { setBannerType('register'); return }
+    if (!user) {
+      if (hasSignupModalBeenShown()) {
+        setSignupBlocked(true)
+      } else {
+        setSignupShown(true)
+      }
+      return
+    }
     if (!user.emailVerified) { setBannerType('verify'); return }
     const config = AI_CONFIGS[aiLevel]
 
@@ -290,6 +305,15 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   }
 
   const handleNext = () => {
+    // 访客打 3 回合后弹出注册引导
+    if (round === 2 && !user) {
+      if (hasSignupModalBeenShown()) {
+        setSignupBlocked(true)
+      } else {
+        setSignupShown(true)
+      }
+      return
+    }
     const next = round + 1
     if (next >= totalRounds) {
       cleanup()
@@ -320,6 +344,14 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
       setPhase('result')
       return
     }
+    setRound(next)
+    pickWord()
+  }
+
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+    const next = round + 1
     setRound(next)
     pickWord()
   }
@@ -693,7 +725,9 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
   const progress = (round / totalRounds) * 100
 
   return (
-    <div className="bg-gradient-to-br from-orange-50 via-white to-amber-50 rounded-2xl border-2 border-orange-200 p-6 md:p-8">
+    <>
+      {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+      <div className="bg-gradient-to-br from-orange-50 via-white to-amber-50 rounded-2xl border-2 border-orange-200 p-6 md:p-8">
       {/* Progress bar */}
       <div className="mb-4">
         <div className="flex justify-between text-xs text-gray-400 mb-1.5">
@@ -826,6 +860,7 @@ export default function AiBattleGame({ articles = [] }: { articles?: Article[] }
             : (locale === 'zh' ? '下一题 →' : 'Next →')}
         </button>
       )}
-    </div>
+      </div>
+    </>
   )
 }

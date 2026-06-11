@@ -5,6 +5,9 @@ import { useTranslation } from '@/lib/i18n/context'
 import { speak } from '@/lib/tts'
 import { addCoins, syncCoinsToApi } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
+import { useAuth } from '@/lib/auth-context'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
+import SignupModal from './SignupModal'
 import type { Article } from '@/lib/types'
 import { buildWordDatabase } from '@/lib/words'
 
@@ -31,7 +34,8 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function QuizSession({ articles }: QuizSessionProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const { user } = useAuth()
   const [step, setStep] = useState<'config' | 'playing' | 'result'>('config')
   const [quizType, setQuizType] = useState<QuizType>('zh2en')
   const [questionCount, setQuestionCount] = useState(5)
@@ -42,6 +46,8 @@ export default function QuizSession({ articles }: QuizSessionProps) {
   const [correctCount, setCorrectCount] = useState(0)
   const [coinsEarned, setCoinsEarned] = useState(0)
   const [answers, setAnswers] = useState<{ question: Question; chosen: string; correct: boolean }[]>([])
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
 
   const wordDb = useMemo(() => buildWordDatabase(articles), [articles])
 
@@ -111,6 +117,15 @@ export default function QuizSession({ articles }: QuizSessionProps) {
   }
 
   const nextQuestion = () => {
+    // 访客答完 3 题后弹出注册引导
+    if (currentIndex === 2 && !user) {
+      if (hasSignupModalBeenShown()) {
+        setSignupBlocked(true)
+      } else {
+        setSignupShown(true)
+      }
+      return
+    }
     if (currentIndex + 1 < questions.length) {
       setCurrentIndex((i) => i + 1)
       setSelected(null)
@@ -127,7 +142,19 @@ export default function QuizSession({ articles }: QuizSessionProps) {
     }
   }
 
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+    setCurrentIndex((i) => i + 1)
+    setSelected(null)
+    setShowResult(false)
+  }
+
   const playWord = (word: string) => speak(word)
+
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
+  }
 
   // Config screen
   if (step === 'config') {
@@ -198,7 +225,9 @@ export default function QuizSession({ articles }: QuizSessionProps) {
     const prompt = quizType === 'zh2en' ? q.word : q.correctMeaning
 
     return (
-      <div>
+      <>
+        {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+        <div>
         {/* Progress bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
@@ -277,6 +306,7 @@ export default function QuizSession({ articles }: QuizSessionProps) {
           )}
         </div>
       </div>
+      </>
     )
   }
 

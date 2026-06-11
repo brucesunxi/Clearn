@@ -8,6 +8,9 @@ import { buildWordDatabase, getNewWords, getReviewWords, recordAnswer } from '@/
 import { doCheckIn, incrementTodayProgress } from '@/lib/checkin'
 import { addCoins, syncCoinsToApi } from '@/lib/pet'
 import { trackActivity } from '@/lib/activity'
+import { useAuth } from '@/lib/auth-context'
+import { hasSignupModalBeenShown, markSignupModalShown } from '@/lib/signup-guard'
+import SignupModal from './SignupModal'
 
 interface FlashcardSessionProps {
   articles: Article[]
@@ -29,6 +32,7 @@ const MAX_ATTEMPTS = 3
 
 export default function FlashcardSession({ articles, onComplete }: FlashcardSessionProps) {
   const { t, locale } = useTranslation()
+  const { user } = useAuth()
   const [step, setStep] = useState<'config' | 'learning' | 'summary'>('config')
   const [newCount, setNewCount] = useState(5)
   const [reviewCount, setReviewCount] = useState(5)
@@ -36,6 +40,8 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
   const [currentIndex, setCurrentIndex] = useState(0)
   const [results, setResults] = useState<SessionCard[]>([])
   const [totalStarted, setTotalStarted] = useState(0)
+  const [signupShown, setSignupShown] = useState(false)
+  const [signupBlocked, setSignupBlocked] = useState(false)
 
   const wordDb = useMemo(() => buildWordDatabase(articles), [articles])
 
@@ -67,6 +73,12 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
     setStep('learning')
   }, [wordDb, newCount, reviewCount])
 
+  const handleSignupClose = () => {
+    setSignupShown(false)
+    markSignupModalShown()
+    setCurrentIndex(currentIndex + 1)
+  }
+
   const handleResult = useCallback(
     (correct: boolean) => {
       const idx = currentIndex
@@ -88,6 +100,10 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
           fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'study_complete' }) }).catch(() => {})
           setStep('summary')
         } else {
+          if (idx === 2 && !user) {
+            signupGuardCheck()
+            return
+          }
           setCurrentIndex(idx + 1)
         }
       } else {
@@ -106,6 +122,10 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
             fetch('/api/adventure/energy', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ activity: 'study_complete' }) }).catch(() => {})
             setStep('summary')
           } else {
+            if (idx === 2 && !user) {
+              signupGuardCheck()
+              return
+            }
             setCurrentIndex(idx + 1)
           }
         } else {
@@ -121,17 +141,33 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
             })
             return newCards
           })
+          if (idx === 2 && !user) {
+            signupGuardCheck()
+            return
+          }
           setCurrentIndex(idx + 1)
         }
       }
     },
-    [cards, currentIndex, onComplete]
+    [cards, currentIndex, onComplete, user]
   )
+
+  function signupGuardCheck() {
+    if (hasSignupModalBeenShown()) {
+      setSignupBlocked(true)
+    } else {
+      setSignupShown(true)
+    }
+  }
 
   const correctCount = results.filter((r) => r.correct === true).length
   const wrongCount = results.filter((r) => r.correct === false).length
   const totalDone = results.length
   const accuracy = totalDone > 0 ? Math.round((correctCount / totalDone) * 100) : 0
+
+  if (signupBlocked) {
+    return <SignupModal type="register" locale={locale} onClose={() => {}} />
+  }
 
   if (step === 'config') {
     return (
@@ -191,7 +227,9 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
   if (step === 'learning') {
     const currentCard = cards[currentIndex]
     return (
-      <div>
+      <>
+        {signupShown && <SignupModal type="register" locale={locale} onClose={handleSignupClose} />}
+        <div>
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
             <span>
@@ -220,6 +258,7 @@ export default function FlashcardSession({ articles, onComplete }: FlashcardSess
         </div>
         <Flashcard key={currentCard.id} word={currentCard.word} onResult={handleResult} />
       </div>
+      </>
     )
   }
 
