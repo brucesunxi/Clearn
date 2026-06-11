@@ -280,7 +280,7 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {levelFiltered.slice(artPage * 8, (artPage + 1) * 8).map((article) => {
+            {levelFiltered.slice(artPage * 4, (artPage + 1) * 4).map((article) => {
               const selected = selectedArticleIds.includes(article.id)
               const preview = article.paragraphs[0]?.text.slice(0, 60) || ''
               const lvlColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4']
@@ -334,14 +334,14 @@ export default function LearnPageClient({ levels, articles: baseArticles }: Lear
         )}
       </div>
 
-{Math.ceil(levelFiltered.length / 8) > 1 && (
+{Math.ceil(levelFiltered.length / 4) > 1 && (
         <div className="flex items-center justify-center gap-3 mt-4 mb-2">
           <button onClick={() => setArtPage((p) => Math.max(0, p - 1))} disabled={artPage === 0}
             className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
             ← {locale === 'zh' ? '上一页' : 'Prev'}
           </button>
-          <span className="text-xs text-gray-400">{artPage + 1} / {Math.ceil(levelFiltered.length / 8)}</span>
-          <button onClick={() => setArtPage((p) => Math.min(Math.ceil(levelFiltered.length / 8) - 1, p + 1))} disabled={artPage >= Math.ceil(levelFiltered.length / 8) - 1}
+          <span className="text-xs text-gray-400">{artPage + 1} / {Math.ceil(levelFiltered.length / 4)}</span>
+          <button onClick={() => setArtPage((p) => Math.min(Math.ceil(levelFiltered.length / 4) - 1, p + 1))} disabled={artPage >= Math.ceil(levelFiltered.length / 4) - 1}
             className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
             {locale === 'zh' ? '下一页' : 'Next'} →
           </button>
