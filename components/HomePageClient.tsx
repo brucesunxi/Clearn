@@ -140,7 +140,7 @@ export default function HomePageClient({ totalArticles }: HomePageClientProps) {
         </h1>
         <p className="text-gray-500 text-base leading-relaxed">
           {locale === 'zh'
-            ? '菲律宾、马来西亚华人免费中文自学工具，自主刷题练习，无真人课程'
+            ? '海外华人免费中文自学工具，自主刷题练习，无真人课程'
             : 'Free Chinese self-study tool for overseas children. Practice vocabulary, reading, and listening with gamified exercises.'}
           <br />
           <span className="text-xs text-gray-400 mt-1 inline-block">
